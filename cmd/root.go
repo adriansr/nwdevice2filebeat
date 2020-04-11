@@ -40,10 +40,10 @@ func LogError(msg string, keysAndValues ...interface{}) {
 	var sb strings.Builder
 	sb.WriteString("Error: ")
 	sb.WriteString(msg)
-	for i := 0; i < len(keysAndValues); i+= 2 {
+	for i := 0; i < len(keysAndValues); i += 2 {
 		sb.WriteString(fmt.Sprintf(" %s=%v", keysAndValues[i], keysAndValues[i+1]))
 	}
-	if len(keysAndValues) & 1 != 0 {
+	if len(keysAndValues)&1 != 0 {
 		sb.WriteString(fmt.Sprintf(" %s=%v", "_unmatched_", keysAndValues[len(keysAndValues)-1]))
 	}
 	log.Println(sb.String())

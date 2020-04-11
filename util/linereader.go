@@ -26,7 +26,7 @@ func (lc *LineReader) Read(p []byte) (n int, err error) {
 		if lc.err != nil && len(lc.buf) == 0 {
 			return 0, lc.err
 		}
-		lc.line ++
+		lc.line++
 		lc.startOffset = lc.offset
 		lc.offset += uint64(len(lc.buf))
 	}

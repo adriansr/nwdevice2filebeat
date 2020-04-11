@@ -41,4 +41,3 @@ func init() {
 	generateCmd.MarkPersistentFlagRequired("device")
 	//generateCmd.PersistentFlags().StringVar(&devicePath, "fileset", "", "Generated fileset name")
 }
-

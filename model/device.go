@@ -19,7 +19,7 @@ import (
 )
 
 type Device struct {
-	XMLPath string
+	XMLPath                  string
 	name, displayName, group string
 }
 
@@ -41,7 +41,7 @@ func NewDevice(path string) (Device, error) {
 		return Device{}, errors.Errorf("exactly one XML file expected in path, found=%+v", xmlFiles)
 	}
 
-	dev := Device {
+	dev := Device{
 		XMLPath: xmlFiles[0],
 	}
 	return dev, dev.load()
@@ -50,7 +50,7 @@ func NewDevice(path string) (Device, error) {
 func listFilesByExtensions(dir string) (filesByExt map[string][]string, err error) {
 	filesByExt = make(map[string][]string)
 	return filesByExt, filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if info==nil || info.IsDir() {
+		if info == nil || info.IsDir() {
 			return nil
 		}
 		ext := strings.ToLower(filepath.Ext(info.Name()))
@@ -72,7 +72,7 @@ func (p xmlPos) String() string {
 type stateFn func(dev *Device, token xml.Token, pos xmlPos) (xmlState, error)
 
 func name(n string) xml.Name {
-	return xml.Name {
+	return xml.Name{
 		Local: n,
 	}
 }
@@ -107,45 +107,45 @@ const (
 	xmlStateEnd
 )
 
-var xmlStates = map[xmlState]stateFn {
-	xmlStateProcInst: stateProcInst,
-	xmlStateBody: stateBody,
+var xmlStates = map[xmlState]stateFn{
+	xmlStateProcInst:       stateProcInst,
+	xmlStateBody:           stateBody,
 	xmlStateDeviceMessages: deviceMessagesState,
-	xmlStateHeader: stateHeader,
-	xmlStateHeaderClose: closeTagDecoder(name("HEADER"), xmlStateBody),
-	xmlStateVersion: stateVersion,
-	xmlStateVersionClose: closeTagDecoder(name("VERSION"), xmlStateBody),
-	xmlStateValueMap: stateValueMap,
-	xmlStateValueMapClose: closeTagDecoder(name("VALUEMAP"), xmlStateBody),
+	xmlStateHeader:         stateHeader,
+	xmlStateHeaderClose:    closeTagDecoder(name("HEADER"), xmlStateBody),
+	xmlStateVersion:        stateVersion,
+	xmlStateVersionClose:   closeTagDecoder(name("VERSION"), xmlStateBody),
+	xmlStateValueMap:       stateValueMap,
+	xmlStateValueMapClose:  closeTagDecoder(name("VALUEMAP"), xmlStateBody),
 	//xmlStateTagValueMap: stateTagValueMap,
 	//xmlStateTagValueMapClose: closeTagDecoder(name("TAGVALUEMAP"), xmlStateBody),
-	xmlStateTagValMap: stateTagValMap,
+	xmlStateTagValMap:      stateTagValMap,
 	xmlStateTagValMapClose: closeTagDecoder(name("TAGVALMAP"), xmlStateBody),
-	xmlStateMessage: stateMessage,
-	xmlStateMessageClose: closeTagDecoder(name("MESSAGE"), xmlStateBody),
-	xmlStateVarType: stateVarType,
-	xmlStateVarTypeClose: closeTagDecoder(name("VARTYPE"), xmlStateBody),
-	xmlStateRegX: stateRegX,
-	xmlStateRegXClose: closeTagDecoder(name("REGX"), xmlStateBody),
-	xmlStateSumData: stateSumData,
-	xmlStateSumDataClose: closeTagDecoder(name("SUMDATA"), xmlStateBody),
-	xmlStateEnd: stateEnd,
+	xmlStateMessage:        stateMessage,
+	xmlStateMessageClose:   closeTagDecoder(name("MESSAGE"), xmlStateBody),
+	xmlStateVarType:        stateVarType,
+	xmlStateVarTypeClose:   closeTagDecoder(name("VARTYPE"), xmlStateBody),
+	xmlStateRegX:           stateRegX,
+	xmlStateRegXClose:      closeTagDecoder(name("REGX"), xmlStateBody),
+	xmlStateSumData:        stateSumData,
+	xmlStateSumDataClose:   closeTagDecoder(name("SUMDATA"), xmlStateBody),
+	xmlStateEnd:            stateEnd,
 }
 
 var deviceMessagesState = tagDecoder(name("DEVICEMESSAGES"), map[xml.Name]attrExtractor{
-		name("name"): func(value string, dev *Device, pos xmlPos) error {
-			dev.name = value
-			return nil
-		},
-		name("displayname"): func(value string, dev *Device, pos xmlPos) error {
-			dev.displayName = value
-			return nil
-		},
-		name("group"): func(value string, dev *Device, pos xmlPos) error {
-			dev.group = value
-			return nil
-		},
-	}, xmlStateDeviceMessages, xmlStateBody)
+	name("name"): func(value string, dev *Device, pos xmlPos) error {
+		dev.name = value
+		return nil
+	},
+	name("displayname"): func(value string, dev *Device, pos xmlPos) error {
+		dev.displayName = value
+		return nil
+	},
+	name("group"): func(value string, dev *Device, pos xmlPos) error {
+		dev.group = value
+		return nil
+	},
+}, xmlStateDeviceMessages, xmlStateBody)
 
 var stateHeader = tagDecoder(name("HEADER"), map[xml.Name]attrExtractor{
 	name("id1"): func(value string, dev *Device, pos xmlPos) error {
@@ -207,7 +207,6 @@ var stateVersion = tagDecoder(name("VERSION"), map[xml.Name]attrExtractor{
 	},
 }, xmlStateTagValueMap, xmlStateTagValueMapClose)*/
 
-
 var stateTagValMap = tagDecoder(name("TAGVALMAP"), map[xml.Name]attrExtractor{
 	name("delimiter"): func(value string, dev *Device, pos xmlPos) error {
 		return nil
@@ -225,7 +224,6 @@ var stateTagValMap = tagDecoder(name("TAGVALMAP"), map[xml.Name]attrExtractor{
 		return nil
 	},
 }, xmlStateTagValMap, xmlStateTagValMapClose)
-
 
 var stateValueMap = tagDecoder(name("VALUEMAP"), map[xml.Name]attrExtractor{
 	name("name"): func(value string, dev *Device, pos xmlPos) error {
@@ -323,16 +321,16 @@ var stateSumData = tagDecoder(name("SUMDATA"), map[xml.Name]attrExtractor{
 	},
 }, xmlStateSumData, xmlStateSumDataClose)
 
-var allowedBodyTags = map[xml.Name]stateFn {
-	name("HEADER"): stateHeader,
-	name("VERSION"): stateVersion,
-	name("TAGVALMAP"):stateTagValMap,
+var allowedBodyTags = map[xml.Name]stateFn{
+	name("HEADER"):    stateHeader,
+	name("VERSION"):   stateVersion,
+	name("TAGVALMAP"): stateTagValMap,
 	//name("TAGVALUEMAP"):stateTagValueMap, // TODO: Check
-	name("VALUEMAP"):stateValueMap,
-	name("MESSAGE"): stateMessage,
-	name("VARTYPE"): stateVarType,
-	name("REGX"): stateRegX,
-	name("SUMDATA"): stateSumData,
+	name("VALUEMAP"): stateValueMap,
+	name("MESSAGE"):  stateMessage,
+	name("VARTYPE"):  stateVarType,
+	name("REGX"):     stateRegX,
+	name("SUMDATA"):  stateSumData,
 }
 
 func stateBody(dev *Device, token xml.Token, pos xmlPos) (xmlState, error) {
@@ -427,7 +425,7 @@ func tagDecoder(expected xml.Name, attribs map[xml.Name]attrExtractor, self xmlS
 					return xmlStateErr, errors.Errorf("attribute:%v not expected for tag:%v", attr.Name, v.Name)
 				}
 				if err := fn(attr.Value, dev, pos); err != nil {
-					return xmlStateErr, errors.Wrapf(err,"error parsing attribute '%v'", attr.Name)
+					return xmlStateErr, errors.Wrapf(err, "error parsing attribute '%v'", attr.Name)
 				}
 			}
 			return next, nil
@@ -458,7 +456,7 @@ func (dev *Device) load() error {
 	decoder.CharsetReader = charset.NewReaderLabel
 
 	state := xmlStateProcInst
-	pos := xmlPos {
+	pos := xmlPos{
 		path: dev.XMLPath,
 	}
 	for {
@@ -470,14 +468,14 @@ func (dev *Device) load() error {
 			break
 		}
 		if err != nil {
-			return errors.Wrapf(err,"error reading at %s", pos)
+			return errors.Wrapf(err, "error reading at %s", pos)
 		}
 		fn, exists := xmlStates[state]
 		if !exists {
 			return errors.Errorf("internal error: unknown state %v", state)
 		}
 		if state, err = fn(dev, token, pos); err != nil {
-			return errors.Wrapf(err,"error decoding at %s", pos)
+			return errors.Wrapf(err, "error decoding at %s", pos)
 		}
 	}
 	if state != xmlStateEnd {

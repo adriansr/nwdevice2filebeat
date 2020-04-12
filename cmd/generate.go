@@ -21,23 +21,14 @@ var generateCmd = &cobra.Command{
 		}
 		dev, err := model.NewDevice(devicePath)
 		if err != nil {
-			LogError("Failed to load device", "path", devicePath, "error", err)
+			LogError("Failed to load device", "path", devicePath, "reason", err)
 			return
 		}
-		log.Print("Loading device from XML=", dev.XMLPath)
+		log.Printf("Loaded device %s", dev.String())
 	},
 }
 
-//var devicePath string
-
 func init() {
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	//rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	//rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
-
-	//generateCmd.AddCommand()
-	//generateCmd.PersistentFlags().StringVar(&devicePath, "moduledir", "module", "Path to destination module dir")
 	generateCmd.PersistentFlags().String("device", "", "Input device path")
 	generateCmd.MarkPersistentFlagRequired("device")
-	//generateCmd.PersistentFlags().StringVar(&devicePath, "fileset", "", "Generated fileset name")
 }

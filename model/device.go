@@ -19,8 +19,18 @@ import (
 )
 
 type Device struct {
-	XMLPath                  string
-	name, displayName, group string
+	XMLPath string
+	Header  DeviceMessages
+
+	version Version
+
+	headers    []*Header
+	messages   []*Message
+	tagValMaps []*TagValMap
+	valueMaps  []*ValueMap
+	varTypes   []*VarType
+	regexs     []*RegX
+	sumDatas   []*SumData
 }
 
 // New turns a new Device from the given path path.
@@ -29,7 +39,7 @@ func NewDevice(path string) (Device, error) {
 	if err != nil {
 		return Device{}, err
 	}
-	log.Printf("Loaded files: %+v", files)
+	log.Printf("Found files: %+v", files)
 
 	xmlFiles := files[".xml"]
 	// Device log parser dirs only contain one XML.
@@ -44,402 +54,14 @@ func NewDevice(path string) (Device, error) {
 	dev := Device{
 		XMLPath: xmlFiles[0],
 	}
-	return dev, dev.load()
-}
-
-func listFilesByExtensions(dir string) (filesByExt map[string][]string, err error) {
-	filesByExt = make(map[string][]string)
-	return filesByExt, filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if info == nil || info.IsDir() {
-			return nil
-		}
-		ext := strings.ToLower(filepath.Ext(info.Name()))
-		filesByExt[ext] = append(filesByExt[ext], path)
-		return nil
-	})
-}
-
-type xmlPos struct {
-	path string
-	line uint64
-	col  uint64
-}
-
-func (p xmlPos) String() string {
-	return fmt.Sprintf("%s:%d:%d", p.path, p.line, p.col)
-}
-
-type stateFn func(dev *Device, token xml.Token, pos xmlPos) (xmlState, error)
-
-func name(n string) xml.Name {
-	return xml.Name{
-		Local: n,
+	if err = dev.load(); err != nil {
+		return dev, err
 	}
+	return dev, nil
 }
 
-type attrExtractor func(value string, dev *Device, pos xmlPos) error
-
-type xmlState int
-
-const (
-	xmlStateErr xmlState = iota
-	xmlStateProcInst
-	xmlStateDeviceMessages
-	xmlStateBody
-	xmlStateHeader
-	xmlStateHeaderClose
-	xmlStateVersion
-	xmlStateVersionClose
-	xmlStateValueMap
-	xmlStateValueMapClose
-	//xmlStateTagValueMap
-	//xmlStateTagValueMapClose
-	xmlStateTagValMap
-	xmlStateTagValMapClose
-	xmlStateMessage
-	xmlStateMessageClose
-	xmlStateVarType
-	xmlStateVarTypeClose
-	xmlStateRegX
-	xmlStateRegXClose
-	xmlStateSumData
-	xmlStateSumDataClose
-	xmlStateEnd
-)
-
-var xmlStates = map[xmlState]stateFn{
-	xmlStateProcInst:       stateProcInst,
-	xmlStateBody:           stateBody,
-	xmlStateDeviceMessages: deviceMessagesState,
-	xmlStateHeader:         stateHeader,
-	xmlStateHeaderClose:    closeTagDecoder(name("HEADER"), xmlStateBody),
-	xmlStateVersion:        stateVersion,
-	xmlStateVersionClose:   closeTagDecoder(name("VERSION"), xmlStateBody),
-	xmlStateValueMap:       stateValueMap,
-	xmlStateValueMapClose:  closeTagDecoder(name("VALUEMAP"), xmlStateBody),
-	//xmlStateTagValueMap: stateTagValueMap,
-	//xmlStateTagValueMapClose: closeTagDecoder(name("TAGVALUEMAP"), xmlStateBody),
-	xmlStateTagValMap:      stateTagValMap,
-	xmlStateTagValMapClose: closeTagDecoder(name("TAGVALMAP"), xmlStateBody),
-	xmlStateMessage:        stateMessage,
-	xmlStateMessageClose:   closeTagDecoder(name("MESSAGE"), xmlStateBody),
-	xmlStateVarType:        stateVarType,
-	xmlStateVarTypeClose:   closeTagDecoder(name("VARTYPE"), xmlStateBody),
-	xmlStateRegX:           stateRegX,
-	xmlStateRegXClose:      closeTagDecoder(name("REGX"), xmlStateBody),
-	xmlStateSumData:        stateSumData,
-	xmlStateSumDataClose:   closeTagDecoder(name("SUMDATA"), xmlStateBody),
-	xmlStateEnd:            stateEnd,
-}
-
-var deviceMessagesState = tagDecoder(name("DEVICEMESSAGES"), map[xml.Name]attrExtractor{
-	name("name"): func(value string, dev *Device, pos xmlPos) error {
-		dev.name = value
-		return nil
-	},
-	name("displayname"): func(value string, dev *Device, pos xmlPos) error {
-		dev.displayName = value
-		return nil
-	},
-	name("group"): func(value string, dev *Device, pos xmlPos) error {
-		dev.group = value
-		return nil
-	},
-}, xmlStateDeviceMessages, xmlStateBody)
-
-var stateHeader = tagDecoder(name("HEADER"), map[xml.Name]attrExtractor{
-	name("id1"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("id2"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("eventcategory"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("missField"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("tagval"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("functions"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("content"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("messageid"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("prioritize"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("devts"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateHeader, xmlStateHeaderClose)
-
-var stateVersion = tagDecoder(name("VERSION"), map[xml.Name]attrExtractor{
-	name("xml"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("checksum"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("revision"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("device"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("enVision"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateVersion, xmlStateVersionClose)
-
-/*var stateTagValueMap = tagDecoder(name("TAGVALUEMAP"), map[xml.Name]attrExtractor{
-	name("pairdelimiter"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("encapsulator"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateTagValueMap, xmlStateTagValueMapClose)*/
-
-var stateTagValMap = tagDecoder(name("TAGVALMAP"), map[xml.Name]attrExtractor{
-	name("delimiter"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("valuedelimiter"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("pairdelimiter"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("escapeValueDelim"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("encapsulator"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateTagValMap, xmlStateTagValMapClose)
-
-var stateValueMap = tagDecoder(name("VALUEMAP"), map[xml.Name]attrExtractor{
-	name("name"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("default"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("keyvaluepairs"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateValueMap, xmlStateValueMapClose)
-
-var stateVarType = tagDecoder(name("VARTYPE"), map[xml.Name]attrExtractor{
-	name("name"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("regex"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("ignorecase"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateVarType, xmlStateVarTypeClose)
-
-var stateMessage = tagDecoder(name("MESSAGE"), map[xml.Name]attrExtractor{
-	name("id1"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("id2"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("eventcategory"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("missField"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("tagval"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("functions"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("content"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("messageid"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("level"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("parse"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("parsedefvalue"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("tableid"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("summary"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateMessage, xmlStateMessageClose)
-
-var stateRegX = tagDecoder(name("REGX"), map[xml.Name]attrExtractor{
-	name("name"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("parms"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("default"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("expr"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateRegX, xmlStateRegXClose)
-
-var stateSumData = tagDecoder(name("SUMDATA"), map[xml.Name]attrExtractor{
-	name("bucket"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("key"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("subkey"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-	name("fields"): func(value string, dev *Device, pos xmlPos) error {
-		return nil
-	},
-}, xmlStateSumData, xmlStateSumDataClose)
-
-var allowedBodyTags = map[xml.Name]stateFn{
-	name("HEADER"):    stateHeader,
-	name("VERSION"):   stateVersion,
-	name("TAGVALMAP"): stateTagValMap,
-	//name("TAGVALUEMAP"):stateTagValueMap, // TODO: Check
-	name("VALUEMAP"): stateValueMap,
-	name("MESSAGE"):  stateMessage,
-	name("VARTYPE"):  stateVarType,
-	name("REGX"):     stateRegX,
-	name("SUMDATA"):  stateSumData,
-}
-
-func stateBody(dev *Device, token xml.Token, pos xmlPos) (xmlState, error) {
-	switch v := token.(type) {
-	case xml.StartElement:
-		fn, found := allowedBodyTags[v.Name]
-		if !found {
-			return xmlStateErr, errors.Errorf("unexpected XML tag:%s", v.Name)
-		}
-		return fn(dev, token, pos)
-
-	case xml.ProcInst:
-		return xmlStateErr, errors.Errorf("unexpected XML: ProcInst found while scanning for body")
-
-	case xml.CharData, xml.Comment, xml.Directive: // ignore
-		return xmlStateBody, nil
-
-	case xml.EndElement:
-		if v.Name != name("DEVICEMESSAGES") {
-			return xmlStateErr, errors.Errorf("unexpected closing tag:%s", v.Name)
-		}
-		return xmlStateEnd, nil
-
-	default:
-		return xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
-	}
-}
-
-func stateProcInst(dev *Device, token xml.Token, pos xmlPos) (xmlState, error) {
-	switch v := token.(type) {
-	case xml.StartElement:
-		return deviceMessagesState(dev, token, pos)
-
-	case xml.EndElement:
-		return xmlStateErr, errors.Errorf("found unexpected XML end element while scanning for XML header: %s", v.Name)
-
-	case xml.CharData, xml.Comment, xml.Directive: // ignore
-		log.Printf("ignore element %v", token)
-		return xmlStateProcInst, nil
-
-	case xml.ProcInst:
-		log.Printf("ProcInst target=%s data=%s", v.Target, v.Inst)
-		return xmlStateDeviceMessages, nil
-
-	default:
-		return xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
-	}
-}
-
-func stateEnd(dev *Device, token xml.Token, pos xmlPos) (xmlState, error) {
-	switch token.(type) {
-	case xml.CharData, xml.Comment, xml.Directive: // ignore
-		log.Printf("ignore element %v", token)
-		return xmlStateEnd, nil
-
-	default:
-		return xmlStateErr, errors.Errorf("unexpected XML token found after end: %v", token)
-	}
-}
-
-func closeTagDecoder(expected xml.Name, next xmlState) stateFn {
-	return func(dev *Device, token xml.Token, pos xmlPos) (xmlState, error) {
-		switch v := token.(type) {
-		case xml.EndElement:
-			if v.Name != expected {
-				return xmlStateErr, errors.Errorf("unexpected closing tag:%v found. Expected:%v", v.Name, expected)
-			}
-			return next, nil
-
-		case xml.StartElement:
-			return xmlStateErr, errors.Errorf("unexpected nesteg tag:%v found. Expected closing tag:%v", v.Name, expected)
-
-		case xml.CharData, xml.Comment, xml.Directive, xml.ProcInst: // ignore
-			return xmlStateErr, errors.Errorf("unexpected XML %v found while scanning for closing tag: %s", v, expected)
-
-		default:
-			return xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
-		}
-	}
-}
-
-func tagDecoder(expected xml.Name, attribs map[xml.Name]attrExtractor, self xmlState, next xmlState) stateFn {
-	return func(dev *Device, token xml.Token, pos xmlPos) (xmlState, error) {
-		switch v := token.(type) {
-		case xml.StartElement:
-			if v.Name != expected {
-				return xmlStateErr, errors.Errorf("unexpected tag:%v found. Expected:%v", v.Name, expected)
-			}
-			for _, attr := range v.Attr {
-				fn, found := attribs[attr.Name]
-				if !found {
-					return xmlStateErr, errors.Errorf("attribute:%v not expected for tag:%v", attr.Name, v.Name)
-				}
-				if err := fn(attr.Value, dev, pos); err != nil {
-					return xmlStateErr, errors.Wrapf(err, "error parsing attribute '%v'", attr.Name)
-				}
-			}
-			return next, nil
-
-		case xml.EndElement, xml.ProcInst:
-			return xmlStateErr, errors.Errorf("unexpected XML %v found while scanning for start element: %s", v, expected)
-
-		case xml.CharData, xml.Comment, xml.Directive: // ignore
-			return self, nil
-
-		default:
-			return xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
-		}
-	}
+func (dev *Device) String() string {
+	return fmt.Sprintf("device={%s, xml:'%s'}", dev.Header.String(), dev.XMLPath)
 }
 
 func (dev *Device) load() error {
@@ -456,13 +78,15 @@ func (dev *Device) load() error {
 	decoder.CharsetReader = charset.NewReaderLabel
 
 	state := xmlStateProcInst
-	pos := xmlPos{
-		path: dev.XMLPath,
+	pos := XMLPos{
+		Path: dev.XMLPath,
 	}
+
+	numItems := 0
 	for {
 		// Save pos before reading a token otherwise it points to the end
 		// of a tag.
-		pos.line, pos.col = lineReader.Position(uint64(decoder.InputOffset()))
+		pos.Line, pos.Col = lineReader.Position(uint64(decoder.InputOffset()))
 		token, err := decoder.Token()
 		if err == io.EOF {
 			break
@@ -472,14 +96,382 @@ func (dev *Device) load() error {
 		}
 		fn, exists := xmlStates[state]
 		if !exists {
-			return errors.Errorf("internal error: unknown state %v", state)
+			return errors.Errorf("at %s: internal error: unknown state %v", pos, state)
 		}
-		if state, err = fn(dev, token, pos); err != nil {
+		var item XMLElement
+		item, state, err = fn(token, decoder)
+		if err != nil {
 			return errors.Wrapf(err, "error decoding at %s", pos)
+		}
+		if item != nil {
+			numItems++
+			item.SetPos(pos)
+			if err = item.Apply(dev); err != nil {
+				return errors.Wrapf(err, "error applying item at %s", pos)
+			}
 		}
 	}
 	if state != xmlStateEnd {
-		return errors.Errorf("error decoding at %s: Unexpected file EOF", pos)
+		return errors.Errorf("error decoding at %s: Unexpected EOF", pos)
 	}
+	log.Printf("loaded %d elements", numItems)
 	return nil
+}
+
+func listFilesByExtensions(dir string) (filesByExt map[string][]string, err error) {
+	filesByExt = make(map[string][]string)
+	return filesByExt, filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if info == nil || info.IsDir() {
+			return nil
+		}
+		ext := strings.ToLower(filepath.Ext(info.Name()))
+		filesByExt[ext] = append(filesByExt[ext], path)
+		return nil
+	})
+}
+
+type XMLPos struct {
+	Path string
+	Line uint64
+	Col  uint64
+}
+
+func (p XMLPos) String() string {
+	return fmt.Sprintf("%s:%d:%d", p.Path, p.Line, p.Col)
+}
+
+type stateFn func(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error)
+
+func name(n string) xml.Name {
+	return xml.Name{
+		Local: n,
+	}
+}
+
+func displayName(x xml.Name) string {
+	if x.Space == "" {
+		return x.Local
+	}
+	return x.Space + ":" + x.Local
+}
+
+type xmlState int
+
+const (
+	xmlStateErr xmlState = iota
+	xmlStateProcInst
+	xmlStateDeviceMessages
+	xmlStateBody
+	xmlStateEnd
+)
+
+var xmlStates = map[xmlState]stateFn{
+	xmlStateProcInst:       stateProcInst,
+	xmlStateBody:           stateBody,
+	xmlStateDeviceMessages: stateDeviceMessages,
+	xmlStateEnd:            stateEnd,
+}
+
+type XMLElement interface {
+	XMLDecodingError() error
+	Pos() XMLPos
+	SetPos(XMLPos)
+	Apply(*Device) error
+}
+
+type XMLBaseElement struct {
+	location    XMLPos
+	UnknownAttr []xml.Attr `xml:",any,attr"`
+	UnknownXML  []byte     `xml:",innerxml"`
+}
+
+func (e *XMLBaseElement) Pos() XMLPos {
+	return e.location
+}
+
+func (e *XMLBaseElement) SetPos(p XMLPos) {
+	e.location = p
+}
+
+func (e *XMLBaseElement) XMLDecodingError() error {
+	hasAttr, hasXML := len(e.UnknownAttr) != 0, len(e.UnknownXML) != 0
+	if !hasAttr && !hasXML {
+		return nil
+	}
+	var sb strings.Builder
+	if hasAttr {
+		sb.WriteString("unknown attributes=")
+		for idx, attr := range e.UnknownAttr {
+			if idx > 0 {
+				sb.WriteByte(',')
+			} else {
+				sb.WriteByte('[')
+			}
+			sb.WriteByte('"')
+			sb.WriteString(displayName(attr.Name))
+			sb.WriteByte('"')
+		}
+		sb.WriteByte(']')
+	}
+	if hasXML {
+		if hasAttr {
+			sb.WriteString(", ")
+		}
+		sb.WriteString(fmt.Sprintf("unexpected inner XML=\"%s\"", string(e.UnknownXML)))
+	}
+	return errors.New(sb.String())
+}
+
+type DeviceMessages struct {
+	XMLBaseElement
+	Name        string `xml:"name,attr"`
+	DisplayName string `xml:"displayname,attr"`
+	Group       string `xml:"group,attr"`
+}
+
+func (h DeviceMessages) String() string {
+	return fmt.Sprintf("header={name:'%s', displayName:'%s', group:'%s'}",
+		h.Name, h.DisplayName, h.Group)
+}
+
+func (h *DeviceMessages) Apply(dev *Device) error {
+	dev.Header = *h
+	return nil
+}
+
+type Header struct {
+	XMLBaseElement
+	ID1           string `xml:"id1,attr"`
+	ID2           string `xml:"id2,attr"`
+	EventCategory string `xml:"eventcategory,attr"`
+	MissField     string `xml:"missField,attr"`
+	TagVal        string `xml:"tagval,attr"`
+	Functions     string `xml:"functions,attr"`
+	Content       string `xml:"content,attr"`
+	MessageID     string `xml:"messageid,attr"`
+	Prioritize    string `xml:"prioritize,attr"`
+	Devts         string `xml:"devts,attr"`
+}
+
+func (h *Header) Apply(dev *Device) error {
+	dev.headers = append(dev.headers, h)
+	return nil
+}
+
+type Version struct {
+	XMLBaseElement
+	Xml      string `xml:"xml,attr"`
+	Checksum string `xml:"checksum,attr"`
+	Revision string `xml:"revision,attr"`
+	Device   string `xml:"device,attr"`
+	EnVision string `xml:"enVision,attr"`
+}
+
+func (v *Version) Apply(dev *Device) error {
+	var unset XMLPos
+	if dev.version.Pos() != unset {
+		return errors.Errorf("VERSION already set from %s", dev.version.Pos())
+	}
+	dev.version = *v
+	return nil
+}
+
+type TagValMap struct {
+	XMLBaseElement
+	Delimiter         string `xml:"delimiter,attr"`
+	ValueDelimiter    string `xml:"valuedelimiter,attr"`
+	PairDelimiter     string `xml:"pairdelimiter,attr"`
+	EscapeValueDelimt string `xml:"escapeValueDelim,attr"`
+	Encapsulator      string `xml:"encapsulator,attr"`
+}
+
+func (tvm *TagValMap) Apply(dev *Device) error {
+	dev.tagValMaps = append(dev.tagValMaps, tvm)
+	return nil
+}
+
+type ValueMap struct {
+	XMLBaseElement
+	Name          string `xml:"name,attr"`
+	Default       string `xml:"default,attr"`
+	KeyValuePairs string `xml:"keyvaluepairs,attr"`
+}
+
+func (vm *ValueMap) Apply(dev *Device) error {
+	dev.valueMaps = append(dev.valueMaps, vm)
+	return nil
+}
+
+type Message struct {
+	XMLBaseElement
+	ID1           string `xml:"id1,attr"`
+	ID2           string `xml:"id2,attr"`
+	EventCategory string `xml:"eventcategory,attr"`
+	MissField     string `xml:"missField,attr"`
+	TagVal        string `xml:"tagval,attr"`
+	Functions     string `xml:"functions,attr"`
+	Content       string `xml:"content,attr"`
+	MessageID     string `xml:"messageid,attr"`
+	Level         string `xml:"level,attr"`
+	Parse         string `xml:"parse,attr"`
+	ParseDefValue string `xml:"parsedefvalue,attr"`
+	TableID       string `xml:"tableid,attr"`
+	Summary       string `xml:"summary,attr"`
+}
+
+func (m *Message) Apply(dev *Device) error {
+	dev.messages = append(dev.messages, m)
+	return nil
+}
+
+type VarType struct {
+	XMLBaseElement
+	Name       string `xml:"name,attr"`
+	Regex      string `xml:"regex,attr"`
+	IgnoreCase string `xml:"ignorecase,attr"`
+}
+
+func (vt *VarType) Apply(dev *Device) error {
+	dev.varTypes = append(dev.varTypes, vt)
+	return nil
+}
+
+type RegX struct {
+	XMLBaseElement
+	Name    string `xml:"name,attr"`
+	Parms   string `xml:"parms,attr"`
+	Default string `xml:"default,attr"`
+	Expr    string `xml:"expr,attr"`
+}
+
+func (rx *RegX) Apply(dev *Device) error {
+	dev.regexs = append(dev.regexs, rx)
+	return nil
+}
+
+type SumData struct {
+	XMLBaseElement
+	Bucket string `xml:"bucket,attr"`
+	Key    string `xml:"key,attr"`
+	SubKey string `xml:"subkey,attr"`
+	Fields string `xml:"fields,attr"`
+}
+
+func (sd *SumData) Apply(dev *Device) error {
+	dev.sumDatas = append(dev.sumDatas, sd)
+	return nil
+}
+
+var allowedBodyTags = map[xml.Name]func() XMLElement{
+	name("HEADER"):    func() XMLElement { return new(Header) },
+	name("VERSION"):   func() XMLElement { return new(Version) },
+	name("TAGVALMAP"): func() XMLElement { return new(TagValMap) },
+	name("VALUEMAP"):  func() XMLElement { return new(ValueMap) },
+	name("MESSAGE"):   func() XMLElement { return new(Message) },
+	name("VARTYPE"):   func() XMLElement { return new(VarType) },
+	name("REGX"):      func() XMLElement { return new(RegX) },
+	name("SUMDATA"):   func() XMLElement { return new(SumData) },
+}
+
+func stateBody(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error) {
+	switch v := token.(type) {
+	case xml.StartElement:
+		alloc, ok := allowedBodyTags[v.Name]
+		if !ok {
+			return nil, xmlStateErr, errors.Errorf("unexpected XML tag found: %s", displayName(v.Name))
+		}
+		e := alloc()
+		if err := decoder.DecodeElement(&e, &v); err != nil {
+			return nil, xmlStateErr, errors.Wrapf(err, "error decoding tag %s", displayName(v.Name))
+		}
+		if err := e.XMLDecodingError(); err != nil {
+			return nil, xmlStateErr, errors.Wrapf(err, "unexpected data decoding tag %s", displayName(v.Name))
+		}
+		return e, xmlStateBody, nil
+
+	case xml.ProcInst:
+		return nil, xmlStateErr, errors.Errorf("unexpected XML: ProcInst found while scanning for body")
+
+	case xml.CharData, xml.Comment, xml.Directive: // ignore
+		return nil, xmlStateBody, nil
+
+	case xml.EndElement:
+		if v.Name != name("DEVICEMESSAGES") {
+			return nil, xmlStateErr, errors.Errorf("unexpected closing tag:%s", displayName(v.Name))
+		}
+		return nil, xmlStateEnd, nil
+
+	default:
+		return nil, xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
+	}
+}
+
+func stateDeviceMessages(token xml.Token, _ *xml.Decoder) (XMLElement, xmlState, error) {
+	expected := name("DEVICEMESSAGES")
+	switch v := token.(type) {
+	case xml.StartElement:
+		if v.Name != expected {
+			return nil, xmlStateErr, errors.Errorf("unexpected tag:%v found. Expected:%v", v.Name, expected)
+		}
+		var dm DeviceMessages
+		// Manual decoding :(
+		// There is no way to decode this element using standard library without
+		// decoding all the inner XML (messages, headers, etc.)
+		for _, attr := range v.Attr {
+			switch name := displayName(attr.Name); name {
+			case "name":
+				dm.Name = attr.Value
+			case "displayname":
+				dm.DisplayName = attr.Value
+			case "group":
+				dm.Group = attr.Value
+			default:
+				return nil, xmlStateErr, errors.Errorf("unexpected attribute in %s: %s", displayName(expected), name)
+			}
+		}
+		return &dm, xmlStateBody, nil
+
+	case xml.ProcInst:
+		return nil, xmlStateErr, errors.Errorf("unexpected XML: ProcInst found while scanning for %s", displayName(expected))
+
+	case xml.CharData, xml.Comment, xml.Directive: // ignore
+		return nil, xmlStateDeviceMessages, nil
+
+	case xml.EndElement:
+		return nil, xmlStateErr, errors.Errorf("unexpected closing tag:%s", displayName(v.Name))
+
+	default:
+		return nil, xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
+	}
+}
+
+func stateProcInst(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error) {
+	switch v := token.(type) {
+	case xml.StartElement:
+		return stateDeviceMessages(token, decoder)
+
+	case xml.EndElement:
+		return nil, xmlStateErr, errors.Errorf("found unexpected XML end element while scanning for XML header: %s", v.Name)
+
+	case xml.CharData, xml.Comment, xml.Directive: // ignore
+		//log.Printf("ignore element %v", token)
+		return nil, xmlStateProcInst, nil
+
+	case xml.ProcInst:
+		//log.Printf("ProcInst target=%s data=%s", v.Target, v.Inst)
+		return nil, xmlStateDeviceMessages, nil
+
+	default:
+		return nil, xmlStateErr, errors.Errorf("unknown XML token found: %v", token)
+	}
+}
+
+func stateEnd(token xml.Token, _ *xml.Decoder) (XMLElement, xmlState, error) {
+	switch token.(type) {
+	case xml.CharData, xml.Comment, xml.Directive: // ignore
+		return nil, xmlStateEnd, nil
+
+	default:
+		return nil, xmlStateErr, errors.Errorf("unexpected XML token found after end: %v", token)
+	}
 }

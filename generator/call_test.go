@@ -37,7 +37,16 @@ func TestCall(t *testing.T) {
 				},
 			},
 		},
-
+		{
+			input: `*ESCAPED('here\'s a quote', 'and a \\ slash') `,
+			expected: Call {
+				Function: "ESCAPED",
+				Args: []Value{
+					Constant("here's a quote"),
+					Constant(`and a \ slash`),
+				},
+			},
+		},
 		{
 			input: "MY_FUN(field)",
 			expected: Call {
@@ -70,6 +79,10 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: "ALSO INVALID",
+			err: true,
+		},
+		{
+			input: `*THIS('is\'just'plain'wrong')`,
 			err: true,
 		},
 	} {

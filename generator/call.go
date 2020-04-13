@@ -10,12 +10,11 @@ import "github.com/pkg/errors"
 //line call.go:11
 var _parse_call_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 6,
-	6,
+	0, 0, 0, 6,
 }
 
 const parse_call_start int = 1
-const parse_call_first_final int = 15
+const parse_call_first_final int = 11
 const parse_call_error int = 0
 
 const parse_call_en_main int = 1
@@ -32,12 +31,12 @@ func ParseCall(data string) (call Call, err error) {
 	start := -1
 	err = ErrBadCall
 
-//line call.go:39
+//line call.go:38
 	{
 		cs = parse_call_start
 	}
 
-//line call.go:44
+//line call.go:43
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -160,7 +159,7 @@ func ParseCall(data string) (call Call, err error) {
 				goto tr17
 			}
 			goto tr1
-		case 15:
+		case 11:
 			if data[(p)] == 32 {
 				goto tr18
 			}
@@ -171,147 +170,38 @@ func ParseCall(data string) (call Call, err error) {
 		case 9:
 			switch data[(p)] {
 			case 39:
-				goto tr19
+				goto tr14
 			case 92:
-				goto tr16
+				goto tr14
 			}
-			goto tr14
+			goto tr1
 		case 10:
 			switch data[(p)] {
 			case 32:
-				goto tr20
-			case 39:
-				goto tr15
+				goto tr19
 			case 41:
-				goto tr21
-			case 44:
-				goto tr22
-			case 92:
-				goto tr16
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
 				goto tr20
-			}
-			goto tr14
-		case 16:
-			switch data[(p)] {
-			case 32:
+			case 44:
 				goto tr21
-			case 39:
-				goto tr15
-			case 92:
-				goto tr16
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr21
-			}
-			goto tr14
-		case 11:
-			switch data[(p)] {
-			case 32:
-				goto tr22
-			case 39:
-				goto tr23
-			case 92:
-				goto tr16
 			case 95:
-				goto tr24
+				goto tr22
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr19
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr22
+					}
+				case data[(p)] >= 65:
 					goto tr22
 				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr24
-					}
-				case data[(p)] >= 65:
-					goto tr24
-				}
 			default:
-				goto tr24
-			}
-			goto tr14
-		case 12:
-			switch data[(p)] {
-			case 32:
-				goto tr25
-			case 39:
-				goto tr12
-			case 41:
-				goto tr26
-			case 44:
-				goto tr27
-			case 92:
-				goto tr13
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr25
-			}
-			goto tr11
-		case 13:
-			switch data[(p)] {
-			case 32:
-				goto tr28
-			case 39:
-				goto tr15
-			case 41:
-				goto tr29
-			case 44:
-				goto tr30
-			case 92:
-				goto tr16
-			case 95:
-				goto tr31
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr28
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr31
-					}
-				case data[(p)] >= 65:
-					goto tr31
-				}
-			default:
-				goto tr31
-			}
-			goto tr14
-		case 14:
-			switch data[(p)] {
-			case 32:
-				goto tr32
-			case 41:
-				goto tr33
-			case 44:
-				goto tr34
-			case 95:
-				goto tr35
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr32
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr35
-					}
-				case data[(p)] >= 65:
-					goto tr35
-				}
-			default:
-				goto tr35
+				goto tr22
 			}
 			goto tr1
 		}
@@ -343,7 +233,7 @@ func ParseCall(data string) (call Call, err error) {
 	tr5:
 		cs = 5
 		goto f1
-	tr34:
+	tr21:
 		cs = 5
 		goto f4
 	tr9:
@@ -364,7 +254,7 @@ func ParseCall(data string) (call Call, err error) {
 	tr15:
 		cs = 8
 		goto f3
-	tr32:
+	tr19:
 		cs = 8
 		goto f4
 	tr16:
@@ -373,56 +263,17 @@ func ParseCall(data string) (call Call, err error) {
 	tr13:
 		cs = 9
 		goto f0
-	tr20:
-		cs = 10
-		goto _again
-	tr25:
-		cs = 10
-		goto f0
-	tr19:
-		cs = 10
-		goto f3
-	tr28:
-		cs = 10
-		goto f4
 	tr22:
-		cs = 11
-		goto _again
-	tr27:
-		cs = 11
-		goto f0
-	tr30:
-		cs = 11
-		goto f4
-	tr23:
-		cs = 12
-		goto f3
-	tr31:
-		cs = 13
-		goto _again
-	tr24:
-		cs = 13
-		goto f0
-	tr35:
-		cs = 14
+		cs = 10
 		goto _again
 	tr10:
-		cs = 14
+		cs = 10
 		goto f0
 	tr18:
-		cs = 15
+		cs = 11
 		goto _again
-	tr33:
-		cs = 15
-		goto f4
-	tr21:
-		cs = 16
-		goto _again
-	tr26:
-		cs = 16
-		goto f0
-	tr29:
-		cs = 16
+	tr20:
+		cs = 11
 		goto f4
 
 	f0:
@@ -440,7 +291,7 @@ func ParseCall(data string) (call Call, err error) {
 	f3:
 //line call.rl:39
 
-		call.Args = append(call.Args, Constant(data[start:p]))
+		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
 		goto _again
 	f4:
@@ -456,7 +307,7 @@ func ParseCall(data string) (call Call, err error) {
 
 //line call.rl:39
 
-		call.Args = append(call.Args, Constant(data[start:p]))
+		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
 		goto _again
 
@@ -477,7 +328,7 @@ func ParseCall(data string) (call Call, err error) {
 
 				err = nil
 
-//line call.go:410
+//line call.go:287
 			}
 		}
 

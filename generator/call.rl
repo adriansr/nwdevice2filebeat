@@ -28,7 +28,7 @@ func ParseCall(data string) (call Call, err error) {
         escape = "\\";
         escape_quote = escape quote;
         backslash = "\\\\";
-        str_chars = backslash | escape_quote | (any -- quote);
+        str_chars = backslash | escape_quote | (any -- quote -- escape);
 
         action mark {
             start = p;
@@ -37,7 +37,7 @@ func ParseCall(data string) (call Call, err error) {
             call.Function = data[start:p]
         }
         action capture_constant {
-            call.Args = append(call.Args, Constant(data[start:p]))
+            call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
         }
         action capture_field {
             call.Args = append(call.Args, Field(data[start:p]))

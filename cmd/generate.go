@@ -7,6 +7,7 @@ package cmd
 import (
 	"log"
 
+	"github.com/adriansr/nwdevice2filebeat/generator"
 	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,11 @@ var generateCmd = &cobra.Command{
 			LogError("Failed to load device", "path", devicePath, "reason", err)
 			return
 		}
-		log.Printf("Loaded device %s", dev.String())
+		log.Printf("Loaded XML %s", dev.String())
+		_, err = generator.New(dev)
+		if err != nil {
+			LogError("Failed to parse device", "path", devicePath, "reason", err)
+		}
 	},
 }
 

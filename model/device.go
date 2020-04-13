@@ -19,18 +19,17 @@ import (
 )
 
 type Device struct {
-	XMLPath string
-	Header  DeviceMessages
+	XMLPath     string
+	Description DeviceHeader
+	Version     Version
 
-	version Version
-
-	headers    []*Header
-	messages   []*Message
-	tagValMaps []*TagValMap
-	valueMaps  []*ValueMap
-	varTypes   []*VarType
-	regexs     []*RegX
-	sumDatas   []*SumData
+	Headers    []*Header
+	Messages   []*Message
+	TagValMaps []*TagValMap
+	ValueMaps  []*ValueMap
+	VarTypes   []*VarType
+	Regexs     []*RegX
+	SumDatas   []*SumData
 }
 
 // New turns a new Device from the given path path.
@@ -61,7 +60,7 @@ func NewDevice(path string) (Device, error) {
 }
 
 func (dev *Device) String() string {
-	return fmt.Sprintf("device={%s, xml:'%s'}", dev.Header.String(), dev.XMLPath)
+	return fmt.Sprintf("device={%s, %s, xml:'%s'}", dev.Description.String(), dev.Version.String(), dev.XMLPath)
 }
 
 func (dev *Device) load() error {
@@ -222,20 +221,20 @@ func (e *XMLBaseElement) XMLDecodingError() error {
 	return errors.New(sb.String())
 }
 
-type DeviceMessages struct {
+type DeviceHeader struct {
 	XMLBaseElement
 	Name        string `xml:"name,attr"`
 	DisplayName string `xml:"displayname,attr"`
 	Group       string `xml:"group,attr"`
 }
 
-func (h DeviceMessages) String() string {
-	return fmt.Sprintf("header={name:'%s', displayName:'%s', group:'%s'}",
+func (h DeviceHeader) String() string {
+	return fmt.Sprintf("description={name:'%s', displayName:'%s', group:'%s'}",
 		h.Name, h.DisplayName, h.Group)
 }
 
-func (h *DeviceMessages) Apply(dev *Device) error {
-	dev.Header = *h
+func (h *DeviceHeader) Apply(dev *Device) error {
+	dev.Description = *h
 	return nil
 }
 
@@ -254,25 +253,30 @@ type Header struct {
 }
 
 func (h *Header) Apply(dev *Device) error {
-	dev.headers = append(dev.headers, h)
+	dev.Headers = append(dev.Headers, h)
 	return nil
 }
 
 type Version struct {
 	XMLBaseElement
-	Xml      string `xml:"xml,attr"`
+	XML      string `xml:"xml,attr"`
 	Checksum string `xml:"checksum,attr"`
 	Revision string `xml:"revision,attr"`
 	Device   string `xml:"device,attr"`
 	EnVision string `xml:"enVision,attr"`
 }
 
+func (v *Version) String() string {
+	return fmt.Sprintf("version={xml:'%s', revision:'%s', device:'%s', checksum:'%s', enVision:'%s'",
+		v.XML, v.Revision, v.Device, v.Checksum, v.EnVision)
+}
+
 func (v *Version) Apply(dev *Device) error {
 	var unset XMLPos
-	if dev.version.Pos() != unset {
-		return errors.Errorf("VERSION already set from %s", dev.version.Pos())
+	if dev.Version.Pos() != unset {
+		return errors.Errorf("VERSION already set from %s", dev.Version.Pos())
 	}
-	dev.version = *v
+	dev.Version = *v
 	return nil
 }
 
@@ -286,7 +290,7 @@ type TagValMap struct {
 }
 
 func (tvm *TagValMap) Apply(dev *Device) error {
-	dev.tagValMaps = append(dev.tagValMaps, tvm)
+	dev.TagValMaps = append(dev.TagValMaps, tvm)
 	return nil
 }
 
@@ -298,7 +302,7 @@ type ValueMap struct {
 }
 
 func (vm *ValueMap) Apply(dev *Device) error {
-	dev.valueMaps = append(dev.valueMaps, vm)
+	dev.ValueMaps = append(dev.ValueMaps, vm)
 	return nil
 }
 
@@ -320,7 +324,7 @@ type Message struct {
 }
 
 func (m *Message) Apply(dev *Device) error {
-	dev.messages = append(dev.messages, m)
+	dev.Messages = append(dev.Messages, m)
 	return nil
 }
 
@@ -332,7 +336,7 @@ type VarType struct {
 }
 
 func (vt *VarType) Apply(dev *Device) error {
-	dev.varTypes = append(dev.varTypes, vt)
+	dev.VarTypes = append(dev.VarTypes, vt)
 	return nil
 }
 
@@ -345,7 +349,7 @@ type RegX struct {
 }
 
 func (rx *RegX) Apply(dev *Device) error {
-	dev.regexs = append(dev.regexs, rx)
+	dev.Regexs = append(dev.Regexs, rx)
 	return nil
 }
 
@@ -358,7 +362,7 @@ type SumData struct {
 }
 
 func (sd *SumData) Apply(dev *Device) error {
-	dev.sumDatas = append(dev.sumDatas, sd)
+	dev.SumDatas = append(dev.SumDatas, sd)
 	return nil
 }
 
@@ -413,7 +417,7 @@ func stateDeviceMessages(token xml.Token, _ *xml.Decoder) (XMLElement, xmlState,
 		if v.Name != expected {
 			return nil, xmlStateErr, errors.Errorf("unexpected tag:%v found. Expected:%v", v.Name, expected)
 		}
-		var dm DeviceMessages
+		var dm DeviceHeader
 		// Manual decoding :(
 		// There is no way to decode this element using standard library without
 		// decoding all the inner XML (messages, headers, etc.)

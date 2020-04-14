@@ -49,7 +49,7 @@ func ParseCall(data string) (pCall *Call, err error) {
         function = (fn_chars+ >mark %capture_fn);
         constant_str = str_chars+ >mark %capture_constant;
         argument = constant_str;
-        function_call = sp* function "(" argument ( comma argument)* ")" space* %commit;
+        function_call = sp* function "(" ( argument ( comma argument)* )? ")" space* %commit;
         main := function_call;
         write init;
         write exec;

@@ -106,8 +106,10 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: "INVALID()",
-			err: true,
+			input: "PERFECTLY_VALID()",
+			expected:Call{
+				Function: "PERFECTLY_VALID",
+			},
 		},
 		{
 			input: "INVALID ",
@@ -151,7 +153,7 @@ func TestCall(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, &testCase.expected, result, testCase.input)
 		} else {
-			assert.Equal(t, ErrBadCall, err)
+			assert.Equal(t, ErrBadCall, err, testCase.input)
 		}
 	}
 }

@@ -4,6 +4,8 @@
 
 package generator
 
+import "github.com/pkg/errors"
+
 %%{
     machine parse_call;
     write data;
@@ -16,10 +18,12 @@ var ErrBadCall = errors.New("malformed function call")
 // ParseCall parses a function call.
 // Input: "STRCAT('header_', msgIdPart2)"
 // Output: Call(Function:"STRCAT", Args: [ Constant("header_"), Field("msgIdPart2")])
-func ParseCall(data string) (call Call, err error) {
+func ParseCall(data string) (pCall *Call, err error) {
     cs, p, pe, eof := 0, 0, len(data), len(data)
     start := -1
     err = ErrBadCall;
+
+    var call Call
 
     %%{
         # Define what header characters are allowed.
@@ -62,6 +66,8 @@ func ParseCall(data string) (call Call, err error) {
         write init;
         write exec;
     }%%
-
-    return call, err;
+    if err != nil {
+        return nil, err
+    }
+    return &call, nil;
 }

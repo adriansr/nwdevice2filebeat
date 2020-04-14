@@ -7,7 +7,7 @@ package generator
 
 import "github.com/pkg/errors"
 
-//line call.go:11
+//line call.go:13
 var _parse_call_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 6,
@@ -19,24 +19,26 @@ const parse_call_error int = 0
 
 const parse_call_en_main int = 1
 
-//line call.rl:12
+//line call.rl:14
 
 var ErrBadCall = errors.New("malformed function call")
 
 // ParseCall parses a function call.
 // Input: "STRCAT('header_', msgIdPart2)"
 // Output: Call(Function:"STRCAT", Args: [ Constant("header_"), Field("msgIdPart2")])
-func ParseCall(data string) (call Call, err error) {
+func ParseCall(data string) (pCall *Call, err error) {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	start := -1
 	err = ErrBadCall
 
-//line call.go:38
+	var call Call
+
+//line call.go:42
 	{
 		cs = parse_call_start
 	}
 
-//line call.go:43
+//line call.go:47
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -277,35 +279,35 @@ func ParseCall(data string) (call Call, err error) {
 		goto f4
 
 	f0:
-//line call.rl:33
+//line call.rl:37
 
 		start = p
 
 		goto _again
 	f1:
-//line call.rl:36
+//line call.rl:40
 
 		call.Function = data[start:p]
 
 		goto _again
 	f3:
-//line call.rl:39
+//line call.rl:43
 
 		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
 		goto _again
 	f4:
-//line call.rl:42
+//line call.rl:46
 
 		call.Args = append(call.Args, Field(data[start:p]))
 
 		goto _again
 	f2:
-//line call.rl:33
+//line call.rl:37
 
 		start = p
 
-//line call.rl:39
+//line call.rl:43
 
 		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
@@ -324,11 +326,11 @@ func ParseCall(data string) (call Call, err error) {
 		if (p) == eof {
 			switch _parse_call_eof_actions[cs] {
 			case 6:
-//line call.rl:45
+//line call.rl:49
 
 				err = nil
 
-//line call.go:287
+//line call.go:291
 			}
 		}
 
@@ -337,7 +339,10 @@ func ParseCall(data string) (call Call, err error) {
 		}
 	}
 
-//line call.rl:64
+//line call.rl:68
 
-	return call, err
+	if err != nil {
+		return nil, err
+	}
+	return &call, nil
 }

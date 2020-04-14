@@ -85,11 +85,19 @@ func TestCall(t *testing.T) {
 			input: `*THIS('is\'just'plain'wrong')`,
 			err: true,
 		},
+		{
+			input: `*THIS('is not terminated`,
+			err: true,
+		},
+		{
+			input: `NEITHER(`,
+			err: true,
+		},
 	} {
 		result, err := ParseCall(testCase.input)
 		if !testCase.err {
 			assert.NoError(t, err)
-			assert.Equal(t, testCase.expected, result, testCase.input)
+			assert.Equal(t, &testCase.expected, result, testCase.input)
 		} else {
 			assert.Equal(t, ErrBadCall, err)
 		}

@@ -47,7 +47,7 @@ func processHeaders(input []*model.Header) (output []header, err error) {
 	for idx, xml := range input {
 		vm, err := newHeader(xml)
 		if err != nil {
-			return output, errors.Wrapf(err, "error parsing VALUEMAP at %s", xml.Pos())
+			return output, errors.Wrapf(err, "error parsing HEADER at %s", xml.Pos())
 		}
 		output[idx] = vm
 	}
@@ -100,8 +100,8 @@ func newValueMap(xml *model.ValueMap) (vm valueMap, err error) {
 
 type header struct {
 	id2 string
-	messageID Call
-	content string
+	messageID *Call
+	content Pattern
 }
 
 func newHeader(xml *model.Header) (h header, err error) {
@@ -114,12 +114,16 @@ func newHeader(xml *model.Header) (h header, err error) {
 	}
 	h = header {
 		id2: xml.ID2,
-		content: xml.Content,
 	}
 	if xml.MessageID != "" {
 		if h.messageID, err = ParseCall(xml.MessageID); err != nil {
 			return h, errors.Wrapf(err,"error parsing messageid from HEADER at %s", xml.Pos())
 		}
+		//log.Printf("XXX at %s: messageid=<<%s>>", xml.Pos(), h.messageID)
 	}
+	if h.content, err = ParsePattern(xml.Content); err != nil {
+		return h, errors.Wrapf(err,"error parsing content from HEADER at %s", xml.Pos())
+	}
+	// TODO: functions etc.
 	return h, err
 }

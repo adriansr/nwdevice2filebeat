@@ -7,6 +7,7 @@ package generator
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -40,6 +41,37 @@ func (c Field) String() string {
 	return "Field(" + string(c) + ")"
 }
 
+type Call struct {
+	Function string
+	Args     []Value
+}
+
+func (c Call) IsValue() {}
+
+func (c Call) String() string {
+	args := make([]string, len(c.Args))
+	for idx, val := range c.Args {
+		args[idx] = val.String()
+	}
+	return fmt.Sprintf("Call(fn='%s',%s)", c.Function, strings.Join(args, ","))
+}
+
+type Pattern []Value
+
+func (p Pattern) IsValue() {}
+
+func (p Pattern) String() string {
+	return fmt.Sprintf("%v", []Value(p))
+}
+
+type Payload Field
+
+func (c Payload) IsValue() {}
+
+func (c Payload) String() string {
+	return "Payload(" + Field(c).String() + ")"
+}
+
 var fieldNameRegex = regexp.MustCompile("^[a-zA-Z_]+$")
 var functionNameRegex = regexp.MustCompile("^[A-Z_]+$")
 
@@ -67,10 +99,3 @@ func newValue(s string) (Value, error) {
 		return Field(s), nil
 	}
 }
-
-type Call struct {
-	Function string
-	Args     []Value
-}
-
-type Expression []Value

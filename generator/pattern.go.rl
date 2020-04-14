@@ -18,7 +18,7 @@ var ErrBadPattern = errors.New("malformed pattern")
 // ParsePattern parses a device log parser pattern.
 func ParsePattern(data string) (pattern Pattern, err error) {
     cs, p, pe, eof := 0, 0, len(data), len(data)
-    mark := -1
+    mark := 0
 
     isPayload := false
 
@@ -26,28 +26,26 @@ func ParsePattern(data string) (pattern Pattern, err error) {
         action mark {
             mark = p;
         }
-        #action capture_constant {
-        #    if mark>-1 && p-mark > 0 {
-        #    pattern = append(pattern, Constant(data[mark:p]))
-        #    }
-        #}
         action capture_constant {
-            //fmt.Fprintf(os.Stderr, "XXX: capture_constant at %d (len %d): '%s'\n", p, p-mark, data[mark:p])
-            if mark < p {
-                pattern = append(pattern, Constant(data[mark:p]))
+            if mark < p-1 {
+                pattern = append(pattern, Constant(data[mark:p-1]))
             }
+            mark = p
         }
         action capture_field {
-            //fmt.Fprintf(os.Stderr, "XXX: capture_field at %d (len %d): '%s'\n", p, p-mark, data[mark:p])
             if !isPayload {
                 pattern = append(pattern, Field(data[mark:p]))
             } else {
                 pattern = append(pattern, Payload(Field(data[mark:p])))
                 isPayload = false
             }
+            mark = p
         }
         action commit {
             err = nil
+            if mark < p {
+                pattern = append(pattern, Constant(data[mark:p]))
+            }
         }
         action onerror {
             mark = eof - p
@@ -74,9 +72,9 @@ func ParsePattern(data string) (pattern Pattern, err error) {
         field_name = field_chars+ >mark %capture_field;
         payload_custom = ":" field_name;
         payload_decl = "!payload" %enter_payload payload_custom? %leave_payload;
-        field = "<" (payload_decl | field_name) $/onerror ">" @^onerror;
-        constant = const_chars* >mark %capture_constant;
-        pattern = ( field | constant ) ;
+        field = "<"  %capture_constant (payload_decl | field_name) $/onerror ">" %mark @^onerror;
+        constant = const_chars++;
+        pattern = ( field | constant );
 
         main := pattern* %commit;
 
@@ -86,41 +84,5 @@ func ParsePattern(data string) (pattern Pattern, err error) {
     if err != nil {
         return nil, err
     }
-    // TODO: Please fix this hack.
-    //       The state machine above outputs single-char Constants one after the
-    //       other. This joins consecutive Constants into one.
-    nn := len(pattern)
-    isConstant := func(v Value) bool {
-        _, ok := v.(Constant)
-        return ok
-    }
-    var out Pattern
-    for i := 0; i < nn; i++ {
-        if isConstant(pattern[i]) {
-            next := i+1
-            for ;next < nn && isConstant(pattern[next]); next++ {
-                pattern[i] = Constant(string(pattern[i].(Constant)) + string(pattern[next].(Constant)))
-            }
-            out = append(out, pattern[i])
-            i = next - 1
-        } else {
-            out = append(out, pattern[i])
-        }
-    }
-    return out, nil;
+    return pattern, nil
 }
-
-/*
-        escaped_lt = "<<";
-        pattern_chars = escaped_lt | (any -- "<");
-        field_chars = [A-Za-z_0-9];
-        constant = pattern_chars** >mark %capture_constant;
-        field_name = field_chars+ >mark %capture_field;
-        payload_custom = ":" field_chars+ >mark %capture_field;
-        payload_decl = "!payload" %enter_payload payload_custom? %leave_payload;
-        field = "<" (payload_decl | field_name) ">";
-        pattern = ( field | constant ) ;
-
-        main := pattern* %commit $!onerror;
-
-*/

@@ -10,7 +10,7 @@ import "github.com/pkg/errors"
 //line pattern.go:13
 var _parse_pattern_eof_actions []byte = []byte{
 	0, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 7, 8,
+	1, 1, 1, 1, 1, 9, 10,
 }
 
 const parse_pattern_start int = 13
@@ -26,7 +26,7 @@ var ErrBadPattern = errors.New("malformed pattern")
 // ParsePattern parses a device log parser pattern.
 func ParsePattern(data string) (pattern Pattern, err error) {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
-	mark := -1
+	mark := 0
 
 	isPayload := false
 
@@ -47,14 +47,9 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		switch cs {
 		case 13:
 			if data[(p)] == 60 {
-				goto tr20
+				goto tr19
 			}
-			goto tr19
-		case 14:
-			if data[(p)] == 60 {
-				goto tr22
-			}
-			goto tr21
+			goto tr3
 		case 1:
 			switch data[(p)] {
 			case 33:
@@ -159,6 +154,11 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 				goto tr15
 			}
 			goto tr11
+		case 14:
+			if data[(p)] == 60 {
+				goto tr21
+			}
+			goto tr20
 		case 12:
 			switch data[(p)] {
 			case 62:
@@ -187,15 +187,15 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 	tr11:
 		cs = 0
 		goto f0
-	tr20:
+	tr19:
 		cs = 1
-		goto f1
-	tr22:
+		goto _again
+	tr21:
 		cs = 1
-		goto f8
+		goto f5
 	tr0:
 		cs = 2
-		goto _again
+		goto f1
 	tr4:
 		cs = 3
 		goto _again
@@ -219,58 +219,64 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		goto _again
 	tr12:
 		cs = 10
-		goto f2
+		goto f3
 	tr15:
 		cs = 11
 		goto _again
 	tr14:
 		cs = 11
-		goto f1
+		goto f5
 	tr17:
 		cs = 12
 		goto _again
 	tr2:
 		cs = 12
-		goto f1
-	tr13:
+		goto f2
+	tr3:
 		cs = 13
-		goto f3
-	tr16:
-		cs = 13
-		goto f4
-	tr18:
+		goto _again
+	tr20:
 		cs = 13
 		goto f5
-	tr3:
+	tr13:
 		cs = 14
-		goto _again
-	tr19:
+		goto f4
+	tr16:
 		cs = 14
-		goto f1
-	tr21:
+		goto f6
+	tr18:
 		cs = 14
-		goto f8
+		goto f7
 
-	f1:
+	f5:
 //line pattern.go.rl:26
 
 		mark = p
 
 		goto _again
-	f5:
-//line pattern.go.rl:40
+	f1:
+//line pattern.go.rl:29
 
-		//fmt.Fprintf(os.Stderr, "XXX: capture_field at %d (len %d): '%s'\n", p, p-mark, data[mark:p])
+		if mark < p-1 {
+			pattern = append(pattern, Constant(data[mark:p-1]))
+		}
+		mark = p
+
+		goto _again
+	f7:
+//line pattern.go.rl:35
+
 		if !isPayload {
 			pattern = append(pattern, Field(data[mark:p]))
 		} else {
 			pattern = append(pattern, Payload(Field(data[mark:p])))
 			isPayload = false
 		}
+		mark = p
 
 		goto _again
 	f0:
-//line pattern.go.rl:52
+//line pattern.go.rl:50
 
 		mark = eof - p
 		if mark > 20 {
@@ -283,37 +289,37 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		}
 
 		goto _again
-	f2:
-//line pattern.go.rl:63
+	f3:
+//line pattern.go.rl:61
 
 		isPayload = true
 
 		goto _again
-	f8:
-//line pattern.go.rl:34
+	f2:
+//line pattern.go.rl:29
 
-		//fmt.Fprintf(os.Stderr, "XXX: capture_constant at %d (len %d): '%s'\n", p, p-mark, data[mark:p])
-		if mark < p {
-			pattern = append(pattern, Constant(data[mark:p]))
+		if mark < p-1 {
+			pattern = append(pattern, Constant(data[mark:p-1]))
 		}
+		mark = p
 
 //line pattern.go.rl:26
 
 		mark = p
 
 		goto _again
-	f4:
-//line pattern.go.rl:40
+	f6:
+//line pattern.go.rl:35
 
-		//fmt.Fprintf(os.Stderr, "XXX: capture_field at %d (len %d): '%s'\n", p, p-mark, data[mark:p])
 		if !isPayload {
 			pattern = append(pattern, Field(data[mark:p]))
 		} else {
 			pattern = append(pattern, Payload(Field(data[mark:p])))
 			isPayload = false
 		}
+		mark = p
 
-//line pattern.go.rl:66
+//line pattern.go.rl:64
 
 		if isPayload {
 			pattern = append(pattern, Payload(Field("")))
@@ -321,12 +327,12 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		}
 
 		goto _again
-	f3:
-//line pattern.go.rl:63
+	f4:
+//line pattern.go.rl:61
 
 		isPayload = true
 
-//line pattern.go.rl:66
+//line pattern.go.rl:64
 
 		if isPayload {
 			pattern = append(pattern, Payload(Field("")))
@@ -347,13 +353,16 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		}
 		if (p) == eof {
 			switch _parse_pattern_eof_actions[cs] {
-			case 7:
-//line pattern.go.rl:49
+			case 9:
+//line pattern.go.rl:44
 
 				err = nil
+				if mark < p {
+					pattern = append(pattern, Constant(data[mark:p]))
+				}
 
 			case 1:
-//line pattern.go.rl:52
+//line pattern.go.rl:50
 
 				mark = eof - p
 				if mark > 20 {
@@ -365,19 +374,19 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 					err = errors.Errorf("malformed pattern at position %d (EOF)", p)
 				}
 
-			case 8:
-//line pattern.go.rl:34
+			case 10:
+//line pattern.go.rl:26
 
-				//fmt.Fprintf(os.Stderr, "XXX: capture_constant at %d (len %d): '%s'\n", p, p-mark, data[mark:p])
+				mark = p
+
+//line pattern.go.rl:44
+
+				err = nil
 				if mark < p {
 					pattern = append(pattern, Constant(data[mark:p]))
 				}
 
-//line pattern.go.rl:49
-
-				err = nil
-
-//line pattern.go:338
+//line pattern.go:349
 			}
 		}
 
@@ -386,46 +395,10 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		}
 	}
 
-//line pattern.go.rl:85
+//line pattern.go.rl:83
 
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Please fix this hack.
-	//       The state machine above outputs single-char Constants one after the
-	//       other. This joins consecutive Constants into one.
-	nn := len(pattern)
-	isConstant := func(v Value) bool {
-		_, ok := v.(Constant)
-		return ok
-	}
-	var out Pattern
-	for i := 0; i < nn; i++ {
-		if isConstant(pattern[i]) {
-			next := i + 1
-			for ; next < nn && isConstant(pattern[next]); next++ {
-				pattern[i] = Constant(string(pattern[i].(Constant)) + string(pattern[next].(Constant)))
-			}
-			out = append(out, pattern[i])
-			i = next - 1
-		} else {
-			out = append(out, pattern[i])
-		}
-	}
-	return out, nil
+	return pattern, nil
 }
-
-/*
-   escaped_lt = "<<";
-   pattern_chars = escaped_lt | (any -- "<");
-   field_chars = [A-Za-z_0-9];
-   constant = pattern_chars** >mark %capture_constant;
-   field_name = field_chars+ >mark %capture_field;
-   payload_custom = ":" field_chars+ >mark %capture_field;
-   payload_decl = "!payload" %enter_payload payload_custom? %leave_payload;
-   field = "<" (payload_decl | field_name) ">";
-   pattern = ( field | constant ) ;
-
-   main := pattern* %commit $!onerror;
-
-*/

@@ -97,7 +97,7 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: "  MY_FUN  (   \tfield ) ",
+			input: "  MY_FUN(   field ) ",
 			expected: Call {
 				Function: "MY_FUN",
 				Args: []Value{
@@ -132,6 +132,18 @@ func TestCall(t *testing.T) {
 		{
 			input: `NEITHER(`,
 			err: true,
+		},
+		{
+			input: "UNQUOTED('this is fine', at some point someone got tired of quotes, \t, my.field)",
+			expected: Call{
+				Function: "UNQUOTED",
+				Args:     []Value{
+					Constant("this is fine"),
+					Constant("at some point someone got tired of quotes"),
+					Constant("\t"),
+					Field("my.field"),
+				},
+			},
 		},
 	} {
 		result, err := ParseCall(testCase.input)

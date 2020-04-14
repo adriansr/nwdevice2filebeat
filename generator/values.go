@@ -77,8 +77,8 @@ func (c Payload) String() string {
 	return "Payload(" + Field(c).String() + ")"
 }
 
-var fieldNameRegex = regexp.MustCompile("^[a-zA-Z_]+$")
-var functionNameRegex = regexp.MustCompile("^[A-Z_]+$")
+var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_0-9$\.]+$`)
+var functionNameRegex = regexp.MustCompile(`^[A-Za-z_0-9]+$`)
 
 func newValue(s string) (Value, error) {
 	n := len(s)

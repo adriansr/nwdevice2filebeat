@@ -20,3 +20,18 @@ func unescapeConstant(b string) string {
 	return b
 }
 
+func disambiguateFieldOrConstant(s string) Value {
+	trimmed := strings.Trim(s, " ")
+	n := len(trimmed)
+	if n == 0 {
+		// Return original, spaces and all
+		return Constant(s)
+	}
+	if n > 1 && trimmed[0] == '\'' && trimmed[n-1] == '\'' {
+		return Constant(unescapeConstant(trimmed[1:n-1]))
+	}
+	if fieldNameRegex.MatchString(trimmed) {
+		return Field(trimmed)
+	}
+	return Constant(trimmed)
+}

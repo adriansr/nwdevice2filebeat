@@ -208,14 +208,16 @@ func parseFunctions(s string) (calls []Call, err error) {
 	if end == -1 {
 		return nil, errors.New("no closing brace")
 	}
-	for {
+	for n := len(s);; {
 		strCall := s[start+1:end]
 		call, err := parseCall(strCall, true)
 		if err != nil {
 			return nil, errors.Wrapf(err,"can't parse call at %d:%d : '%s'", start, end, strCall)
 		}
 		calls = append(calls, *call)
-		if start = end + 1; start >= len(s) {
+		for start = end + 1; start < n && s[start] == ' '; start++ {
+		}
+		if start >= n {
 			break
 		}
 		if s[start] != '<' {

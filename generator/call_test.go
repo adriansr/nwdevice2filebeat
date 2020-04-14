@@ -68,16 +68,6 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: `@dest:Why oh why.`,
-			expected: Call {
-				Function: "$set$",
-				Target: "dest",
-				Args: []Value {
-					Constant("Why oh why."),
-				},
-			},
-		},
-		{
 			input: `@event_time:*MyCall($HDR,'%G/%F/%W %H:%U:%O',hdate1,htime)`,
 			expected: Call {
 				Function: "MyCall",

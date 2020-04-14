@@ -52,11 +52,6 @@ func ParseCall(data string) (pCall *Call, err error) {
         action commit {
             err = nil
         }
-        action capture_free_value {
-            call.Function = "$set$"
-            call.Args = []Value{ Constant(data[start:p]) }
-            err = nil
-        }
 
         # No function in the published parsers is outside of A-Z_.
         # TODO: Don't be so strict...
@@ -70,9 +65,7 @@ func ParseCall(data string) (pCall *Call, err error) {
         argument = constant_str | field_ref;
         function_call = space* "*"? function space* "(" space* argument space* ( comma space* argument space* )* ")" space* %commit;
         target = '@' %mark field_chars* ':' %capture_target;
-        free_value = (any -- "(")** >mark %capture_free_value;
-        expr = ( target? function_call | target free_value );
-        main := expr;
+        main := target? function_call;
         write init;
         write exec;
     }%%

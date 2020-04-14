@@ -7,7 +7,7 @@ package generator
 
 import "github.com/pkg/errors"
 
-//line pattern.go:13
+//line pattern_generated.go:13
 var _parse_pattern_eof_actions []byte = []byte{
 	0, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 9, 10,
@@ -30,12 +30,12 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 
 	isPayload := false
 
-//line pattern.go:39
+//line pattern_generated.go:39
 	{
 		cs = parse_pattern_start
 	}
 
-//line pattern.go:44
+//line pattern_generated.go:44
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -395,7 +395,7 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 					pattern = append(pattern, Constant(data[mark:p]))
 				}
 
-//line pattern.go:358
+//line pattern_generated.go:358
 			}
 		}
 

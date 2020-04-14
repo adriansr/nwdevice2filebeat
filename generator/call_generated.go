@@ -1,4 +1,4 @@
-//line call.rl:1
+//line call.go.rl:1
 //  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
@@ -7,7 +7,7 @@ package generator
 
 import "github.com/pkg/errors"
 
-//line call.go:13
+//line call_generated.go:13
 var _parse_call_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 6,
@@ -19,7 +19,7 @@ const parse_call_error int = 0
 
 const parse_call_en_main int = 1
 
-//line call.rl:14
+//line call.go.rl:14
 
 var ErrBadCall = errors.New("malformed function call")
 
@@ -33,12 +33,12 @@ func ParseCall(data string) (pCall *Call, err error) {
 
 	var call Call
 
-//line call.go:42
+//line call_generated.go:42
 	{
 		cs = parse_call_start
 	}
 
-//line call.go:47
+//line call_generated.go:47
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -279,35 +279,35 @@ func ParseCall(data string) (pCall *Call, err error) {
 		goto f4
 
 	f0:
-//line call.rl:37
+//line call.go.rl:37
 
 		start = p
 
 		goto _again
 	f1:
-//line call.rl:40
+//line call.go.rl:40
 
 		call.Function = data[start:p]
 
 		goto _again
 	f3:
-//line call.rl:43
+//line call.go.rl:43
 
 		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
 		goto _again
 	f4:
-//line call.rl:46
+//line call.go.rl:46
 
 		call.Args = append(call.Args, Field(data[start:p]))
 
 		goto _again
 	f2:
-//line call.rl:37
+//line call.go.rl:37
 
 		start = p
 
-//line call.rl:43
+//line call.go.rl:43
 
 		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
@@ -326,11 +326,11 @@ func ParseCall(data string) (pCall *Call, err error) {
 		if (p) == eof {
 			switch _parse_call_eof_actions[cs] {
 			case 6:
-//line call.rl:49
+//line call.go.rl:49
 
 				err = nil
 
-//line call.go:291
+//line call_generated.go:291
 			}
 		}
 
@@ -339,7 +339,7 @@ func ParseCall(data string) (pCall *Call, err error) {
 		}
 	}
 
-//line call.rl:68
+//line call.go.rl:68
 
 	if err != nil {
 		return nil, err

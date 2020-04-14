@@ -182,10 +182,13 @@ func newMessage(xml *model.Message) (m message, err error) {
 	if m.content, err = ParsePattern(xml.Content); err != nil {
 		return m, errors.Wrap(err,"error parsing content")
 	}
-	if m.functions, err = parseFunctions(xml.Functions); err != nil {
-		return m, errors.Wrap(err,"error parsing functions")
+
+	if xml.Functions != "" {
+		if m.functions, err = parseFunctions(xml.Functions); err != nil {
+			return m, errors.Wrap(err, "error parsing functions")
+		}
+		//log.Printf("XXX at %s: got %+v", xml.Pos(), m)
 	}
-	log.Printf("XXX at %s: got %+v", xml.Pos(), m)
 	return m, err
 }
 

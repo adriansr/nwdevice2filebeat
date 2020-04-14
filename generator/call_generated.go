@@ -10,11 +10,12 @@ import "github.com/pkg/errors"
 //line call_generated.go:13
 var _parse_call_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 8,
+	0, 0, 0, 0, 0, 0, 6, 7,
+	9, 9, 9, 9, 9,
 }
 
 const parse_call_start int = 1
-const parse_call_first_final int = 15
+const parse_call_first_final int = 14
 const parse_call_error int = 0
 
 const parse_call_en_main int = 1
@@ -33,12 +34,12 @@ func ParseCall(data string) (pCall *Call, err error) {
 
 	var call Call
 
-//line call_generated.go:42
+//line call_generated.go:43
 	{
 		cs = parse_call_start
 	}
 
-//line call_generated.go:47
+//line call_generated.go:48
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -234,7 +235,7 @@ func ParseCall(data string) (pCall *Call, err error) {
 				goto tr16
 			}
 			goto tr1
-		case 15:
+		case 14:
 			if data[(p)] == 32 {
 				goto tr17
 			}
@@ -310,33 +311,127 @@ func ParseCall(data string) (pCall *Call, err error) {
 				goto tr26
 			}
 			goto tr1
-		case 14:
+		case 15:
 			switch data[(p)] {
 			case 32:
-				goto tr28
-			case 42:
 				goto tr29
-			case 95:
+			case 40:
+				goto tr1
+			case 42:
 				goto tr30
+			case 95:
+				goto tr31
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr28
+					goto tr29
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr30
+						goto tr31
 					}
 				case data[(p)] >= 65:
-					goto tr30
+					goto tr31
 				}
 			default:
-				goto tr30
+				goto tr31
 			}
-			goto tr1
+			goto tr28
+		case 16:
+			if data[(p)] == 40 {
+				goto tr1
+			}
+			goto tr32
+		case 17:
+			switch data[(p)] {
+			case 32:
+				goto tr33
+			case 40:
+				goto tr1
+			case 42:
+				goto tr34
+			case 95:
+				goto tr35
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr33
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr35
+					}
+				case data[(p)] >= 65:
+					goto tr35
+				}
+			default:
+				goto tr35
+			}
+			goto tr32
+		case 18:
+			switch data[(p)] {
+			case 40:
+				goto tr1
+			case 95:
+				goto tr35
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr35
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr35
+				}
+			default:
+				goto tr35
+			}
+			goto tr32
+		case 19:
+			switch data[(p)] {
+			case 32:
+				goto tr36
+			case 40:
+				goto tr6
+			case 95:
+				goto tr37
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr36
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr37
+					}
+				case data[(p)] >= 65:
+					goto tr37
+				}
+			default:
+				goto tr37
+			}
+			goto tr32
+		case 20:
+			switch data[(p)] {
+			case 32:
+				goto tr38
+			case 40:
+				goto tr9
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr38
+			}
+			goto tr32
 		}
 
 	tr1:
@@ -345,24 +440,15 @@ func ParseCall(data string) (pCall *Call, err error) {
 	tr0:
 		cs = 2
 		goto _again
-	tr28:
-		cs = 2
-		goto f5
 	tr2:
 		cs = 3
 		goto _again
-	tr29:
-		cs = 3
-		goto f5
 	tr7:
 		cs = 4
 		goto _again
 	tr3:
 		cs = 4
 		goto f0
-	tr30:
-		cs = 4
-		goto f6
 	tr8:
 		cs = 5
 		goto _again
@@ -420,18 +506,51 @@ func ParseCall(data string) (pCall *Call, err error) {
 	tr24:
 		cs = 13
 		goto f0
-	tr27:
-		cs = 14
-		goto _again
-	tr25:
-		cs = 14
-		goto f0
 	tr17:
-		cs = 15
+		cs = 14
 		goto _again
 	tr14:
-		cs = 15
+		cs = 14
 		goto f2
+	tr27:
+		cs = 15
+		goto _again
+	tr25:
+		cs = 15
+		goto f0
+	tr32:
+		cs = 16
+		goto _again
+	tr28:
+		cs = 16
+		goto f7
+	tr33:
+		cs = 17
+		goto _again
+	tr29:
+		cs = 17
+		goto f7
+	tr34:
+		cs = 18
+		goto _again
+	tr30:
+		cs = 18
+		goto f7
+	tr37:
+		cs = 19
+		goto _again
+	tr35:
+		cs = 19
+		goto f0
+	tr31:
+		cs = 19
+		goto f7
+	tr38:
+		cs = 20
+		goto _again
+	tr36:
+		cs = 20
+		goto f1
 
 	f0:
 //line call.go.rl:37
@@ -457,12 +576,6 @@ func ParseCall(data string) (pCall *Call, err error) {
 		call.Args = append(call.Args, Field(data[start:p]))
 
 		goto _again
-	f5:
-//line call.go.rl:49
-
-		call.Target = data[start : p-1]
-
-		goto _again
 	f3:
 //line call.go.rl:37
 
@@ -473,7 +586,7 @@ func ParseCall(data string) (pCall *Call, err error) {
 		call.Args = append(call.Args, Constant(unescapeConstant(data[start:p])))
 
 		goto _again
-	f6:
+	f7:
 //line call.go.rl:49
 
 		call.Target = data[start : p-1]
@@ -496,12 +609,34 @@ func ParseCall(data string) (pCall *Call, err error) {
 		}
 		if (p) == eof {
 			switch _parse_call_eof_actions[cs] {
-			case 8:
+			case 6:
 //line call.go.rl:52
 
 				err = nil
 
-//line call_generated.go:446
+			case 9:
+//line call.go.rl:55
+
+				call.Function = "$set$"
+				call.Args = []Value{Constant(data[start:p])}
+				err = nil
+
+			case 7:
+//line call.go.rl:49
+
+				call.Target = data[start : p-1]
+
+//line call.go.rl:37
+
+				start = p
+
+//line call.go.rl:55
+
+				call.Function = "$set$"
+				call.Args = []Value{Constant(data[start:p])}
+				err = nil
+
+//line call_generated.go:565
 			}
 		}
 
@@ -510,7 +645,7 @@ func ParseCall(data string) (pCall *Call, err error) {
 		}
 	}
 
-//line call.go.rl:71
+//line call.go.rl:78
 
 	if err != nil {
 		return nil, err

@@ -46,23 +46,26 @@ func ParseCall(data string) (pCall *Call, err error) {
         action capture_field {
             call.Args = append(call.Args, Field(data[start:p]))
         }
+        action capture_target {
+            call.Target = data[start:p-1];
+        }
         action commit {
             err = nil
         }
 
         # No function in the published parsers is outside of A-Z_.
         # TODO: Don't be so strict...
-        fn_chars = [A-Z_];
+        fn_chars = [A-Za-z0-9_];
         # TODO: Don't be so strict...
-        field_chars = [A-Za-z_0-9];
+        field_chars = [A-Za-z0-9_$];
 
         function = (fn_chars+ >mark %capture_fn);
         constant_str = quote (str_chars* >mark %capture_constant) quote;
         field_ref = (field_chars+ >mark %capture_field);
         argument = constant_str | field_ref;
         function_call = space* "*"? function space* "(" space* argument space* ( comma space* argument space* )* ")" space* %commit;
-
-        main := function_call;
+        target = '@' %mark field_chars* ':' %capture_target;
+        main := target? function_call;
         write init;
         write exec;
     }%%

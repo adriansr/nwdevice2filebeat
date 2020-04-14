@@ -43,6 +43,7 @@ func (c Field) String() string {
 
 type Call struct {
 	Function string
+	Target   string
 	Args     []Value
 }
 

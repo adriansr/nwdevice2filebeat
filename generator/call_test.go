@@ -38,6 +38,49 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
+			input: "@destfield:*STRCAT('header_' , id2)",
+			expected: Call {
+				Function: "STRCAT",
+				Target: "destfield",
+				Args: []Value{
+					Constant("header_"),
+					Field("id2"),
+				},
+			},
+		},
+		{
+			input: `@msg:*PARMVAL($MSG)`,
+			expected: Call {
+				Function: "PARMVAL",
+				Target: "msg",
+				Args: []Value {
+					Field("$MSG"),
+				},
+			},
+		},
+		{
+			input: `@:*PARMVAL($MSG)`,
+			expected: Call {
+				Function: "PARMVAL",
+				Args: []Value {
+					Field("$MSG"),
+				},
+			},
+		},
+		{
+			input: `@event_time:*MyCall($HDR,'%G/%F/%W %H:%U:%O',hdate1,htime)`,
+			expected: Call {
+				Function: "MyCall",
+				Target: "event_time",
+				Args: []Value {
+					Field("$HDR"),
+					Constant(`%G/%F/%W %H:%U:%O`),
+					Field("hdate1"),
+					Field("htime"),
+				},
+			},
+		},
+		{
 			input: `*ESCAPED('here\'s a quote', 'and a \\ slash') `,
 			expected: Call {
 				Function: "ESCAPED",

@@ -150,12 +150,12 @@ type message struct {
 	id1 string
 	id2 string
 	eventcategory string
-	functions string
+	functions []Call
 	content Pattern
 }
 
 func (m message) String() string {
-	return fmt.Sprintf("message={id1='%s', id2='%s', eventcategory='%s' functions='%s', content=%s}",
+	return fmt.Sprintf("message={id1='%s', id2='%s', eventcategory='%s' functions='%+v', content=%s}",
 		m.id1, m.id2, m.eventcategory, m.functions, m.content.String())
 }
 
@@ -182,7 +182,40 @@ func newMessage(xml *model.Message) (m message, err error) {
 	if m.content, err = ParsePattern(xml.Content); err != nil {
 		return m, errors.Wrap(err,"error parsing content")
 	}
+	if m.functions, err = parseFunctions(xml.Functions); err != nil {
+		return m, errors.Wrap(err,"error parsing functions")
+	}
 	log.Printf("XXX at %s: got %+v", xml.Pos(), m)
-	// TODO: functions etc.
 	return m, err
+}
+
+func parseFunctions(s string) (calls []Call, err error) {
+	if len(s) < 2 || s[0] != '<' {
+		return nil, errors.New("pattern start error")
+	}
+	start := 0
+	end := strings.IndexByte(s, '>')
+	if end == -1 {
+		return nil, errors.New("no closing brace")
+	}
+	for {
+		strCall := s[start+1:end]
+		call, err := ParseCall(strCall)
+		if err != nil {
+			return nil, errors.Wrapf(err,"can't parse call at %d:%d : '%s'", start, end, strCall)
+		}
+		calls = append(calls, *call)
+		if start = end + 1; start >= len(s) {
+			break
+		}
+		if s[start] != '<' {
+			return nil, errors.Errorf("no opening brace at '%s'", s[start:])
+		}
+		end = strings.IndexByte(s[start:], '>')
+		if end == -1 {
+			return nil, errors.Errorf("no closing brace at '%s'", s[start:])
+		}
+		end += start
+	}
+	return calls, nil
 }

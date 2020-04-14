@@ -50,11 +50,15 @@ type Call struct {
 func (c Call) IsValue() {}
 
 func (c Call) String() string {
+	var target string
+	if c.Target != "" {
+		target = "target="+ c.Target + ","
+	}
 	args := make([]string, len(c.Args))
 	for idx, val := range c.Args {
 		args[idx] = val.String()
 	}
-	return fmt.Sprintf("Call(fn='%s',%s)", c.Function, strings.Join(args, ","))
+	return fmt.Sprintf("Call(%sfn='%s',%s)", target, c.Function, strings.Join(args, ","))
 }
 
 type Pattern []Value

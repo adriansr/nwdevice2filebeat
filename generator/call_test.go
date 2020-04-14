@@ -157,3 +157,37 @@ func TestCall(t *testing.T) {
 		}
 	}
 }
+
+
+func TestCall2(t *testing.T) {
+	for _, testCase := range []struct {
+		input    string
+		expected Call
+		err      bool
+	}{
+		{
+			input: "@target:*APPEND('hola',:,feo)",
+			expected: Call{
+				Function: "APPEND",
+				Target:   "target",
+				Args:     []Value{Constant("hola"), Constant(":"), Field("feo")},
+			},
+		},
+		{
+			input: "@target:SOMETHING()",
+			expected: Call{
+				Function: "$set$",
+				Target:   "target",
+				Args:     []Value{Constant("SOMETHING()")},
+			},
+		},
+	}{
+		result, err := parseCall(testCase.input, true)
+		if !testCase.err {
+			assert.NoError(t, err)
+			assert.Equal(t, &testCase.expected, result, testCase.input)
+		} else {
+			assert.Equal(t, ErrBadCall, err, testCase.input)
+		}
+	}
+}

@@ -17,7 +17,7 @@ func TestCall(t *testing.T) {
 		err bool
 	} {
 		{
-			input: "*STRCAT('CISCOIPORTESA','_','GENERIC')",
+			input: "STRCAT('CISCOIPORTESA','_','GENERIC')",
 			expected: Call {
 				Function: "STRCAT",
 				Args: []Value{
@@ -28,7 +28,7 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: "*STRCAT('header_' , id2)",
+			input: "STRCAT('header_' , id2)",
 			expected: Call {
 				Function: "STRCAT",
 				Args: []Value{
@@ -38,10 +38,9 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: "@destfield:*STRCAT('header_' , id2)",
+			input: "STRCAT('header_' , id2)",
 			expected: Call {
 				Function: "STRCAT",
-				Target: "destfield",
 				Args: []Value{
 					Constant("header_"),
 					Field("id2"),
@@ -49,17 +48,7 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: `@msg:*PARMVAL($MSG)`,
-			expected: Call {
-				Function: "PARMVAL",
-				Target: "msg",
-				Args: []Value {
-					Field("$MSG"),
-				},
-			},
-		},
-		{
-			input: `@:*PARMVAL($MSG)`,
+			input: `PARMVAL($MSG)`,
 			expected: Call {
 				Function: "PARMVAL",
 				Args: []Value {
@@ -68,10 +57,18 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: `@event_time:*MyCall($HDR,'%G/%F/%W %H:%U:%O',hdate1,htime)`,
+			input: `PARMVAL($MSG)`,
+			expected: Call {
+				Function: "PARMVAL",
+				Args: []Value {
+					Field("$MSG"),
+				},
+			},
+		},
+		{
+			input: `MyCall($HDR,'%G/%F/%W %H:%U:%O',hdate1,htime)`,
 			expected: Call {
 				Function: "MyCall",
-				Target: "event_time",
 				Args: []Value {
 					Field("$HDR"),
 					Constant(`%G/%F/%W %H:%U:%O`),
@@ -81,7 +78,7 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: `*ESCAPED('here\'s a quote', 'and a \\ slash') `,
+			input: `ESCAPED('here\'s a quote', 'and a \\ slash') `,
 			expected: Call {
 				Function: "ESCAPED",
 				Args: []Value{
@@ -100,7 +97,7 @@ func TestCall(t *testing.T) {
 			},
 		},
 		{
-			input: "  *MY_FUN  (   \tfield ) ",
+			input: "  MY_FUN  (   \tfield ) ",
 			expected: Call {
 				Function: "MY_FUN",
 				Args: []Value{
@@ -129,7 +126,7 @@ func TestCall(t *testing.T) {
 			err: true,
 		},
 		{
-			input: `*THIS('is not terminated`,
+			input: `THIS('is not terminated`,
 			err: true,
 		},
 		{

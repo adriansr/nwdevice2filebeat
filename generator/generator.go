@@ -133,7 +133,7 @@ func newHeader(xml *model.Header) (h header, err error) {
 		id2: xml.ID2,
 	}
 	if xml.MessageID != "" {
-		if h.messageID, err = ParseCall(xml.MessageID); err != nil {
+		if h.messageID, err = parseCall(xml.MessageID, false); err != nil {
 			return h, errors.Wrap(err,"error parsing messageid")
 		}
 		//log.Printf("XXX at %s: messageid=<<%s>>", xml.Pos(), h.messageID)
@@ -183,15 +183,25 @@ func newMessage(xml *model.Message) (m message, err error) {
 		return m, errors.Wrap(err,"error parsing content")
 	}
 	if m.functions, err = parseFunctions(xml.Functions); err != nil {
-		return m, errors.Wrap(err,"error parsing functions")
+		return m, errors.Wrap(err, "error parsing functions")
 	}
 	log.Printf("XXX at %s: got %+v", xml.Pos(), m)
 	return m, err
 }
 
 func parseFunctions(s string) (calls []Call, err error) {
-	if len(s) < 2 || s[0] != '<' {
-		return nil, errors.New("pattern start error")
+	// Skip leading spaces
+	i := 0
+	for n := len(s);i<n && s[i] == ' '; i++ {}
+	s = s[i:]
+	if s == "" {
+		return nil, nil
+	}
+	if n := len(s); n < 2 || s[0] != '<' {
+		if n > 20 {
+			n = 20
+		}
+		return nil, errors.Errorf("pattern start error at '%s'", s[:n])
 	}
 	start := 0
 	end := strings.IndexByte(s, '>')
@@ -200,7 +210,7 @@ func parseFunctions(s string) (calls []Call, err error) {
 	}
 	for {
 		strCall := s[start+1:end]
-		call, err := ParseCall(strCall)
+		call, err := parseCall(strCall, true)
 		if err != nil {
 			return nil, errors.Wrapf(err,"can't parse call at %d:%d : '%s'", start, end, strCall)
 		}
@@ -218,4 +228,37 @@ func parseFunctions(s string) (calls []Call, err error) {
 		end += start
 	}
 	return calls, nil
+}
+
+func parseCall(s string, allowTarget bool) (call *Call, err error) {
+	call = &Call {}
+	n := len(s)
+	if allowTarget && s[0] == '@' {
+		end := strings.IndexByte(s, ':')
+		if end == -1 {
+			return call, errors.Errorf("target not terminated at '%s'", s)
+		}
+		call.Target = s[1:end]
+		s = s[end+1:]
+		if n = len(s); n == 0 {
+			return call, errors.Errorf("bad target pattern at '%s'", s)
+		}
+		if s[0] != '*' {
+			call.Function = "$set$"
+			call.Args = []Value{ Constant(s) }
+			return call, nil
+		}
+		s = s[1:]
+	} else {
+		if s[0] == '*' {
+			s = s[1:]
+		}
+	}
+	p, err := ParseCall(s)
+	if err != nil {
+		return call, errors.Wrapf(err,"bad function call at '%s'", s)
+	}
+	call.Function = p.Function
+	call.Args = p.Args
+	return call, nil
 }

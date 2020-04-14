@@ -63,9 +63,8 @@ func ParseCall(data string) (pCall *Call, err error) {
         constant_str = quote (str_chars* >mark %capture_constant) quote;
         field_ref = (field_chars+ >mark %capture_field);
         argument = constant_str | field_ref;
-        function_call = space* "*"? function space* "(" space* argument space* ( comma space* argument space* )* ")" space* %commit;
-        target = '@' %mark field_chars* ':' %capture_target;
-        main := target? function_call;
+        function_call = space* function space* "(" space* argument space* ( comma space* argument space* )* ")" space* %commit;
+        main := function_call;
         write init;
         write exec;
     }%%

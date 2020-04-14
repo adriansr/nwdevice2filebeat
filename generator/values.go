@@ -61,7 +61,11 @@ type Pattern []Value
 func (p Pattern) IsValue() {}
 
 func (p Pattern) String() string {
-	return fmt.Sprintf("%v", []Value(p))
+	items := make([]string, len(p))
+	for idx, it := range p {
+		items[idx] = it.String()
+	}
+	return fmt.Sprintf("Pattern{%s}", strings.Join(items, ", "))
 }
 
 type Payload Field

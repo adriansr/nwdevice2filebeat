@@ -71,6 +71,10 @@ func TestPattern(t *testing.T) {
 			input: `<!payload:custom> And this is just <<neat>`,
 			expected: []Value{Payload(Field("custom")), Constant(` And this is just <<neat>`)},
 		},
+		{
+			input: `<dot.fields> are cool too`,
+			expected: []Value{Field("dot.fields"), Constant(` are cool too`)},
+		},
 	} {
 		result, err := ParsePattern(testCase.input)
 		if testCase.err == nil {

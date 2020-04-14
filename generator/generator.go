@@ -5,6 +5,7 @@
 package generator
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 type Generator struct {
 	valueMaps map[string]valueMap
 	headers   []header
+	messages  []message
 }
 
 func New(dev model.Device) (gen Generator, err error) {
@@ -22,6 +24,9 @@ func New(dev model.Device) (gen Generator, err error) {
 		return gen, err
 	}
 	if gen.headers, err = processHeaders(dev.Headers); err != nil {
+		return gen, err
+	}
+	if gen.messages, err = processMessages(dev.Messages); err != nil {
 		return gen, err
 	}
 	return gen, nil
@@ -48,6 +53,18 @@ func processHeaders(input []*model.Header) (output []header, err error) {
 		vm, err := newHeader(xml)
 		if err != nil {
 			return output, errors.Wrapf(err, "error parsing HEADER at %s", xml.Pos())
+		}
+		output[idx] = vm
+	}
+	return output, nil
+}
+
+func processMessages(input []*model.Message) (output []message, err error) {
+	output = make([]message, len(input))
+	for idx, xml := range input {
+		vm, err := newMessage(xml)
+		if err != nil {
+			return output, errors.Wrapf(err, "error parsing MESSAGE at %s", xml.Pos())
 		}
 		output[idx] = vm
 	}
@@ -107,23 +124,65 @@ type header struct {
 func newHeader(xml *model.Header) (h header, err error) {
 	// This appears in all the messages.
 	if xml.ID2 == "" {
-		return h, errors.Errorf("no id2 in HEADER at %s", xml.Pos())
+		return h, errors.Errorf("empty id2 attribute")
 	}
 	if xml.Content == "" {
-		return h, errors.Errorf("no content in HEADER at %s", xml.Pos())
+		return h, errors.Errorf("empty content attribute")
 	}
 	h = header {
 		id2: xml.ID2,
 	}
 	if xml.MessageID != "" {
 		if h.messageID, err = ParseCall(xml.MessageID); err != nil {
-			return h, errors.Wrapf(err,"error parsing messageid from HEADER at %s", xml.Pos())
+			return h, errors.Wrap(err,"error parsing messageid")
 		}
 		//log.Printf("XXX at %s: messageid=<<%s>>", xml.Pos(), h.messageID)
 	}
 	if h.content, err = ParsePattern(xml.Content); err != nil {
-		return h, errors.Wrapf(err,"error parsing content from HEADER at %s", xml.Pos())
+		return h, errors.Wrap(err,"error parsing content")
 	}
+	//log.Printf("XXX at %s: got pattern=<<%s>>", xml.Pos(), h.content)
 	// TODO: functions etc.
 	return h, err
+}
+
+type message struct {
+	id1 string
+	id2 string
+	eventcategory string
+	functions string
+	content Pattern
+}
+
+func (m message) String() string {
+	return fmt.Sprintf("message={id1='%s', id2='%s', eventcategory='%s' functions='%s', content=%s}",
+		m.id1, m.id2, m.eventcategory, m.functions, m.content.String())
+}
+
+func newMessage(xml *model.Message) (m message, err error) {
+	// This appears in all the messages.
+	if xml.ID1 == "" {
+		return m, errors.Errorf("empty ID1 attribute")
+	}
+	if xml.ID2 == "" {
+		return m, errors.New("empty ID2 attribute")
+	}
+	if xml.Content == "" {
+		return m, errors.New("empty content attribute")
+	}
+	//if xml.Functions == "" {
+	//	return m, errors.Errorf("no functions in MESSAGE at %s", xml.Pos())
+	//}
+	m = message {
+		id1: xml.ID1,
+		id2: xml.ID2,
+		eventcategory: xml.EventCategory,
+	}
+
+	if m.content, err = ParsePattern(xml.Content); err != nil {
+		return m, errors.Wrap(err,"error parsing content")
+	}
+	log.Printf("XXX at %s: got %+v", xml.Pos(), m)
+	// TODO: functions etc.
+	return m, err
 }

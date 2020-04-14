@@ -54,6 +54,8 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 			switch data[(p)] {
 			case 33:
 				goto tr0
+			case 46:
+				goto tr2
 			case 60:
 				goto tr3
 			case 95:
@@ -118,7 +120,10 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 			}
 			goto tr11
 		case 10:
-			if data[(p)] == 95 {
+			switch data[(p)] {
+			case 46:
+				goto tr14
+			case 95:
 				goto tr14
 			}
 			switch {
@@ -136,6 +141,8 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 			goto tr1
 		case 11:
 			switch data[(p)] {
+			case 46:
+				goto tr15
 			case 62:
 				goto tr16
 			case 95:
@@ -161,6 +168,8 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 			goto tr20
 		case 12:
 			switch data[(p)] {
+			case 46:
+				goto tr17
 			case 62:
 				goto tr18
 			case 95:
@@ -386,7 +395,7 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 					pattern = append(pattern, Constant(data[mark:p]))
 				}
 
-//line pattern.go:349
+//line pattern.go:358
 			}
 		}
 

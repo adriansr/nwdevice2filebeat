@@ -7,9 +7,11 @@ package cmd
 import (
 	"log"
 
-	"github.com/adriansr/nwdevice2filebeat/generator"
-	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/spf13/cobra"
+
+	"github.com/adriansr/nwdevice2filebeat/generator/javascript"
+	"github.com/adriansr/nwdevice2filebeat/model"
+	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
 var generateCmd = &cobra.Command{
@@ -26,10 +28,15 @@ var generateCmd = &cobra.Command{
 			return
 		}
 		log.Printf("Loaded XML %s", dev.String())
-		_, err = generator.New(dev)
+		p, err := parser.New(dev)
 		if err != nil {
 			LogError("Failed to parse device", "path", devicePath, "reason", err)
 		}
+		js, err := javascript.Generate(p)
+		if err != nil {
+			LogError("Failed to generate javascript pipeline", "reason", err)
+		}
+		log.Print("Got pipeline:\n", string(js), "\n")
 	},
 }
 

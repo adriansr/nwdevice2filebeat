@@ -2,14 +2,20 @@
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
 
-package generator
+package parser
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 const (
 	escapedBackslash = "\\\\"
 	escapedSingleQuote = "\\'"
 )
+
+var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_0-9$\.]+$`)
+var functionNameRegex = regexp.MustCompile(`^[A-Za-z_0-9]+$`)
 
 var constantEscapes = strings.NewReplacer("\\\\", "\\", "\\'", "'")
 

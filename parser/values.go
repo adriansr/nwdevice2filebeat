@@ -2,11 +2,10 @@
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
 
-package generator
+package parser
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -14,7 +13,8 @@ import (
 
 type Value interface{
 	fmt.Stringer
-	IsValue() // TODO: Just for membership
+	Operation
+	Token() string
 }
 
 type Constant string
@@ -23,47 +23,29 @@ func (c Constant) String() string {
 	return "Constant('" + string(c) + "')"
 }
 
-func (c Constant) IsValue() {}
-
-type FieldRef string
-
-func (c FieldRef) String() string {
-	return "FieldRef(*" + string(c) + ")"
+func (c Constant) Children() []Operation {
+	return nil
 }
 
-func (c FieldRef) IsValue() {}
+func (c Constant) Token() string {
+	return string(c)
+}
 
 type Field string
-
-func (c Field) IsValue() {}
 
 func (c Field) String() string {
 	return "Field(" + string(c) + ")"
 }
 
-type Call struct {
-	Function string
-	Target   string
-	Args     []Value
+func (f Field) Token() string {
+	return "%{" + string(f) + "}"
 }
 
-func (c Call) IsValue() {}
-
-func (c Call) String() string {
-	var target string
-	if c.Target != "" {
-		target = "target="+ c.Target + ","
-	}
-	args := make([]string, len(c.Args))
-	for idx, val := range c.Args {
-		args[idx] = val.String()
-	}
-	return fmt.Sprintf("Call(%sfn='%s',%s)", target, c.Function, strings.Join(args, ","))
+func (c Field) Children() []Operation {
+	return nil
 }
 
 type Pattern []Value
-
-func (p Pattern) IsValue() {}
 
 func (p Pattern) String() string {
 	items := make([]string, len(p))
@@ -73,18 +55,42 @@ func (p Pattern) String() string {
 	return fmt.Sprintf("Pattern{%s}", strings.Join(items, ", "))
 }
 
-type Payload Field
+func (c Pattern) Children() []Operation {
+	return nil
+}
 
-func (c Payload) IsValue() {}
+type Tokenizer interface {
+	Token() string
+}
+
+func (c Pattern) Tokenizer() string {
+	parts := make([]string, len(c))
+	for idx, val := range c {
+		parts[idx] = val.Token()
+	}
+	return strings.Join(parts, "")
+}
+
+type Payload Field
 
 func (c Payload) String() string {
 	return "Payload(" + Field(c).String() + ")"
 }
 
-var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_0-9$\.]+$`)
-var functionNameRegex = regexp.MustCompile(`^[A-Za-z_0-9]+$`)
+func (c Payload) Children() []Operation {
+	return nil
+}
 
-func newValue(s string) (Value, error) {
+
+func (p Payload) Token() string {
+	if len(p) == 0 {
+		return "%{payload}"
+	}
+	return "%{" + string(p) + "}"
+}
+
+
+func newValue(s string, unquotedMeansField bool) (Value, error) {
 	n := len(s)
 	if n == 0 {
 		return nil, errors.New("empty value not allowed")
@@ -100,11 +106,16 @@ func newValue(s string) (Value, error) {
 		if !fieldNameRegex.MatchString(name) {
 			return nil, errors.Errorf("field name in reference:<<%s>> does not match regex:<<%s>>", name, fieldNameRegex)
 		}
-		return FieldRef(name), nil
+		// TODO: This was FieldRef, but the distinction doesn't seem necessary.
+		return Field(name), nil
 	default:
-		if !fieldNameRegex.MatchString(s) {
-			return nil, errors.Errorf("field name:<<%s>> does not match regex:<<%s>>", s, fieldNameRegex)
+		if unquotedMeansField {
+			if !fieldNameRegex.MatchString(s) {
+				return nil, errors.Errorf("field name:<<%s>> does not match regex:<<%s>>", s, fieldNameRegex)
+			}
+			return Field(s), nil
+		} else {
+			return Constant(s), nil
 		}
-		return Field(s), nil
 	}
 }

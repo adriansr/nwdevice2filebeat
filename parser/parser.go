@@ -2,7 +2,7 @@
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
 
-package generator
+package parser
 
 import (
 	"fmt"
@@ -13,36 +13,72 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Generator struct {
-	valueMaps map[string]valueMap
-	headers   []header
-	messages  []message
+type Parser struct {
+	ValueMaps []ValueMap
+	Headers   []header
+	Messages  []message
+
+	Root Operation
 }
 
-func New(dev model.Device) (gen Generator, err error) {
-	if gen.valueMaps, err = processValueMaps(dev.ValueMaps); err != nil {
-		return gen, err
+func New(dev model.Device) (p Parser, err error) {
+	if p.ValueMaps, err = processValueMaps(dev.ValueMaps); err != nil {
+		return p, err
 	}
-	if gen.headers, err = processHeaders(dev.Headers); err != nil {
-		return gen, err
+	p.Headers, err = processHeaders(dev.Headers)
+	if err != nil {
+		return p, err
 	}
-	if gen.messages, err = processMessages(dev.Messages); err != nil {
-		return gen, err
+	if p.Messages, err = processMessages(dev.Messages); err != nil {
+		return p, err
 	}
-	return gen, nil
+
+	root := Chain {
+		SourceContext: SourceContext(dev.Description.Pos()),
+	}
+
+	hNodes := make([]Operation, 0, len(p.Headers))
+	for _, h := range p.Headers {
+		match := Match{
+			SourceContext: SourceContext(h.pos),
+			Input:         "message",
+			Pattern:       h.content,
+		}
+		match.OnSuccess = make([]Operation, 0, 1+len(h.functions))
+		if h.messageID != nil {
+			match.OnSuccess = append(match.OnSuccess, h.messageID)
+		}
+		for _, fn := range h.functions {
+			match.OnSuccess = append(match.OnSuccess, SetField{
+				SourceContext: SourceContext(h.pos),
+				Target: Field(fn.Target),
+				Value: [1]Operation{fn},
+			})
+		}
+		hNodes = append(hNodes, match)
+	}
+
+	root.Nodes = append(root.Nodes, LinearSelect{
+		SourceContext: SourceContext{},
+		Nodes:         hNodes,
+	})
+
+	p.Root = root
+	return p,nil
 }
 
-func processValueMaps(input []*model.ValueMap) (output map[string]valueMap, err error) {
-	output = make(map[string]valueMap, len(input))
+func processValueMaps(input []*model.ValueMap) (output []ValueMap, err error) {
+	seen := make(map[string]bool, len(input))
 	for _, xml := range input {
 		vm, err := newValueMap(xml)
 		if err != nil {
 			return output, errors.Wrapf(err, "error parsing VALUEMAP at %s", xml.Pos())
 		}
-		if _, found := output[vm.name]; found {
+		if seen[vm.Name] {
 			return output, errors.Errorf("duplicated VALUEMAP name at %s", xml.Pos())
 		}
-		output[vm.name] = vm
+		seen[vm.Name] = true
+		output = append(output, vm)
 	}
 	return output, nil
 }
@@ -71,22 +107,25 @@ func processMessages(input []*model.Message) (output []message, err error) {
 	return output, nil
 }
 
-// TODO: Sometimes keys are numeric (and hex!) should it support numeric keys
-//       in different base? As in 33 for 0x21
-// TODO: Values are either quoted (single) or refs to fields (*dport)
-type valueMap struct {
-	name string
-	def  string
-	mappings map[string]Value
+var valueMapNullValues = map[string]bool {
+	"": true,
+	"$NONE": true,
+	"$NULL": true,
 }
 
-func newValueMap(xml *model.ValueMap) (vm valueMap, err error) {
-	if xml.Default != "$NONE" {
-		vm.def = xml.Default
+func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
+	vm.SourceContext = SourceContext(xml.Pos())
+	if !valueMapNullValues[xml.Default] {
+		v, err := newValue(xml.Default, false)
+		if err != nil {
+			return vm, errors.Wrapf(err,"cannot parse VALUEMAP default value '%s'", xml.Default)
+		}
+		vm.Default = &v
 	}
-	vm.name = xml.Name
+	vm.Name = xml.Name
 	kvpairs := strings.Split(xml.KeyValuePairs, "|")
-	vm.mappings = make(map[string]Value, len(kvpairs))
+	vm.Nodes = make([]Operation, 0, len(kvpairs))
+	vm.Mappings = make(map[string]int, len(kvpairs))
 	for _, pair := range kvpairs {
 		kv := strings.Split(pair, "=")
 		if len(kv) != 2 {
@@ -97,31 +136,38 @@ func newValueMap(xml *model.ValueMap) (vm valueMap, err error) {
 			continue
 			//return vm, errors.New("failed parsing keyvaluepairs")
 		}
-		value, err := newValue(kv[1])
+		value, err := newValue(kv[1], true)
 		if err != nil {
 			return vm, err
 		}
-		if prev, found := vm.mappings[kv[0]]; found {
+		if prevIdx, found := vm.Mappings[kv[0]]; found {
+			prev := vm.Nodes[prevIdx]
 			if prev == value {
 				log.Printf("WARN: parsing VALUEMAP at %s: duplicated keyvaluepair entry: '%s'", xml.Pos(), pair)
 				continue
 			}
 			// TODO:
 			// What to do here. It happens only once (ibmracf)
-			return vm, errors.Errorf("found duplicated key '%s' with differing value old:%s new:%s", kv[0], prev, value)
+			log.Printf("WARN: parsing VALUEMAP at %s: found duplicated key '%s' with differing value old:%s new:%s", xml.Pos(), kv[0], prev, value)
+			vm.Nodes[prevIdx] = value
+		} else {
+			vm.Nodes = append(vm.Nodes, value)
+			vm.Mappings[kv[0]] = len(vm.Nodes) - 1
 		}
-		vm.mappings[kv[0]] = value
 	}
 	return vm, nil
 }
 
 type header struct {
+	pos model.XMLPos
 	id2 string
 	messageID *Call
+	functions []Call
 	content Pattern
 }
 
 func newHeader(xml *model.Header) (h header, err error) {
+	h.pos = xml.Pos()
 	// This appears in all the messages.
 	if xml.ID2 == "" {
 		return h, errors.Errorf("empty id2 attribute")
@@ -141,8 +187,9 @@ func newHeader(xml *model.Header) (h header, err error) {
 	if h.content, err = ParsePattern(xml.Content); err != nil {
 		return h, errors.Wrap(err,"error parsing content")
 	}
-	//log.Printf("XXX at %s: got pattern=<<%s>>", xml.Pos(), h.content)
-	// TODO: functions etc.
+	if h.functions, err = parseFunctions(xml.Functions); err != nil {
+		return h, errors.Wrap(err,"error parsing functions")
+	}
 	return h, err
 }
 
@@ -185,7 +232,7 @@ func newMessage(xml *model.Message) (m message, err error) {
 	if m.functions, err = parseFunctions(xml.Functions); err != nil {
 		return m, errors.Wrap(err, "error parsing functions")
 	}
-	log.Printf("XXX at %s: got %+v", xml.Pos(), m)
+	//log.Printf("XXX at %s: got %+v", xml.Pos(), m)
 	return m, err
 }
 

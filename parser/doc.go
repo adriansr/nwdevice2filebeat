@@ -2,7 +2,7 @@
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
 
-package generator
+package parser
 
 //go:generate ragel -Z -G1 call.go.rl -o call_generated.go
 //go:generate goimports -l -w call_generated.go

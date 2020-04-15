@@ -49,22 +49,37 @@ func New(dev model.Device) (p Parser, err error) {
 			match.OnSuccess = append(match.OnSuccess, h.messageID)
 		}
 		for _, fn := range h.functions {
-			match.OnSuccess = append(match.OnSuccess, SetField{
-				SourceContext: SourceContext(h.pos),
-				Target: Field(fn.Target),
-				Value: [1]Operation{fn},
-			})
+			match.OnSuccess = append(match.OnSuccess, fn)
 		}
 		hNodes = append(hNodes, match)
 	}
 
+	mNodes := make([]Operation, 0, len(p.Messages))
+	for _, m := range p.Messages {
+		match := Match{
+			SourceContext: SourceContext(m.pos),
+			Input:         "message", // TODO
+			Pattern:       m.content,
+		}
+		match.OnSuccess = make([]Operation, 0, 1+len(m.functions))
+		if m.eventcategory != "" {
+			match.OnSuccess = append(match.OnSuccess, Constant(m.eventcategory))
+		}
+		for _, fn := range m.functions {
+			match.OnSuccess = append(match.OnSuccess, fn)
+		}
+		mNodes = append(mNodes, match)
+	}
 	root.Nodes = append(root.Nodes, LinearSelect{
 		SourceContext: SourceContext{},
 		Nodes:         hNodes,
 	})
-
+	root.Nodes = append(root.Nodes, LinearSelect{
+		SourceContext: SourceContext{},
+		Nodes:         mNodes,
+	})
 	p.Root = root
-	return p,nil
+	return p, validate(p)
 }
 
 func processValueMaps(input []*model.ValueMap) (output []ValueMap, err error) {
@@ -194,6 +209,7 @@ func newHeader(xml *model.Header) (h header, err error) {
 }
 
 type message struct {
+	pos model.XMLPos
 	id1 string
 	id2 string
 	eventcategory string

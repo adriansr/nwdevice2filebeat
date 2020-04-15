@@ -5,9 +5,9 @@
 package javascript
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -15,10 +15,9 @@ import (
 	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
-var header = `
-//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one",
-//  or more contributor license agreements. Licensed under the Elastic License;",
-//  you may not use this file except in compliance with the Elastic License.",
+var header = `//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+//  or more contributor license agreements. Licensed under the Elastic License;
+//  you may not use this file except in compliance with the Elastic License.
 
 processor = require("processor");
 console   = require("console");
@@ -37,18 +36,42 @@ function process(evt) {
 `
 
 type codeWriter struct {
-	buf bytes.Buffer
+	//buf bytes.Buffer
+	dest io.Writer
 	errors []error
-	newline bool
 	prefix  []byte
-
 	indent []byte
+	bytes  uint64
+	writeFailed bool
+	newline bool
+}
+
+func newCodeWriter(target io.Writer, indent string) *codeWriter {
+	return &codeWriter{
+		dest:    target,
+		indent:  []byte(indent),
+	}
+}
+
+func (c *codeWriter) write(data []byte) *codeWriter {
+	total := len(data)
+	if total == 0 || c.writeFailed {
+		return c
+	}
+	written, err := c.dest.Write(data)
+	if err != nil || written != total {
+		if err == nil {
+			err = errors.New("short write")
+		}
+		c.Err(errors.Wrap(err, "error writing output"))
+	}
+	c.bytes += uint64(total)
+	return c
 }
 
 func (c *codeWriter) AddRaw(raw string) *codeWriter {
 	c.newline = false
-	c.buf.WriteString(raw)
-	return c
+	return c.write([]byte(raw))
 }
 
 func (c *codeWriter) Err(err error) *codeWriter {
@@ -59,9 +82,8 @@ func (c *codeWriter) Err(err error) *codeWriter {
 }
 
 func (c *codeWriter) Newline() *codeWriter {
-	c.buf.WriteByte('\n')
 	c.newline = true
-	return c
+	return c.write([]byte{'\n'})
 }
 
 func (c *codeWriter) JS(v interface{}) *codeWriter {
@@ -71,12 +93,15 @@ func (c *codeWriter) JS(v interface{}) *codeWriter {
 }
 
 func (c *codeWriter) Write(s string) *codeWriter {
+	return c.WriteBytes([]byte(s))
+}
+
+func (c *codeWriter) WriteBytes(s []byte) *codeWriter {
 	if c.newline {
 		c.newline = false
-		c.buf.Write(c.prefix)
+		c.write(c.prefix)
 	}
-	c.buf.WriteString(s)
-	return c
+	return c.write(s)
 }
 
 func (c *codeWriter) Writef(format string, args... interface{}) *codeWriter {
@@ -97,7 +122,7 @@ func (c *codeWriter) Unindent() *codeWriter {
 	return c
 }
 
-func (c *codeWriter) Finalize() (out []byte, err error) {
+func (c *codeWriter) Finalize() (count uint64, err error) {
 	if n := len(c.errors); n > 0 {
 		limit := n
 		if limit > 10 {
@@ -114,22 +139,21 @@ func (c *codeWriter) Finalize() (out []byte, err error) {
 		}
 		err = errors.New(strings.Join(msg, "\n"))
 	}
-	return c.buf.Bytes(), err
+	return c.bytes, err
 }
 
-func Generate(p parser.Parser) (content []byte, err error) {
-	var cw codeWriter
-	cw.indent = []byte("    ")
+func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
+	cw := newCodeWriter(dest, "    ")
 	cw.AddRaw(header)
 	for _, vm := range p.ValueMaps {
-		generate(vm, &cw)
+		generate(vm, cw)
 		cw.Newline()
 	}
 	cw.Write("function DeviceProcessor() {").Newline().Indent().
 		Write("var builder = new processor.Chain();").Newline().
 		Write("builder.Add(save_flags);").Newline().
 		Write("builder.Add(").Newline().Indent()
-	generate(p.Root, &cw)
+	generate(p.Root, cw)
 	cw.Unindent().Write(");").Newline().
 		Write("builder.Add(restore_flags);").Newline().
 		Write("var chain = builder.Build();").Newline().
@@ -184,22 +208,24 @@ func generate(op parser.Operation, out *codeWriter) {
 		out.Unindent().Write("])")
 
 	case parser.Match:
-		out.Write("match({").Newline().Indent().
-			Write("dissect: {").Newline().Indent().
-			Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
-			// TODO: Why Input is Field and not string
-			Write("field: ").JS(string(v.Input)).Write(",").Newline().
-			Write("target_prefix: ").JS("nwparser").Write(",").Newline().
-			Write("ignore_failure: ").JS(true).Write(",").Newline().
-			Unindent().Write("},").Newline()
+		out.Write("match({").Newline().
+			Indent().Write("dissect: {").Newline().
+				Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
+				// TODO: Why Input is Field and not string
+						 Write("field: ").JS(string(v.Input)).Write(",").Newline().
+						 Write("target_prefix: ").JS("nwparser").Write(",").Newline().
+						 Write("ignore_failure: ").JS(true).Write(",").Newline().
+			    Unindent().Write("},").Newline()
 		if len(v.OnSuccess) > 0 {
-			out.Write("on_success: processor_chain([").Indent().Newline()
+			out.Write("on_success: processor_chain([").
+				Indent().Newline()
 			for _, act := range v.OnSuccess {
 				generate(act, out)
 				out.Write(",").Newline()
 			}
 			out.Unindent().Write("]),").Newline()
 		}
+		out.Unindent().Write("})")
 
 	case parser.Call:
 		out.Write("call({").Newline().Indent().
@@ -211,8 +237,17 @@ func generate(op parser.Operation, out *codeWriter) {
 			out.Write(",").Newline()
 		}
 		out.Unindent().Write("],").Unindent().Newline().Write("})")
+
 	case *parser.Call:
 		generate(*v, out)
+
+	case parser.SetField:
+		out.Write("set_field({").Newline().Indent().
+			Write("dest: ").JS(v.Target).Write(",").Newline().
+			Write("value: ")
+		generate(v.Value[0], out)
+		out.Write(",").Newline().Unindent()
+		out.Write("})")
 	default:
 		// TODO: return nil, errors.Errorf("unsupported type %T", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))

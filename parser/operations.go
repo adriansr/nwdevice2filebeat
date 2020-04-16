@@ -56,8 +56,9 @@ type SwitchSelect struct {
 
 type Match struct {
 	SourceContext
-	Input   Field
+	Input   string
 	Pattern Pattern
+	PayloadField string
 	OnSuccess []Operation
 }
 
@@ -67,7 +68,7 @@ func (m Match) Children() []Operation {
 
 type SetField struct {
 	SourceContext
-	Target Field
+	Target string
 	Value [1]Operation
 }
 

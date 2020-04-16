@@ -32,6 +32,7 @@ var generateCmd = &cobra.Command{
 		p, err := parser.New(dev)
 		if err != nil {
 			LogError("Failed to parse device", "path", devicePath, "reason", err)
+			return
 		}
 		numBytes, err := javascript.Generate(p, ioutil.Discard)
 		if err != nil {

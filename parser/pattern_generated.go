@@ -121,6 +121,8 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 			goto tr11
 		case 10:
 			switch data[(p)] {
+			case 36:
+				goto tr14
 			case 46:
 				goto tr14
 			case 95:
@@ -141,6 +143,8 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 			goto tr1
 		case 11:
 			switch data[(p)] {
+			case 36:
+				goto tr15
 			case 46:
 				goto tr15
 			case 62:
@@ -395,7 +399,7 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 					pattern = append(pattern, Constant(data[mark:p]))
 				}
 
-//line pattern_generated.go:358
+//line pattern_generated.go:362
 			}
 		}
 
@@ -404,7 +408,7 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 		}
 	}
 
-//line pattern.go.rl:83
+//line pattern.go.rl:85
 
 	if err != nil {
 		return nil, err

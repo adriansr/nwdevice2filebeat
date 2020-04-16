@@ -25,19 +25,17 @@ var ErrBadCall = errors.New("malformed function call")
 // ParseCall is the first step on parsing a function call.
 // Input: "STRCAT('header_', msgIdPart2)"
 // Output: Call(Function:"STRCAT", Args: [ Constant("header_"), Field("msgIdPart2")])
-func ParseCall(data string) (pCall *Call, err error) {
+func ParseCall(data string) (call Call, err error) {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	start := -1
 	err = ErrBadCall
 
-	var call Call
-
-//line call_generated.go:41
+//line call_generated.go:39
 	{
 		cs = parse_call_start
 	}
 
-//line call_generated.go:46
+//line call_generated.go:44
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -160,19 +158,19 @@ func ParseCall(data string) (pCall *Call, err error) {
 		goto f2
 
 	f0:
-//line call.go.rl:33
+//line call.go.rl:31
 
 		start = p
 
 		goto _again
 	f1:
-//line call.go.rl:36
+//line call.go.rl:34
 
 		call.Function = data[start:p]
 
 		goto _again
 	f2:
-//line call.go.rl:39
+//line call.go.rl:37
 
 		call.Args = append(call.Args, disambiguateFieldOrConstant(data[start:p]))
 
@@ -191,11 +189,11 @@ func ParseCall(data string) (pCall *Call, err error) {
 		if (p) == eof {
 			switch _parse_call_eof_actions[cs] {
 			case 4:
-//line call.go.rl:42
+//line call.go.rl:40
 
 				err = nil
 
-//line call_generated.go:180
+//line call_generated.go:178
 			}
 		}
 
@@ -204,10 +202,7 @@ func ParseCall(data string) (pCall *Call, err error) {
 		}
 	}
 
-//line call.go.rl:56
+//line call.go.rl:54
 
-	if err != nil {
-		return nil, err
-	}
-	return &call, nil
+	return call, err
 }

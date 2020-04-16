@@ -136,7 +136,10 @@ type XMLPos struct {
 }
 
 func (p XMLPos) String() string {
-	return fmt.Sprintf("%s:%d:%d", p.Path, p.Line, p.Col)
+	if len(p.Path) != 0 {
+		return fmt.Sprintf("%s:%d:%d", p.Path, p.Line, p.Col)
+	}
+	return "(unknown)"
 }
 
 type stateFn func(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error)

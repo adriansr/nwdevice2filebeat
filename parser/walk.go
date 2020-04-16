@@ -15,7 +15,7 @@ const (
 
 type WalkFn func(node Operation) (WalkAction, Operation)
 
-func Walk(parser *Parser, visitor WalkFn) WalkAction {
+func (parser *Parser) Walk(visitor WalkFn) WalkAction {
 	return walk(&parser.Root, visitor)
 }
 

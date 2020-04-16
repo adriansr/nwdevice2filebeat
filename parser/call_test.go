@@ -151,7 +151,7 @@ func TestCall(t *testing.T) {
 		result, err := ParseCall(testCase.input)
 		if !testCase.err {
 			assert.NoError(t, err)
-			assert.Equal(t, &testCase.expected, result, testCase.input)
+			assert.Equal(t, testCase.expected, result, testCase.input)
 		} else {
 			assert.Equal(t, ErrBadCall, err, testCase.input)
 		}
@@ -160,14 +160,20 @@ func TestCall(t *testing.T) {
 
 
 func TestCall2(t *testing.T) {
+	loc := SourceContext{
+		Path: "call_test.go",
+		Line: 99,
+		Col:  17,
+	}
 	for _, testCase := range []struct {
 		input    string
-		expected Call
+		expected Operation
 		err      bool
 	}{
 		{
 			input: "@target:*APPEND('hola',:,feo)",
 			expected: Call{
+				SourceContext: loc,
 				Function: "APPEND",
 				Target:   "target",
 				Args:     []Value{Constant("hola"), Constant(":"), Field("feo")},
@@ -175,17 +181,17 @@ func TestCall2(t *testing.T) {
 		},
 		{
 			input: "@target:SOMETHING()",
-			expected: Call{
-				Function: "$set$",
+			expected: SetField{
+				SourceContext: loc,
 				Target:   "target",
-				Args:     []Value{Constant("SOMETHING()")},
+				Value:     [1]Operation{Constant("SOMETHING()")},
 			},
 		},
 	}{
-		result, err := parseCall(testCase.input, true)
+		result, err := parseCall(testCase.input, true, loc)
 		if !testCase.err {
 			assert.NoError(t, err)
-			assert.Equal(t, &testCase.expected, result, testCase.input)
+			assert.Equal(t, testCase.expected, result, testCase.input)
 		} else {
 			assert.Equal(t, ErrBadCall, err, testCase.input)
 		}

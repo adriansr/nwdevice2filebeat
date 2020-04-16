@@ -5,13 +5,11 @@
 package javascript
 
 import (
-	"encoding/json"
-	"fmt"
 	"io"
-	"strings"
 
 	"github.com/pkg/errors"
 
+	"github.com/adriansr/nwdevice2filebeat/generator"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
@@ -35,115 +33,11 @@ function process(evt) {
 
 `
 
-type codeWriter struct {
-	//buf bytes.Buffer
-	dest io.Writer
-	errors []error
-	prefix  []byte
-	indent []byte
-	bytes  uint64
-	writeFailed bool
-	newline bool
-}
-
-func newCodeWriter(target io.Writer, indent string) *codeWriter {
-	return &codeWriter{
-		dest:    target,
-		indent:  []byte(indent),
-	}
-}
-
-func (c *codeWriter) write(data []byte) *codeWriter {
-	total := len(data)
-	if total == 0 || c.writeFailed {
-		return c
-	}
-	written, err := c.dest.Write(data)
-	if err != nil || written != total {
-		if err == nil {
-			err = errors.New("short write")
-		}
-		c.Err(errors.Wrap(err, "error writing output"))
-	}
-	c.bytes += uint64(total)
-	return c
-}
-
-func (c *codeWriter) AddRaw(raw string) *codeWriter {
-	c.newline = false
-	return c.write([]byte(raw))
-}
-
-func (c *codeWriter) Err(err error) *codeWriter {
-	if err != nil {
-		c.errors = append(c.errors, err)
-	}
-	return c
-}
-
-func (c *codeWriter) Newline() *codeWriter {
-	c.newline = true
-	return c.write([]byte{'\n'})
-}
-
-func (c *codeWriter) JS(v interface{}) *codeWriter {
-	b, err := json.Marshal(v)
-	c.Err(err)
-	return c.Write(string(b))
-}
-
-func (c *codeWriter) Write(s string) *codeWriter {
-	return c.WriteBytes([]byte(s))
-}
-
-func (c *codeWriter) WriteBytes(s []byte) *codeWriter {
-	if c.newline {
-		c.newline = false
-		c.write(c.prefix)
-	}
-	return c.write(s)
-}
-
-func (c *codeWriter) Writef(format string, args... interface{}) *codeWriter {
-	return c.Write(fmt.Sprintf(format, args...))
-}
-
-func (c *codeWriter) Indent() *codeWriter {
-	c.prefix = append(c.prefix, c.indent...)
-	return c
-}
-
-func (c *codeWriter) Unindent() *codeWriter {
-	if a, b := len(c.prefix), len(c.indent); a >= b {
-		c.prefix = c.prefix[:a-b]
-	} else {
-		c.Err(errors.New("indent below zero"))
-	}
-	return c
-}
-
-func (c *codeWriter) Finalize() (count uint64, err error) {
-	if n := len(c.errors); n > 0 {
-		limit := n
-		if limit > 10 {
-			limit = 10
-		}
-		msg := []string{
-			fmt.Sprintf("found %d errors while generating javascript:\n", n),
-		}
-		for i := 0; i < limit; i++ {
-			msg = append(msg, "    " + c.errors[i].Error())
-		}
-		if limit != n {
-			msg = append(msg, fmt.Sprintf("    ... (and %d more)", n - limit))
-		}
-		err = errors.New(strings.Join(msg, "\n"))
-	}
-	return c.bytes, err
-}
-
 func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
-	cw := newCodeWriter(dest, "\t")
+	if err := p.Apply(preprocessors); err != nil {
+		return 0, err
+	}
+	cw := generator.NewCodeWriter(dest, "\t")
 	cw.AddRaw(header)
 	for _, vm := range p.ValueMaps {
 		generate(vm, cw)
@@ -163,7 +57,7 @@ func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
 	return cw.Finalize()
 }
 
-func generate(op parser.Operation, out *codeWriter) {
+func generate(op parser.Operation, out *generator.CodeWriter) {
 	switch v := op.(type) {
 	case parser.ValueMap:
 		out.Writef("var map_%s = {", v.Name).Newline().
@@ -211,8 +105,7 @@ func generate(op parser.Operation, out *codeWriter) {
 		out.Write("match({").Newline().
 			Indent().Write("dissect: {").Newline().
 				Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
-				// TODO: Why Input is Field and not string
-						 Write("field: ").JS(string(v.Input)).Write(",").Newline().
+						 Write("field: ").JS(v.Input).Write(",").Newline().
 						 Write("target_prefix: ").JS("nwparser").Write(",").Newline().
 						 Write("ignore_failure: ").JS(true).Write(",").Newline().
 			    Unindent().Write("},").Newline()
@@ -238,9 +131,9 @@ func generate(op parser.Operation, out *codeWriter) {
 		}
 		out.Unindent().Write("],").Unindent().Newline().Write("})")
 
-	case *parser.Call:
-		// TODO: Get rid of pointers sneaking in
-		generate(*v, out)
+	//case *parser.Call:
+	//	// TODO: Get rid of pointers sneaking in
+	//	generate(*v, out)
 
 	case parser.SetField:
 		out.Write("set_field({").Newline().Indent().

@@ -14,6 +14,8 @@ import (
 type Value interface{
 	fmt.Stringer
 	Operation
+	// TODO: Move token to it's own interface. Value should be anything that
+	//       you can use as a value to set a field.
 	Token() string
 }
 
@@ -35,6 +37,10 @@ type Field string
 
 func (c Field) String() string {
 	return "Field(" + string(c) + ")"
+}
+
+func (c Field) Name() string {
+	return string(c)
 }
 
 func (f Field) Token() string {
@@ -59,6 +65,22 @@ func (c Pattern) Children() []Operation {
 	return nil
 }
 
+var ErrNoPayload = errors.New("no payload field in expression")
+
+func (c Pattern) PayloadField() (field string, err error) {
+	err = ErrNoPayload
+	for _, elem := range c {
+		if payload, ok := elem.(Payload); ok {
+			if err == nil {
+				return field, errors.New("multiple payload fields in pattern")
+			}
+			field = payload.FieldName()
+			err = nil
+		}
+	}
+	return
+}
+
 type Tokenizer interface {
 	Token() string
 }
@@ -75,6 +97,10 @@ type Payload Field
 
 func (c Payload) String() string {
 	return "Payload(" + Field(c).String() + ")"
+}
+
+func (c Payload) FieldName() string {
+	return string(c)
 }
 
 func (c Payload) Children() []Operation {

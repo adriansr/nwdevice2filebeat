@@ -69,8 +69,10 @@ func ParsePattern(data string) (pattern Pattern, err error) {
         }
         const_chars = "<<" | (any -- "<");
         field_chars = [A-Za-z_0-9\.];
+        payload_field_chars = [$A-Za-z_0-9\.];
         field_name = field_chars+ >mark %capture_field;
-        payload_custom = ":" field_name;
+        payload_field_name = payload_field_chars+ >mark %capture_field;
+        payload_custom = ":" payload_field_name;
         payload_decl = "!payload" %enter_payload payload_custom? %leave_payload;
         field = "<"  %capture_constant (payload_decl | field_name) $/onerror ">" %mark @^onerror;
         constant = const_chars++;

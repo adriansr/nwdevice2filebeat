@@ -35,6 +35,13 @@ func New(dev model.Device) (p Parser, err error) {
 		return p, err
 	}
 
+	if err = p.Apply(prechecks); err != nil {
+		return p, err
+	}
+	if err = p.Apply(preactions); err != nil {
+		return p, err
+	}
+
 	root := Chain {
 		SourceContext: SourceContext(dev.Description.Pos()),
 	}
@@ -45,14 +52,12 @@ func New(dev model.Device) (p Parser, err error) {
 			SourceContext: SourceContext(h.pos),
 			Input:         "message",
 			Pattern:       h.content,
+			PayloadField:  h.payloadField,
 		}
-		match.OnSuccess = make([]Operation, 0, 1+len(h.functions))
 		if h.messageID != nil {
 			match.OnSuccess = append(match.OnSuccess, h.messageID)
 		}
-		for _, fn := range h.functions {
-			match.OnSuccess = append(match.OnSuccess, fn)
-		}
+		match.OnSuccess = append(match.OnSuccess, h.functions...)
 		hNodes = append(hNodes, match)
 	}
 
@@ -60,7 +65,7 @@ func New(dev model.Device) (p Parser, err error) {
 	for _, m := range p.Messages {
 		match := Match{
 			SourceContext: SourceContext(m.pos),
-			Input:         "message", // TODO
+			Input:         "payload",
 			Pattern:       m.content,
 		}
 		match.OnSuccess = make([]Operation, 0, 1+len(m.functions))
@@ -81,7 +86,7 @@ func New(dev model.Device) (p Parser, err error) {
 		Nodes:         mNodes,
 	})
 	p.Root = root
-	if err := p.Apply(fixtures); err != nil {
+	if err := p.Apply(transforms); err != nil {
 		return p, err
 	}
 	return p, validate(&p)
@@ -182,13 +187,16 @@ func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 type header struct {
 	pos model.XMLPos
 	id2 string
-	messageID *Call
-	functions []Call
+	messageID Operation
+	functions []Operation
 	content Pattern
+
+	// This field is not in the XML. We're adding this information to help
+	// capture payload when the payload overlaps part of the header.
+	payloadField string
 }
 
 func newHeader(xml *model.Header) (h header, err error) {
-	h.pos = xml.Pos()
 	// This appears in all the messages.
 	if xml.ID2 == "" {
 		return h, errors.Errorf("empty id2 attribute")
@@ -197,18 +205,26 @@ func newHeader(xml *model.Header) (h header, err error) {
 		return h, errors.Errorf("empty content attribute")
 	}
 	h = header {
+		pos: xml.Pos(),
 		id2: xml.ID2,
 	}
 	if xml.MessageID != "" {
-		if h.messageID, err = parseCall(xml.MessageID, false); err != nil {
+		if h.messageID, err = parseCall(xml.MessageID, false, SourceContext(xml.Pos())); err != nil {
 			return h, errors.Wrap(err,"error parsing messageid")
 		}
-		//log.Printf("XXX at %s: messageid=<<%s>>", xml.Pos(), h.messageID)
+		switch v := h.messageID.(type) {
+		case Call:
+			v.Target = "messageid"
+			h.messageID = v
+		case SetField:
+			v.Target = "messageid"
+			h.messageID = v
+		}
 	}
 	if h.content, err = ParsePattern(xml.Content); err != nil {
 		return h, errors.Wrap(err,"error parsing content")
 	}
-	if h.functions, err = parseFunctions(xml.Functions); err != nil {
+	if h.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
 		return h, errors.Wrap(err,"error parsing functions")
 	}
 	return h, err
@@ -219,7 +235,7 @@ type message struct {
 	id1 string
 	id2 string
 	eventcategory string
-	functions []Call
+	functions []Operation
 	content Pattern
 }
 
@@ -251,14 +267,14 @@ func newMessage(xml *model.Message) (m message, err error) {
 	if m.content, err = ParsePattern(xml.Content); err != nil {
 		return m, errors.Wrap(err,"error parsing content")
 	}
-	if m.functions, err = parseFunctions(xml.Functions); err != nil {
+	if m.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
 		return m, errors.Wrap(err, "error parsing functions")
 	}
 	//log.Printf("XXX at %s: got %+v", xml.Pos(), m)
 	return m, err
 }
 
-func parseFunctions(s string) (calls []Call, err error) {
+func parseFunctions(s string, loc SourceContext) (calls []Operation, err error) {
 	// Skip leading spaces
 	i := 0
 	for n := len(s);i<n && s[i] == ' '; i++ {}
@@ -279,11 +295,11 @@ func parseFunctions(s string) (calls []Call, err error) {
 	}
 	for n := len(s);; {
 		strCall := s[start+1:end]
-		call, err := parseCall(strCall, true)
+		call, err := parseCall(strCall, true, loc)
 		if err != nil {
 			return nil, errors.Wrapf(err,"can't parse call at %d:%d : '%s'", start, end, strCall)
 		}
-		calls = append(calls, *call)
+		calls = append(calls, call)
 		for start = end + 1; start < n && s[start] == ' '; start++ {
 		}
 		if start >= n {
@@ -301,23 +317,25 @@ func parseFunctions(s string) (calls []Call, err error) {
 	return calls, nil
 }
 
-func parseCall(s string, allowTarget bool) (call *Call, err error) {
-	call = &Call {}
+func parseCall(s string, allowTarget bool, location SourceContext) (op Operation, err error) {
 	n := len(s)
+	var target string
 	if allowTarget && s[0] == '@' {
 		end := strings.IndexByte(s, ':')
 		if end == -1 {
-			return call, errors.Errorf("target not terminated at '%s'", s)
+			return op, errors.Errorf("target not terminated at '%s'", s)
 		}
-		call.Target = s[1:end]
+		target = s[1:end]
 		s = s[end+1:]
 		if n = len(s); n == 0 {
-			return call, errors.Errorf("bad target pattern at '%s'", s)
+			return op, errors.Errorf("bad target pattern at '%s'", s)
 		}
 		if s[0] != '*' {
-			call.Function = "$set$"
-			call.Args = []Value{ Constant(s) }
-			return call, nil
+			return SetField{
+				SourceContext: location,
+				Target:        target,
+				Value:         [1]Operation{ Constant(s) },
+			}, nil
 		}
 		s = s[1:]
 	} else {
@@ -327,9 +345,9 @@ func parseCall(s string, allowTarget bool) (call *Call, err error) {
 	}
 	p, err := ParseCall(s)
 	if err != nil {
-		return call, errors.Wrapf(err,"bad function call at '%s'", s)
+		return op, errors.Wrapf(err,"bad function call at '%s'", s)
 	}
-	call.Function = p.Function
-	call.Args = p.Args
-	return call, nil
+	p.SourceContext = location
+	p.Target = target
+	return p, nil
 }

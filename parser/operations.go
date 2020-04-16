@@ -115,3 +115,14 @@ func (v ValueMap) Children() []Operation {
 	return v.Nodes
 }
 
+type ValueMapCall struct {
+	SourceContext
+	Target  string
+	MapName string
+	Key     [1]Operation
+}
+
+
+func (v ValueMapCall) Children() []Operation {
+	return v.Key[:]
+}

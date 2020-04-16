@@ -19,8 +19,8 @@ var header = `//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch 
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
 
-processor = require("processor");
-console   = require("console");
+var processor = require("processor");
+var console   = require("console");
 
 var device;
 
@@ -143,7 +143,7 @@ func (c *codeWriter) Finalize() (count uint64, err error) {
 }
 
 func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
-	cw := newCodeWriter(dest, "    ")
+	cw := newCodeWriter(dest, "\t")
 	cw.AddRaw(header)
 	for _, vm := range p.ValueMaps {
 		generate(vm, cw)
@@ -166,7 +166,7 @@ func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
 func generate(op parser.Operation, out *codeWriter) {
 	switch v := op.(type) {
 	case parser.ValueMap:
-		out.Writef("var valuemap_%s = make_valuemap({", v.Name).Newline().
+		out.Writef("var map_%s = {", v.Name).Newline().
 			Indent().
 				JS("keyvaluepairs").Write(": {").Newline().
 				Indent()
@@ -239,6 +239,7 @@ func generate(op parser.Operation, out *codeWriter) {
 		out.Unindent().Write("],").Unindent().Newline().Write("})")
 
 	case *parser.Call:
+		// TODO: Get rid of pointers sneaking in
 		generate(*v, out)
 
 	case parser.SetField:
@@ -248,7 +249,18 @@ func generate(op parser.Operation, out *codeWriter) {
 		generate(v.Value[0], out)
 		out.Write(",").Newline().Unindent()
 		out.Write("})")
+
+	case parser.ValueMapCall:
+		out.Write("lookup({").Newline().Indent().
+			Write("dest: ").JS(v.Target).Write(",").Newline().
+			Write("map: ").Write("map_" + v.MapName).Write(",").Newline().
+			Write("key: ")
+		generate(v.Key[0], out)
+		out.Write(",").Newline().Unindent()
+		out.Write("})")
+
 	default:
+		out.Writef("/* TODO: here goes a %T */", v)
 		// TODO: return nil, errors.Errorf("unsupported type %T", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))
 	}

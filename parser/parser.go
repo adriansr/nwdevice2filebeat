@@ -18,11 +18,13 @@ type Parser struct {
 	Headers   []header
 	Messages  []message
 
+	ValueMapsByName map[string]*ValueMap
+
 	Root Operation
 }
 
 func New(dev model.Device) (p Parser, err error) {
-	if p.ValueMaps, err = processValueMaps(dev.ValueMaps); err != nil {
+	if p.ValueMaps, p.ValueMapsByName, err = processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
 	}
 	p.Headers, err = processHeaders(dev.Headers)
@@ -79,23 +81,27 @@ func New(dev model.Device) (p Parser, err error) {
 		Nodes:         mNodes,
 	})
 	p.Root = root
-	return p, validate(p)
+	if err := p.Apply(fixtures); err != nil {
+		return p, err
+	}
+	return p, validate(&p)
 }
 
-func processValueMaps(input []*model.ValueMap) (output []ValueMap, err error) {
-	seen := make(map[string]bool, len(input))
-	for _, xml := range input {
+func processValueMaps(input []*model.ValueMap) (output []ValueMap, byName map[string]*ValueMap, err error) {
+	byName = make(map[string]*ValueMap, len(input))
+	output = make([]ValueMap, len(input))
+	for idx, xml := range input {
 		vm, err := newValueMap(xml)
 		if err != nil {
-			return output, errors.Wrapf(err, "error parsing VALUEMAP at %s", xml.Pos())
+			return output, byName, errors.Wrapf(err, "error parsing VALUEMAP at %s", xml.Pos())
 		}
-		if seen[vm.Name] {
-			return output, errors.Errorf("duplicated VALUEMAP name at %s", xml.Pos())
+		if byName[vm.Name] != nil {
+			return output, byName, errors.Errorf("duplicated VALUEMAP name at %s", xml.Pos())
 		}
-		seen[vm.Name] = true
-		output = append(output, vm)
+		output[idx] = vm
+		byName[vm.Name] = &output[idx]
 	}
-	return output, nil
+	return output, byName, nil
 }
 
 func processHeaders(input []*model.Header) (output []header, err error) {

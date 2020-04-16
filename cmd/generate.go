@@ -37,7 +37,7 @@ var generateCmd = &cobra.Command{
 		if err != nil {
 			LogError("Failed to generate javascript pipeline", "reason", err)
 		}
-		log.Printf("XXX got pipeline of %d bytes\n", numBytes)
+		log.Printf("XXX %d bytes for pipeline %s (%s)\n", numBytes, dev.Description.DisplayName, dev.Description.Name)
 	},
 }
 

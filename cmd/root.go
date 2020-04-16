@@ -5,11 +5,13 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/joeshaw/multierror"
 	"github.com/spf13/cobra"
 )
 
@@ -37,10 +39,26 @@ func LogError(msg string, keysAndValues ...interface{}) {
 	sb.WriteString("Error: ")
 	sb.WriteString(msg)
 	for i := 0; i < len(keysAndValues); i += 2 {
-		sb.WriteString(fmt.Sprintf(" %s=%v", keysAndValues[i], keysAndValues[i+1]))
+		sb.WriteString(fmt.Sprintf(" %s=%v", keysAndValues[i], limitError(keysAndValues[i+1])))
 	}
 	if len(keysAndValues)&1 != 0 {
-		sb.WriteString(fmt.Sprintf(" %s=%v", "_unmatched_", keysAndValues[len(keysAndValues)-1]))
+		sb.WriteString(fmt.Sprintf(" %s=%v", "_unmatched_", limitError(keysAndValues[len(keysAndValues)-1])))
 	}
 	log.Println(sb.String())
+}
+
+const MaxPrintErrors = 10
+
+func limitError(val interface{}) interface{} {
+	// TODO: This doesn't work
+	if err, ok := val.(error); ok {
+		var merr *multierror.MultiError
+		if errors.As(err, &merr) {
+			if n := len(merr.Errors); n > MaxPrintErrors {
+				merr.Errors = append(merr.Errors[:MaxPrintErrors],
+					errors.New(fmt.Sprintf("... and %d more.", n - MaxPrintErrors)))
+			}
+		}
+	}
+	return val
 }

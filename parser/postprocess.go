@@ -6,6 +6,7 @@ package parser
 
 import (
 	"log"
+	"strings"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -51,6 +52,14 @@ var transforms = PostprocessGroup {
 	Actions: []Action{
 		// Replaces a Call() to a MalueMap with a ValueMapCall.
 		{"translate valuemap references", convertValueMapReferences},
+		{"translate PARMVAL calls", translateParmval},
+	},
+}
+
+var optimizations = PostprocessGroup{
+	Title:   "optimizations",
+	Actions: []Action{
+		{"evaluate constant functions", evalConstantFunctions},
 	},
 }
 
@@ -139,6 +148,62 @@ func convertValueMapReferences(parser *Parser) error {
 		return WalkContinue, nil
 	})
 	return errs.Err()
+}
+
+func translateParmval(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok && call.Function == "PARMVAL" {
+			if n := len(call.Args); n != 1 {
+				err = errors.Errorf("at %s: expected 1 argument in PARMVAL call, got %d", call.Source(), n)
+				return WalkCancel, nil
+			}
+			repl := SetField{
+				SourceContext: call.SourceContext,
+				Target:        call.Target,
+				Value:         [1]Operation{ call.Args[0]},
+			}
+			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func evalFn(name string, params []string) (string, error) {
+	switch name {
+	case "STRCAT":
+		return strings.Join(params, ""), nil
+	}
+	return "", errors.Errorf("unsupported function %s", name)
+}
+
+func evalConstantFunctions(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok {
+			var params = make([]string, len(call.Args))
+			for idx, arg := range call.Args {
+				if ct, ok := arg.(Constant); ok {
+					params[idx] = string(ct)
+				} else {
+					return WalkContinue, nil
+				}
+			}
+			var constant string
+			constant, err = evalFn(call.Function, params)
+			if err != nil {
+				err = errors.Wrapf(err, "at %s", call.Source())
+				return WalkCancel, nil
+			}
+			repl := SetField{
+				SourceContext: call.SourceContext,
+				Target:        call.Target,
+				Value:         [1]Operation{ Constant(constant)},
+			}
+			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
 }
 
 func (parser *Parser) Apply(group PostprocessGroup) error {

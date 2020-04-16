@@ -70,7 +70,11 @@ func New(dev model.Device) (p Parser, err error) {
 		}
 		match.OnSuccess = make([]Operation, 0, 1+len(m.functions))
 		if m.eventcategory != "" {
-			match.OnSuccess = append(match.OnSuccess, Constant(m.eventcategory))
+			match.OnSuccess = append(match.OnSuccess, SetField{
+				SourceContext: match.SourceContext,
+				Target:        "eventcategory",
+				Value:         [1]Operation{Constant(m.eventcategory)},
+			})
 		}
 		for _, fn := range m.functions {
 			match.OnSuccess = append(match.OnSuccess, fn)
@@ -87,6 +91,9 @@ func New(dev model.Device) (p Parser, err error) {
 	})
 	p.Root = root
 	if err := p.Apply(transforms); err != nil {
+		return p, err
+	}
+	if err := p.Apply(optimizations); err != nil {
 		return p, err
 	}
 	return p, validate(&p)

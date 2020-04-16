@@ -69,6 +69,7 @@ func (m Match) Children() []Operation {
 type SetField struct {
 	SourceContext
 	Target string
+	// TODO: This should be [1]Value
 	Value [1]Operation
 }
 

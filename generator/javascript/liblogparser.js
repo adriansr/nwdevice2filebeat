@@ -117,6 +117,6 @@ function lookup(opts) {
 
 function set_field(opts) {
     return function(evt) {
-        evt.Put(FIELDS_PREFIX + opts.dest, opts.value(evt));
+        evt.Put(opts.dest, opts.value(evt));
     }
 }

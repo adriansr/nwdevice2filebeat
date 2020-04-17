@@ -65,13 +65,6 @@ function field(name) {
     }
 }
 
-
-// TODO: PARMVAL can be replaced by a reference to a field, so function handlers
-//       don't really need the evt arg (unless there's another reason).
-function PARMVAL(evt, args) {
-    return evt.Get(args[0]);
-}
-
 function STRCAT(evt, args) {
     var s = "";
     var i;
@@ -79,11 +72,6 @@ function STRCAT(evt, args) {
         s += args[i];
     }
     return s;
-}
-
-function EVNTTIME(evt, args) {
-    // TODO
-    return null;
 }
 
 function call(opts) {
@@ -118,5 +106,167 @@ function lookup(opts) {
 function set_field(opts) {
     return function(evt) {
         evt.Put(opts.dest, opts.value(evt));
+    }
+}
+
+function date_time(opts) {
+    return function(evt) {
+        var str = "";
+        for (var i = 0; i < opts.args.length; i++) {
+            var fname = FIELDS_PREFIX + opts.args[i];
+            var val = evt.Get(fname);
+            if (val != null) {
+                if (str != "") str += " ";
+                str += val;
+            } else {
+                console.warn("in date_time: input arg " + fname + " is not set");
+            }
+        }
+        var date = new Date();
+        var pos = 0;
+        var len = str.length;
+        for (var proc=0; pos!==undefined && pos<len && proc<opts.fmt.length; proc++) {
+            //console.warn("in date_time: enter proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
+            pos = opts.fmt[proc](str, pos, date);
+            //console.warn("in date_time: leave proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
+        }
+        if (pos !== undefined) {
+            evt.Put(FIELDS_PREFIX + opts.dest, date);
+        }
+        //console.warn("in date_time: result=" + date);
+    }
+}
+
+function dc(ct) {
+    return function(str, pos, date) {
+        var n = str.length;
+        if (n - pos < ct.length) return;
+        var part = str.substr(pos, ct.length);
+        if (part != ct) {
+            console.warn("parsing date_time '" + str + "' at " + pos + ": '" + part + "' is not '" + ct + "'");
+            return;
+        }
+        return pos + ct.length;
+    }
+}
+
+
+var shortMonths = {
+    // mon => [ month_id , how many chars to skip if month in long form ]
+    "Jan": [0, 4],
+    "Feb": [1, 5],
+    "Mar": [2, 2],
+    "Apr": [3, 2],
+    "May": [4, 0],
+    "Jun": [5, 1],
+    "Jul": [6, 1],
+    "Aug": [7, 3],
+    "Sep": [8, 6],
+    "Oct": [9, 4],
+    "Nov": [10, 5],
+    "Dec": [11, 4],
+    "jan": [0, 4],
+    "feb": [1, 5],
+    "mar": [2, 2],
+    "apr": [3, 2],
+    "may": [4, 0],
+    "jun": [5, 1],
+    "jul": [6, 1],
+    "aug": [7, 3],
+    "sep": [8, 6],
+    "oct": [9, 4],
+    "nov": [10, 5],
+    "dec": [11, 4],
+};
+
+// var dC = undefined;
+var dR = dateMonthName(true);
+var dB = dateMonthName(false);
+var dM = dateFixedWidthNumber('M', 2, 1, 12, function(date, value) { date.SetMonth(value-1); });
+var dG = dateVariableWidthNumber('G', 1, 12, function(date, value) { date.SetMonth(value-1); });
+var dD = dateFixedWidthNumber('D',2, 1, 31, Date.prototype.setDate);
+var dF = dateVariableWidthNumber('F', 1, 31, Date.prototype.setDate);
+var dH = dateFixedWidthNumber('H', 2, 0, 24, Date.prototype.setHours);
+// TODO: var dI = ...
+var dN = dateVariableWidthNumber('N', 0, 24, Date.prototype.setHours);
+var dT = dateFixedWidthNumber('T', 2, 0, 59, Date.prototype.setMinutes);
+var dU = dateVariableWidthNumber('U', 0, 59, Date.prototype.setMinutes);
+// TODO: var dJ = ...Julian day...
+// TODO: var dP = ...AM|PM...
+// TODO: var dQ = ...A.M.|P.M....
+var dS = dateFixedWidthNumber('S', 2,0, 60, Date.prototype.setSeconds);
+var dO = dateVariableWidthNumber('O', 0, 60, Date.prototype.setSeconds);
+// TODO: var dY = ...YY...
+var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setFullYear);
+// TODO: var dZ = ...
+// TODO: var dA = ...
+// TODO: var dX = ...
+
+function skipws(str, pos) {
+    for ( var n = str.length
+        ; pos<n && str.charAt(pos) === ' '
+        ; pos++)
+        ;
+    return pos;
+}
+
+function skipdigits(str, pos) {
+    var c;
+    for ( var n = str.length
+        ; pos<n && (c=str.charAt(pos)) >= '0' && c <= '9'
+        ; pos++)
+        ;
+    return pos;
+}
+
+function dateVariableWidthNumber(fmtChar, min, max, setter) {
+    return function(str, pos, date) {
+        var start = skipws(str, pos);
+        pos = skipdigits(str, start);
+        var s = str.substr(start, pos-start);
+        var value = parseInt(s, 10);
+        if (value >= min && value <= max) {
+            setter.call(date, value);
+            return pos;
+        }
+        console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
+        return;
+    }
+}
+
+
+function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
+    return function(str, pos, date) {
+        pos = skipws(str, pos);
+        var n = str.length;
+        if (pos + width > n) return;
+        var s = str.substr(pos, width);
+        var value = parseInt(s, 10);
+        if (value >= min && value <= max) {
+            setter.call(date, value);
+            return pos + width;
+        }
+        console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
+        return;
+    }
+}
+
+// Short month name (Jan..Dec).
+function dateMonthName(long) {
+    return function(str, pos, date) {
+        pos = skipws(str, pos);
+        var n = str.length;
+        if (pos + 3 > n) return;
+        var mon = str.substr(pos, 3);
+        var idx = shortMonths[mon];
+        if (idx === undefined) {
+            idx = shortMonths[mon.toLowerCase()];
+        }
+        if (idx === undefined) {
+            console.warn("parsing date_time: '" + mon + "' is not a valid short month (%B)");
+            return;
+        }
+        date.setMonth(idx[0]);
+        return pos + 3 + (long? idx[1] : 0);
     }
 }

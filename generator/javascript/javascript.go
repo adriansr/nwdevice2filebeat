@@ -131,10 +131,6 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		}
 		out.Unindent().Write("],").Unindent().Newline().Write("})")
 
-	//case *parser.Call:
-	//	// TODO: Get rid of pointers sneaking in
-	//	generate(*v, out)
-
 	case parser.SetField:
 		out.Write("set_field({").Newline().Indent().
 			Write("dest: ").JS(v.Target).Write(",").Newline().
@@ -152,9 +148,25 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		out.Write(",").Newline().Unindent()
 		out.Write("})")
 
+	case parser.DateTime:
+		out.Write("date_time({").Newline().Indent().
+			Write("dest: ").JS(v.Target).Write(",").Newline().
+			Write("args: ").JS(v.Fields).Write(",").Newline().
+			Write("fmt: [")
+		for idx, fmt := range v.Format {
+			if idx > 0 {
+				out.Write(",")
+			}
+			if spec := fmt.Spec(); spec != parser.DateTimeConstant {
+				out.Writef("d%c", spec)
+			} else {
+				out.Write("dc(").JS(fmt.Value()).Write(")")
+			}
+		}
+		out.Write("],").Newline().Unindent().Write("})")
+
 	default:
 		out.Writef("/* TODO: here goes a %T */", v)
-		// TODO: return nil, errors.Errorf("unsupported type %T", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))
 	}
 }

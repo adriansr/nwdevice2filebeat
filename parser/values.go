@@ -33,6 +33,10 @@ func (c Constant) Token() string {
 	return string(c)
 }
 
+func (c Constant) Value() string {
+	return string(c)
+}
+
 type Field string
 
 func (c Field) String() string {

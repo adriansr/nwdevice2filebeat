@@ -53,6 +53,16 @@ var transforms = PostprocessGroup {
 		// Replaces a Call() to a MalueMap with a ValueMapCall.
 		{"translate valuemap references", convertValueMapReferences},
 		{"translate PARMVAL calls", translateParmval},
+
+		// Remove unnecessary $MSG and $HDR as first argument to calls
+		{ "remove special fields from some calls", removeSpecialFields},
+		{ "log special field usage", checkSpecialFields},
+
+		// Convert EVNTTIME calls
+		{ "convert EVNTTIME calls", convertEventTime},
+		// TODO:
+		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
+
 	},
 }
 
@@ -127,6 +137,37 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 	return nil
 }
 
+
+func removeSpecialFields(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (WalkAction, Operation) {
+		switch call := node.(type) {
+		case Call:
+			if len(call.Args)>0 {
+				if fld, ok := call.Args[0].(Field); ok && (fld.Name() == "$MSG" || fld.Name() == "$HDR") {
+					call.Args = call.Args[1:]
+					return WalkReplace, call
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+func checkSpecialFields(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (WalkAction, Operation) {
+		switch call := node.(type) {
+		case Call:
+			for pos, arg := range call.Args {
+				if fld, ok := arg.(Field); ok && len(fld.Name()) > 0 && fld.Name()[0] == '$' {
+					log.Printf("XXX at %s: special field %s at position %d in call %s\n", call.Source(), fld.Name(), pos, call.String())
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
 func convertValueMapReferences(parser *Parser) error {
 	var errs multierror.Errors
 	parser.Walk(func(node Operation) (WalkAction, Operation) {
@@ -161,6 +202,46 @@ func translateParmval(parser *Parser) (err error) {
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
 				Value:         [1]Operation{ call.Args[0]},
+			}
+			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func convertEventTime(p *Parser) (err error) {
+	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok && call.Function == "EVNTTIME" {
+			numArgs := len(call.Args)
+			if numArgs < 2 {
+				err = errors.Errorf("at %s: EVNTTIME call has too little arguments: %d", call.Source(), numArgs)
+				return WalkCancel, nil
+			}
+			ct, ok := call.Args[0].(Constant)
+			if !ok {
+				err = errors.Errorf("at %s: EVNTTIME call format is not a constant: %s", call.Source(), call.Args[0])
+				return WalkCancel, nil
+			}
+			fields := make([]string, len(call.Args) - 1)
+			for idx, arg := range call.Args[1:] {
+				if field, ok := arg.(Field); ok {
+					fields[idx] = field.Name()
+				} else {
+					err = errors.Errorf("at %s: EVNTTIME call argument %d is not a field", call.Source(), idx+2)
+					return WalkCancel, nil
+				}
+			}
+			fmt, err := parseDateTimeFormat(ct.Value())
+			if err != nil {
+				err = errors.Wrapf(err,"at %s: failed to parse EVNTTIME format '%s'", call.Source(), ct.Value())
+				return WalkCancel, nil
+			}
+			repl := DateTime{
+				SourceContext: call.SourceContext,
+				Target:        call.Target,
+				Fields:        fields,
+				Format:        fmt,
 			}
 			return WalkReplace, repl
 		}

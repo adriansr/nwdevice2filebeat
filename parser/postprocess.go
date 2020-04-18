@@ -182,7 +182,7 @@ func convertValueMapReferences(parser *Parser) error {
 					SourceContext: call.SourceContext,
 					MapName: call.Function,
 					Target:  call.Target,
-					Key:     [1]Operation{call.Args[0]},
+					Key:     []Operation{call.Args[0]},
 				}
 			}
 		}
@@ -201,7 +201,7 @@ func translateParmval(parser *Parser) (err error) {
 			repl := SetField{
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
-				Value:         [1]Operation{ call.Args[0]},
+				Value:         []Operation{ call.Args[0]},
 			}
 			return WalkReplace, repl
 		}
@@ -278,7 +278,7 @@ func evalConstantFunctions(parser *Parser) (err error) {
 			repl := SetField{
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
-				Value:         [1]Operation{ Constant(constant)},
+				Value:         []Operation{ Constant(constant)},
 			}
 			return WalkReplace, repl
 		}

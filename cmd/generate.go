@@ -7,6 +7,7 @@ package cmd
 import (
 	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -32,13 +33,19 @@ var generateCmd = &cobra.Command{
 		p, err := parser.New(dev)
 		if err != nil {
 			LogError("Failed to parse device", "path", devicePath, "reason", err)
-			return
+			//return
 		}
 		numBytes, err := javascript.Generate(p, ioutil.Discard)
 		if err != nil {
 			LogError("Failed to generate javascript pipeline", "reason", err)
 		}
-		log.Printf("XXX %d bytes for pipeline %s (%s)\n", numBytes, dev.Description.DisplayName, dev.Description.Name)
+		var size int64
+		if st, err := os.Stat(dev.XMLPath); err == nil {
+			size = st.Size()
+		}
+		log.Printf("XXX %d bytes for pipeline %s (%s) from %d original (%.2f%%)\n",
+			numBytes, dev.Description.DisplayName, dev.Description.Name,
+			size, 100.0*float64(numBytes) / float64(size))
 	},
 }
 

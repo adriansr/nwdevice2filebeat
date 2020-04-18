@@ -5,6 +5,7 @@
 package javascript
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/adriansr/nwdevice2filebeat/parser"
@@ -26,7 +27,59 @@ var preprocessors = parser.PostprocessGroup{
 			Name: "set @timestamp",
 			Run:  setTimestamp,
 		},
+		{
+			Name: "prepare file structure",
+			Run: adjustTree,
+		},
+		{
+			Name: "extract variables",
+			Run: extractVariables,
+		},
 	},
+}
+
+type MainProcessor struct {
+	inner []parser.Operation
+}
+
+func (p MainProcessor) Children() []parser.Operation {
+	return p.inner
+}
+
+type File struct {
+	DeclarationPos int
+	Nodes []parser.Operation
+}
+
+func (p File) Children() []parser.Operation {
+	return p.Nodes
+}
+
+func (p File) WithVars(vars []parser.Operation) File {
+	p.Nodes = append(p.Nodes, vars...)
+	return p
+}
+
+type RawJS string
+
+func (p RawJS) String() string {
+	return string(p)
+}
+
+func (p RawJS) Children() []parser.Operation {
+	return nil
+}
+
+func adjustTree(p *parser.Parser) (err error) {
+	var file File
+	file.Nodes = append(file.Nodes, RawJS(header))
+	for _, vm := range p.ValueMaps {
+		file.Nodes = append(file.Nodes, vm)
+	}
+	file.DeclarationPos = len(file.Nodes)
+	file.Nodes = append(file.Nodes, MainProcessor{inner: []parser.Operation{p.Root}})
+	p.Root = file
+	return nil
 }
 
 func adjustFieldNames(p *parser.Parser) (err error) {
@@ -113,11 +166,71 @@ func setTimestamp(p *parser.Parser) (err error) {
 		rootChain := p.Root.(parser.Chain)
 		rootChain.Nodes = append(rootChain.Nodes, parser.SetField{
 			Target: "@timestamp",
-			Value:  [1]parser.Operation{parser.Field(selectedField)},
+			Value:  []parser.Operation{parser.Field(selectedField)},
 		})
 		p.Root = rootChain
 	} else {
 		log.Printf("WARN: can't set @timestamp. Fields set by EVNTTIME: %+v", timeFields)
 	}
+	return nil
+}
+
+
+type VariableReference struct {
+	Name string
+}
+
+type Variable struct {
+	Name string
+	Value parser.Operation
+}
+
+func (v Variable) Children() []parser.Operation {
+	return nil
+}
+
+func (v VariableReference) Children() []parser.Operation {
+	return nil
+}
+
+type nameGenerator struct {
+	prefixes map[string]int
+}
+
+func (v *nameGenerator) New(prefix string) string {
+	if v.prefixes == nil {
+		v.prefixes = make(map[string]int)
+	}
+	v.prefixes[prefix] += 1
+	return fmt.Sprintf("%s%d", prefix, v.prefixes[prefix])
+}
+
+func extractVariables(p *parser.Parser) (err error) {
+	file, ok := p.Root.(File)
+	if !ok {
+		return errors.New("operations tree is not a File")
+	}
+	var vars []parser.Operation
+	var gen nameGenerator
+	p.WalkPostOrder(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		var name string
+		switch node.(type) {
+		case parser.Chain:
+			name = gen.New("chain")
+		case parser.Match:
+			name = gen.New("match")
+		case parser.LinearSelect:
+			name = gen.New("select")
+		}
+		if name == "" {
+			return parser.WalkContinue, nil
+		}
+		vars = append(vars, Variable{
+			Name:  name,
+			Value: node,
+		})
+		return parser.WalkReplace, VariableReference{Name: name}
+	})
+	p.Root = file.WithVars(vars)
 	return nil
 }

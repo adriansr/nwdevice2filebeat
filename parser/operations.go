@@ -69,12 +69,11 @@ func (m Match) Children() []Operation {
 type SetField struct {
 	SourceContext
 	Target string
-	// TODO: This should be [1]Value
-	Value [1]Operation
+	Value []Operation
 }
 
 func (c SetField) Children() []Operation {
-	return c.Value[:]
+	return c.Value
 }
 
 type Call struct {
@@ -121,7 +120,7 @@ type ValueMapCall struct {
 	SourceContext
 	Target  string
 	MapName string
-	Key     [1]Operation
+	Key     []Operation
 }
 
 

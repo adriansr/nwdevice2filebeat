@@ -4,7 +4,7 @@
 
 package parser
 
-type WalkAction int
+type WalkAction uint8
 
 const (
 	WalkContinue WalkAction = iota
@@ -19,11 +19,17 @@ func (parser *Parser) Walk(visitor WalkFn) WalkAction {
 	return walk(&parser.Root, visitor)
 }
 
+
+func (parser *Parser) WalkPostOrder(visitor WalkFn) WalkAction {
+	return walkPostOrder(&parser.Root, visitor)
+}
+
 func walk(ref *Operation, visitor WalkFn) WalkAction {
 	act, repl := visitor(*ref)
 	switch act {
 	case WalkReplace:
 		*ref = repl
+		act = WalkContinue
 		fallthrough
 	case WalkContinue:
 		nodes := (*ref).Children()
@@ -35,6 +41,21 @@ func walk(ref *Operation, visitor WalkFn) WalkAction {
 	case WalkSkip:
 		act = WalkContinue
 
+	}
+	return act
+}
+
+func walkPostOrder(ref *Operation, visitor WalkFn) WalkAction {
+	nodes := (*ref).Children()
+	for idx := range nodes {
+		if act := walkPostOrder(&nodes[idx], visitor); act == WalkCancel {
+			return act
+		}
+	}
+	act, repl := visitor(*ref)
+	if act ==  WalkReplace {
+		*ref = repl
+		act = WalkContinue
 	}
 	return act
 }

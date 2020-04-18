@@ -30,7 +30,6 @@ function register(params) {
 function process(evt) {
     return device.process(evt);
 }
-
 `
 
 func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
@@ -38,28 +37,45 @@ func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
 		return 0, err
 	}
 	cw := generator.NewCodeWriter(dest, "\t")
-	cw.AddRaw(header)
-	for _, vm := range p.ValueMaps {
-		generate(vm, cw)
-		cw.Newline()
-	}
-	cw.Write("function DeviceProcessor() {").Newline().Indent().
-		Write("var builder = new processor.Chain();").Newline().
-		Write("builder.Add(save_flags);").Newline().
-		Write("builder.Add(").Newline().Indent()
 	generate(p.Root, cw)
-	cw.Unindent().Write(");").Newline().
-		Write("builder.Add(restore_flags);").Newline().
-		Write("var chain = builder.Build();").Newline().
-		Write("return {").Newline().
-			Indent().Write("process: chain.Run,").Newline().Unindent().
-		Write("}").Newline().Unindent().Write("}").Newline()
 	return cw.Finalize()
 }
 
 func generate(op parser.Operation, out *generator.CodeWriter) {
 	switch v := op.(type) {
+	case File:
+		for _, node := range v.Nodes {
+			generate(node, out)
+		}
+
+	case RawJS:
+		out.AddRaw(v.String())
+
+	case Variable:
+		out.Newline()
+		out.Write("var ").Write(v.Name).Write(" = ")
+		generate(v.Value, out)
+		out.Write(";").Newline()
+
+	case VariableReference:
+		out.Write(v.Name)
+
+	case MainProcessor:
+		out.Newline()
+		out.Write("function DeviceProcessor() {").Newline().Indent().
+			Write("var builder = new processor.Chain();").Newline().
+			Write("builder.Add(save_flags);").Newline().
+			Write("builder.Add(")
+		generate(v.inner[0], out)
+		out.Write(");").Newline().
+			Write("builder.Add(restore_flags);").Newline().
+			Write("var chain = builder.Build();").Newline().
+			Write("return {").Newline().
+			Indent().Write("process: chain.Run,").Newline().Unindent().
+			Write("}").Newline().Unindent().Write("}").Newline()
+
 	case parser.ValueMap:
+		out.Newline()
 		out.Writef("var map_%s = {", v.Name).Newline().
 			Indent().
 				JS("keyvaluepairs").Write(": {").Newline().

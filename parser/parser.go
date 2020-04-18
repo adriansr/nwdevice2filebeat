@@ -73,7 +73,7 @@ func New(dev model.Device) (p Parser, err error) {
 			match.OnSuccess = append(match.OnSuccess, SetField{
 				SourceContext: match.SourceContext,
 				Target:        "eventcategory",
-				Value:         [1]Operation{Constant(m.eventcategory)},
+				Value:         []Operation{Constant(m.eventcategory)},
 			})
 		}
 		for _, fn := range m.functions {
@@ -341,7 +341,7 @@ func parseCall(s string, allowTarget bool, location SourceContext) (op Operation
 			return SetField{
 				SourceContext: location,
 				Target:        target,
-				Value:         [1]Operation{ Constant(s) },
+				Value:         []Operation{ Constant(s) },
 			}, nil
 		}
 		s = s[1:]

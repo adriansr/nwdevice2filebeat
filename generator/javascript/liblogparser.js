@@ -91,14 +91,14 @@ function call(opts) {
 
 function lookup(opts) {
     return function(evt) {
-        var key = evt.Get(opts.key);
+        var key = opts.key(evt);
         if (key == null) return;
-        var value = evt.map.keyvaluepairs[key];
+        var value = opts.map.keyvaluepairs[key];
         if (value === undefined) {
-            value = evt.map.default;
+            value = opts.map.default;
         }
         if (value !== undefined) {
-            evt.Put(opts.dest, value);
+            evt.Put(opts.dest, value(evt));
         }
     }
 }

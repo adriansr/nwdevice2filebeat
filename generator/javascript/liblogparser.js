@@ -33,12 +33,39 @@ function linear_select(subprocessors) {
 }
 
 function match(options) {
+    options.dissect["target_prefix"] = "nwparser";
+    options.dissect["ignore_failure"] = true;
+    options.dissect["overwrite_keys"] = true;
+
     var dissect = new processor.Dissect(options.dissect);
     return function(evt) {
         dissect.Run(evt);
         if (options.on_success != null && evt.Get(FLAG_FIELD) === null) {
             options.on_success(evt);
         }
+    }
+}
+
+function all_match(opts) {
+    return function(evt) {
+        //var saved_flags = evt.Get(FLAG_FIELD);
+        var i;
+        for (i=0; i<opts.processors.length; i++) {
+            evt.Delete(FLAG_FIELD);
+            // TODO: What if dissect sets FLAG_FIELD? :)
+            opts.processors[i](evt);
+            // Dissect processor succeeded?
+            if (evt.Get(FLAG_FIELD) != null) {
+                //console.warn("all_match failure at " + i + ":" + JSON.stringify(evt));
+                if (opts.on_failure != null) opts.on_failure(evt);
+                return;
+            }
+            //console.warn("all_match success at " + i + JSON.stringify(evt));
+        }
+        /*if (saved_flags !== null) {
+            evt.Put(FLAG_FIELD, saved_flags);
+        }*/
+        if (opts.on_success != null) opts.on_success(evt);
     }
 }
 

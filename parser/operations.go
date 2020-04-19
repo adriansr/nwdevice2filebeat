@@ -70,6 +70,37 @@ func (c LinearSelect) Hashable() string {
 	return "LinearSelect{" + OpList(c.Nodes).Hashable() + "}"
 }
 
+type AllMatch struct {
+	Nodes []Operation
+	// Nodes must be a list of all operations contained so we can optimize it.
+	// so it's necessary to know were some start and others end.
+	onSuccessPos int
+	onFailurePos int
+}
+
+func (am AllMatch) Processors() []Operation {
+	return am.Nodes[:am.onSuccessPos]
+}
+
+func (am AllMatch) OnSuccess() []Operation {
+	return am.Nodes[am.onSuccessPos:am.onFailurePos]
+}
+
+func (am AllMatch) OnFailure() []Operation {
+	return am.Nodes[am.onFailurePos:]
+}
+
+func (am AllMatch) Children() []Operation {
+	return am.Nodes
+}
+
+func (am AllMatch) Hashable() string {
+	return "All{n:" + OpList(am.Processors()).Hashable() +
+				",succ=" + OpList(am.OnSuccess()).Hashable() +
+				",fail=" + OpList(am.OnFailure()).Hashable() +
+		"}"
+}
+
 type SwitchSelect struct {
 	LinearSelect
 	Key Field

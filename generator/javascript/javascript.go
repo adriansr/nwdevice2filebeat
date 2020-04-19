@@ -122,13 +122,39 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 			Indent().Write("dissect: {").Newline().
 				Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
 						 Write("field: ").JS(v.Input).Write(",").Newline().
-						 Write("target_prefix: ").JS("nwparser").Write(",").Newline().
-						 Write("ignore_failure: ").JS(true).Write(",").Newline().
 			    Unindent().Write("},").Newline()
 		if len(v.OnSuccess) > 0 {
 			out.Write("on_success: processor_chain([").
 				Indent().Newline()
 			for _, act := range v.OnSuccess {
+				generate(act, out)
+				out.Write(",").Newline()
+			}
+			out.Unindent().Write("]),").Newline()
+		}
+		out.Unindent().Write("})")
+
+	case parser.AllMatch:
+		out.Write("all_match({").Newline().Indent().
+			Write("processors: [").Newline().Indent()
+		for _, proc := range v.Processors() {
+			generate(proc, out)
+			out.Write(",").Newline()
+		}
+		out.Unindent().Write("],").Newline()
+		if len(v.OnSuccess()) > 0 {
+			out.Write("on_success: processor_chain([").
+				Indent().Newline()
+			for _, act := range v.OnSuccess() {
+				generate(act, out)
+				out.Write(",").Newline()
+			}
+			out.Unindent().Write("]),").Newline()
+		}
+		if len(v.OnFailure()) > 0 {
+			out.Write("on_failure: processor_chain([").
+				Indent().Newline()
+			for _, act := range v.OnFailure() {
 				generate(act, out)
 				out.Write(",").Newline()
 			}

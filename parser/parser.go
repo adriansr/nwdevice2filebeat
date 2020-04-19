@@ -232,7 +232,7 @@ func newHeader(xml *model.Header) (h header, err error) {
 			h.messageID = v
 		}
 	}
-	if h.content, err = ParsePattern(xml.Content); err != nil {
+	if h.content, err = ParsePatternWithAlternatives(xml.Content); err != nil {
 		return h, errors.Wrap(err,"error parsing content")
 	}
 	if h.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
@@ -275,7 +275,7 @@ func newMessage(xml *model.Message) (m message, err error) {
 		eventcategory: xml.EventCategory,
 	}
 
-	if m.content, err = ParsePattern(xml.Content); err != nil {
+	if m.content, err = ParsePatternWithAlternatives(xml.Content); err != nil {
 		return m, errors.Wrap(err,"error parsing content")
 	}
 	if m.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {

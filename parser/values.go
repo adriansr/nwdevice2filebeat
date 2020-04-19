@@ -63,6 +63,35 @@ func (c Field) Hashable() string {
 	return c.String()
 }
 
+type Alternatives []Pattern
+
+func (a Alternatives) String() string {
+	var sb strings.Builder
+	sb.WriteString("Alt{")
+	if len(a) > 0 {
+		sb.WriteString(a[0].String())
+		for _, p := range a[1:] {
+			sb.WriteByte(',')
+			sb.WriteString(p.String())
+		}
+	}
+	sb.WriteString("}")
+	return sb.String()
+}
+
+func (a Alternatives) Hashable() string {
+	return a.String()
+}
+
+func (Alternatives) Children() []Operation {
+	// TODO: Sure?
+	return nil
+}
+
+func (Alternatives) Token() string {
+	return "<<alternative>>"
+}
+
 type Pattern []Value
 
 func (p Pattern) String() string {
@@ -73,12 +102,21 @@ func (p Pattern) String() string {
 	return fmt.Sprintf("Pattern{%s}", strings.Join(items, ", "))
 }
 
-func (c Pattern) Hashable() string {
-	return c.String()
+func (p Pattern) Hashable() string {
+	return p.String()
 }
 
-func (c Pattern) Children() []Operation {
+func (p Pattern) Children() []Operation {
 	return nil
+}
+
+func (p Pattern) HasAlternatives() bool {
+	for _, elem := range p {
+		if _, found := elem.(Alternatives); found {
+			return true
+		}
+	}
+	return false
 }
 
 var ErrNoPayload = errors.New("no payload field in expression")

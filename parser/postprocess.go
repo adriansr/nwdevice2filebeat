@@ -5,6 +5,7 @@
 package parser
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -63,6 +64,7 @@ var transforms = PostprocessGroup {
 		// TODO:
 		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
 
+		{"split alternatives into dissect patterns", splitDissect},
 	},
 }
 
@@ -243,6 +245,79 @@ func convertEventTime(p *Parser) (err error) {
 				Fields:        fields,
 				Format:        fmt,
 			}
+			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func dupPattern(in []Value) (out []Value) {
+	out = make([]Value, len(in))
+	copy(out, in)
+	return
+}
+
+func splitDissect(p *Parser) (err error) {
+	// TODO:
+	// Control with a flag.
+	p.WalkPostOrder(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
+			var repl AllMatch
+			input, partCounter := match.Input, 0
+			for pos := 0;; pos ++ {
+				end := pos
+				var found bool
+				var alt Alternatives
+				for ;end < len(match.Pattern); end++ {
+					if alt, found = match.Pattern[end].(Alternatives); found {
+						break
+					}
+				}
+				if pos < end {
+					node := Match{
+						SourceContext: match.SourceContext,
+						Input:         input,
+						Pattern:       dupPattern(match.Pattern[pos:end]),
+						PayloadField:  "", // TODO
+					}
+					if found {
+						input = fmt.Sprintf("p%d", partCounter)
+						partCounter++
+						node.Pattern = append(node.Pattern, Field(input))
+					}
+					repl.Nodes = append(repl.Nodes, node)
+				}
+				if !found {
+					break
+				}
+				pos = end
+				sel := LinearSelect{SourceContext: match.SourceContext}
+				curInput := input
+				var part Value
+				if pos < len(match.Pattern) {
+					input = fmt.Sprintf("p%d", partCounter)
+					part = Field(input)
+					partCounter++
+				}
+				for _, pattern := range alt {
+					m := Match{
+						SourceContext: match.SourceContext,
+						Input:         curInput,
+						PayloadField:  "", // TODO
+					}
+					m.Pattern = pattern
+					if part != nil {
+						m.Pattern = append(m.Pattern, part)
+					}
+					sel.Nodes = append(sel.Nodes, m)
+				}
+				repl.Nodes = append(repl.Nodes, sel)
+			}
+			repl.onSuccessPos = len(repl.Nodes)
+			repl.Nodes = append(repl.Nodes, match.OnSuccess...)
+			repl.onFailurePos = len(repl.Nodes)
+			// TODO: cleanup on failure
 			return WalkReplace, repl
 		}
 		return WalkContinue, nil

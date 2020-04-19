@@ -254,6 +254,8 @@ func extractVariables(p *parser.Parser) (err error) {
 			name = gen.New(prefix)
 		case parser.LinearSelect:
 			name = gen.New("select")
+		case parser.AllMatch:
+			name = gen.New("all")
 		}
 		if name == "" {
 			return parser.WalkContinue, nil

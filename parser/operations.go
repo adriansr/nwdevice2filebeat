@@ -22,6 +22,7 @@ type WithSourceContext interface {
 }
 
 type Operation interface {
+	Hashable() string
 	Children() []Operation
 }
 
@@ -38,6 +39,24 @@ func (c Chain) Children() []Operation {
 	return c.Nodes
 }
 
+func (c Chain) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("Chain{[")
+	if len(c.Nodes) > 0 {
+		sb.WriteString(c.Nodes[0].Hashable())
+		for _, n := range c.Nodes[1:] {
+			sb.WriteByte(',')
+			sb.WriteString(n.Hashable())
+		}
+	}
+	sb.WriteString("]}")
+	return sb.String()
+}
+
+func (c Chain) String() string {
+	return c.Hashable()
+}
+
 type LinearSelect struct {
 	SourceContext
 	Nodes []Operation
@@ -45,6 +64,10 @@ type LinearSelect struct {
 
 func (c LinearSelect) Children() []Operation {
 	return c.Nodes
+}
+
+func (c LinearSelect) Hashable() string {
+	return "LinearSelect{" + OpList(c.Nodes).Hashable() + "}"
 }
 
 type SwitchSelect struct {
@@ -66,6 +89,18 @@ func (m Match) Children() []Operation {
 	return m.OnSuccess
 }
 
+func (m Match) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("Match{")
+	sb.WriteString("Input:" + m.Input)
+	sb.WriteString(",Pattern:" + m.Pattern.Hashable())
+	sb.WriteString("PayloadField:" + m.PayloadField)
+	sb.WriteString("OnSuccess:")
+	sb.WriteString(OpList(m.OnSuccess).Hashable())
+	sb.WriteByte('}')
+	return sb.String()
+}
+
 type SetField struct {
 	SourceContext
 	Target string
@@ -74,6 +109,32 @@ type SetField struct {
 
 func (c SetField) Children() []Operation {
 	return c.Value
+}
+
+type OpList []Operation
+
+func (c OpList) Hashable() string {
+	var sb strings.Builder
+	comma := false
+	sb.WriteByte('[')
+	for _, op := range c {
+		if comma {
+			sb.WriteByte(',')
+		}
+		sb.WriteString(op.Hashable())
+		comma = true
+	}
+	sb.WriteByte(']')
+	return sb.String()
+}
+
+func (c SetField) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("SetField{")
+	sb.WriteString("Target:" + c.Target)
+	sb.WriteString(OpList(c.Value).Hashable())
+	sb.WriteByte('}')
+	return sb.String()
 }
 
 type Call struct {
@@ -100,6 +161,17 @@ func (c Call) String() string {
 	return fmt.Sprintf("Call(%sfn='%s',%s)", target, c.Function, strings.Join(args, ","))
 }
 
+func (c Call) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("Call{target:" + c.Target)
+	sb.WriteString(",function:" + c.Function)
+	sb.WriteString(",args:")
+	for _, a := range c.Args {
+		sb.WriteString(a.String())
+	}
+	sb.WriteByte('}')
+	return sb.String()
+}
 
 // TODO: Sometimes keys are numeric (and hex!) should it support numeric keys
 //       in different base? As in 33 for 0x21
@@ -116,6 +188,31 @@ func (v ValueMap) Children() []Operation {
 	return v.Nodes
 }
 
+func (v ValueMap) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("ValueMap{Name:")
+	sb.WriteString(v.Name)
+	if v.Default != nil {
+		sb.WriteString(",Def:")
+		sb.WriteString((*v.Default).String())
+	}
+	sb.WriteString(",Map:{")
+	content := make([][2]string, len(v.Mappings))
+	for k, idx := range v.Mappings {
+		content[idx] = [2]string{k, v.Nodes[idx].Hashable()}
+	}
+	for _, c := range content {
+		sb.WriteByte('"')
+		sb.WriteString(c[0])
+		sb.WriteString("\":")
+		sb.WriteString(c[1])
+		sb.WriteString("\",")
+	}
+	sb.WriteString("}}")
+	return sb.String()
+}
+
+
 type ValueMapCall struct {
 	SourceContext
 	Target  string
@@ -123,7 +220,18 @@ type ValueMapCall struct {
 	Key     []Operation
 }
 
-
 func (v ValueMapCall) Children() []Operation {
 	return v.Key[:]
+}
+
+func (v ValueMapCall) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("ValueMapCall{Target:")
+	sb.WriteString(v.Target)
+	sb.WriteString(",Name:")
+	sb.WriteString(v.MapName)
+	sb.WriteString(",Key:")
+	sb.WriteString(OpList(v.Key).Hashable())
+	sb.WriteByte('}')
+	return sb.String()
 }

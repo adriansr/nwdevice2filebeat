@@ -27,9 +27,15 @@ var preprocessors = parser.PostprocessGroup{
 			Name: "set @timestamp",
 			Run:  setTimestamp,
 		},
+
+		// Fron here down root node belongs to JS
 		{
 			Name: "prepare file structure",
 			Run: adjustTree,
+		},
+		{
+			Name: "remove duplicates",
+			Run:  removeDuplicateNodes,
 		},
 		{
 			Name: "extract variables",
@@ -40,6 +46,10 @@ var preprocessors = parser.PostprocessGroup{
 
 type MainProcessor struct {
 	inner []parser.Operation
+}
+
+func (MainProcessor) Hashable() string {
+	return ""
 }
 
 func (p MainProcessor) Children() []parser.Operation {
@@ -60,10 +70,18 @@ func (p File) WithVars(vars []parser.Operation) File {
 	return p
 }
 
+func (File) Hashable() string {
+	return ""
+}
+
 type RawJS string
 
 func (p RawJS) String() string {
 	return string(p)
+}
+
+func (RawJS) Hashable() string {
+	return ""
 }
 
 func (p RawJS) Children() []parser.Operation {
@@ -185,12 +203,20 @@ type Variable struct {
 	Value parser.Operation
 }
 
+func (p Variable) Hashable() string {
+	return ""
+}
+
 func (v Variable) Children() []parser.Operation {
 	return nil
 }
 
 func (v VariableReference) Children() []parser.Operation {
 	return nil
+}
+
+func (p VariableReference) Hashable() string {
+	return ""
 }
 
 type nameGenerator struct {
@@ -206,6 +232,9 @@ func (v *nameGenerator) New(prefix string) string {
 }
 
 func extractVariables(p *parser.Parser) (err error) {
+	if !p.Config.Opt.GlobalEntities {
+		return nil
+	}
 	file, ok := p.Root.(File)
 	if !ok {
 		return errors.New("operations tree is not a File")
@@ -230,6 +259,66 @@ func extractVariables(p *parser.Parser) (err error) {
 			Value: node,
 		})
 		return parser.WalkReplace, VariableReference{Name: name}
+	})
+	p.Root = file.WithVars(vars)
+	return nil
+}
+
+func removeDuplicateNodes(p *parser.Parser) (err error) {
+	if !p.Config.Opt.DetectDuplicates {
+		return nil
+	}
+	file, ok := p.Root.(File)
+	if !ok {
+		return errors.New("operations tree is not a File")
+	}
+	var vars []parser.Operation
+
+	total := 0
+	seen := make(map[string][]parser.Operation)
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		hash := node.Hashable()
+		if hash != "" {
+			total ++
+			seen[hash] = append(seen[hash], node)
+		}
+		return parser.WalkContinue, nil
+	})
+	dupes := total - len(seen)
+	if dupes == 0 {
+		return err
+	}
+	log.Printf("XXX duplicates: %d", dupes)
+	for k, v := range seen {
+		if len(v) < 2 {
+			delete(seen, k)
+		} else {
+			seen[k] = nil
+		}
+	}
+	counter := 0
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		hash := node.Hashable()
+		if hash != "" {
+			if ref, ok := seen[hash]; ok {
+				var repl parser.Operation
+				if ref == nil {
+					name := fmt.Sprintf("dup%d", counter)
+					counter ++
+					vars = append(vars, Variable{
+						Name:  name,
+						Value: node,
+					})
+					//log.Printf("XXX duplicates var %s = %s", name, hash)
+					repl = VariableReference{Name:name}
+					seen[hash] = []parser.Operation{repl}
+				} else {
+					repl = ref[0]
+				}
+				return parser.WalkReplace, repl
+			}
+		}
+		return parser.WalkContinue, nil
 	})
 	p.Root = file.WithVars(vars)
 	return nil

@@ -4,7 +4,11 @@
 
 package parser
 
-import "github.com/pkg/errors"
+import (
+	"strings"
+
+	"github.com/pkg/errors"
+)
 
 type DateTimeItem interface {
 	Spec() byte
@@ -14,7 +18,7 @@ type DateTimeItem interface {
 // Caracter after % in an EVNTTIME pattern.
 type DateTimeSpec byte
 
-const DateTimeConstant byte = 0
+const DateTimeConstant byte = '%'
 
 func (s DateTimeSpec) Spec() byte {
 	return byte(s)
@@ -38,6 +42,22 @@ type DateTime struct {
 
 func (DateTime) Children() []Operation {
 	return nil
+}
+
+func (v DateTime) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("DateTime{Target:")
+	sb.WriteString(v.Target)
+	sb.WriteString(",Fields:")
+	sb.WriteString(strings.Join(v.Fields, ","))
+	sb.WriteString(",Format:[")
+	for _, f := range v.Format {
+		sb.WriteByte(f.Spec())
+		sb.WriteString(f.Value())
+		sb.WriteByte(',')
+	}
+	sb.WriteString("]}")
+	return sb.String()
 }
 
 var dateTimeFormatSpecifiers = map[byte]struct{} {

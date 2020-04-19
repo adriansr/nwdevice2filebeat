@@ -25,6 +25,10 @@ func (c Constant) String() string {
 	return "Constant('" + string(c) + "')"
 }
 
+func (c Constant) Hashable() string {
+	return c.String()
+}
+
 func (c Constant) Children() []Operation {
 	return nil
 }
@@ -55,6 +59,10 @@ func (c Field) Children() []Operation {
 	return nil
 }
 
+func (c Field) Hashable() string {
+	return c.String()
+}
+
 type Pattern []Value
 
 func (p Pattern) String() string {
@@ -63,6 +71,10 @@ func (p Pattern) String() string {
 		items[idx] = it.String()
 	}
 	return fmt.Sprintf("Pattern{%s}", strings.Join(items, ", "))
+}
+
+func (c Pattern) Hashable() string {
+	return c.String()
 }
 
 func (c Pattern) Children() []Operation {
@@ -101,6 +113,10 @@ type Payload Field
 
 func (c Payload) String() string {
 	return "Payload(" + Field(c).String() + ")"
+}
+
+func (c Payload) Hashable() string {
+	return c.String()
 }
 
 func (c Payload) FieldName() string {

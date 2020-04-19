@@ -9,11 +9,14 @@ import (
 	"log"
 	"strings"
 
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/pkg/errors"
 )
 
 type Parser struct {
+	Config config.Config
+
 	ValueMaps []ValueMap
 	Headers   []header
 	Messages  []message
@@ -23,7 +26,8 @@ type Parser struct {
 	Root Operation
 }
 
-func New(dev model.Device) (p Parser, err error) {
+func New(dev model.Device, cfg config.Config) (p Parser, err error) {
+	p.Config = cfg
 	if p.ValueMaps, p.ValueMapsByName, err = processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
 	}

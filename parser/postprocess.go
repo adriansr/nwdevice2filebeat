@@ -97,13 +97,13 @@ func checkPayloadPositionInHeaders(parser *Parser) error {
 }
 
 func setPayloadField(parser *Parser) error {
-	for _, hdr := range parser.Headers {
+	for idx, hdr := range parser.Headers {
 		payload, err := hdr.content.PayloadField()
 		if err != nil {
 			return errors.Wrapf(err, "at %s", hdr.pos)
 		}
 		if payload != "" {
-			hdr.payloadField = payload
+			parser.Headers[idx].payloadField = payload
 		}
 		n := len(hdr.content)
 		last := hdr.content[n-1]

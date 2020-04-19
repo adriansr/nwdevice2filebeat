@@ -74,6 +74,17 @@ function STRCAT(evt, args) {
     return s;
 }
 
+/*
+    call({dest: "nwparser.", fn: SYSVAL, args: [ field("$MSGID"),field("$ID1")]}),
+
+    TODO:
+
+    The above seems to indicate that in order to select MESSAGES from a header
+    The value attribute "id1" must be used as key.
+ */
+function SYSVAL(evt, args) {
+    return undefined
+}
 function call(opts) {
     return function(evt) {
         // TODO: Optimize this
@@ -105,7 +116,16 @@ function lookup(opts) {
 
 function set_field(opts) {
     return function(evt) {
-        evt.Put(opts.dest, opts.value(evt));
+        var val = opts.value(evt);
+        if (val != null) {
+            evt.Put(opts.dest, opts.value(evt));
+        }
+    }
+}
+
+function dump(label) {
+    return function(evt) {
+        console.log("Dump of event at " + label + ": " + JSON.stringify(evt, null, '\t'))
     }
 }
 

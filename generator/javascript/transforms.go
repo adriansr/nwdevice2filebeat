@@ -142,7 +142,7 @@ func adjustOverlappingPayload(p *parser.Parser) (err error) {
 			call := parser.Call{
 				SourceContext: match.SourceContext,
 				Function:      "STRCAT",
-				Target:        "nwparser.payload",
+				Target:        "payload",
 				Args:          match.Pattern[pos:],
 			}
 			match.OnSuccess = append(match.OnSuccess, call)

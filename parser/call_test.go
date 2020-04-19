@@ -184,7 +184,7 @@ func TestCall2(t *testing.T) {
 			expected: SetField{
 				SourceContext: loc,
 				Target:   "target",
-				Value:     [1]Operation{Constant("SOMETHING()")},
+				Value:     []Operation{Constant("SOMETHING()")},
 			},
 		},
 	}{

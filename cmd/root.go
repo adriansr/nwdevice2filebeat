@@ -56,7 +56,7 @@ func limitError(val interface{}) interface{} {
 		if errors.As(err, &merr) {
 			if n := len(merr.Errors); n > MaxPrintErrors {
 				merr.Errors = append(merr.Errors[:MaxPrintErrors],
-					errors.New(fmt.Sprintf("... and %d more.", n - MaxPrintErrors)))
+					errors.New(fmt.Sprintf("... and %d more.", n-MaxPrintErrors)))
 			}
 		}
 	}

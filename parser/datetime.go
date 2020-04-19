@@ -60,7 +60,7 @@ func (v DateTime) Hashable() string {
 	return sb.String()
 }
 
-var dateTimeFormatSpecifiers = map[byte]struct{} {
+var dateTimeFormatSpecifiers = map[byte]struct{}{
 	'C': {},
 	'R': {},
 	'B': {},
@@ -89,7 +89,7 @@ var dateTimeFormatSpecifiers = map[byte]struct{} {
 }
 
 func isAllSpaces(s []byte) bool {
-	for _, chr := range	s {
+	for _, chr := range s {
 		if chr != ' ' {
 			return false
 		}

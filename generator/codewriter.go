@@ -15,19 +15,19 @@ import (
 
 type CodeWriter struct {
 	//buf bytes.Buffer
-	dest io.Writer
-	errors []error
-	prefix  []byte
-	indent []byte
-	bytes  uint64
+	dest        io.Writer
+	errors      []error
+	prefix      []byte
+	indent      []byte
+	bytes       uint64
 	writeFailed bool
-	newline bool
+	newline     bool
 }
 
 func NewCodeWriter(target io.Writer, indent string) *CodeWriter {
 	return &CodeWriter{
-		dest:    target,
-		indent:  []byte(indent),
+		dest:   target,
+		indent: []byte(indent),
 	}
 }
 
@@ -82,7 +82,7 @@ func (c *CodeWriter) WriteBytes(s []byte) *CodeWriter {
 	return c.write(s)
 }
 
-func (c *CodeWriter) Writef(format string, args... interface{}) *CodeWriter {
+func (c *CodeWriter) Writef(format string, args ...interface{}) *CodeWriter {
 	return c.Write(fmt.Sprintf(format, args...))
 }
 
@@ -110,10 +110,10 @@ func (c *CodeWriter) Finalize() (count uint64, err error) {
 			fmt.Sprintf("found %d errors while generating javascript:\n", n),
 		}
 		for i := 0; i < limit; i++ {
-			msg = append(msg, "    " + c.errors[i].Error())
+			msg = append(msg, "    "+c.errors[i].Error())
 		}
 		if limit != n {
-			msg = append(msg, fmt.Sprintf("    ... (and %d more)", n - limit))
+			msg = append(msg, fmt.Sprintf("    ... (and %d more)", n-limit))
 		}
 		err = errors.New(strings.Join(msg, "\n"))
 	}

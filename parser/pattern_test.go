@@ -13,12 +13,12 @@ import (
 
 func TestPattern(t *testing.T) {
 	for _, testCase := range []struct {
-		input string
+		input    string
 		expected Pattern
-		err error
-	} {
+		err      error
+	}{
 		{
-			input: `a<a>`,
+			input:    `a<a>`,
 			expected: []Value{Constant("a"), Field("a")},
 		},
 		{
@@ -32,11 +32,11 @@ func TestPattern(t *testing.T) {
 				Constant(" "), Field("hdate")},
 		},
 		{
-			input: `Hello world`,
+			input:    `Hello world`,
 			expected: []Value{Constant("Hello world")},
 		},
 		{
-			input: `<Hello><world>`,
+			input:    `<Hello><world>`,
 			expected: []Value{Field("Hello"), Field("world")},
 		},
 		{
@@ -44,35 +44,35 @@ func TestPattern(t *testing.T) {
 			// TODO: Is this what we want?
 		},
 		{
-			input: ` <field> `,
+			input:    ` <field> `,
 			expected: []Value{Constant(" "), Field("field"), Constant(" ")},
 		},
 		{
 			input: `<field`,
-			err: errors.New("malformed pattern at position 6 (EOF)"),
+			err:   errors.New("malformed pattern at position 6 (EOF)"),
 		},
 		{
-			input: `what about > this thing in here? Is not looking good`,
+			input:    `what about > this thing in here? Is not looking good`,
 			expected: Pattern{Constant("what about > this thing in here? Is not looking good")},
 		},
 		{
 			input: `<`,
-			err: errors.New("malformed pattern at position 1 (EOF)"),
+			err:   errors.New("malformed pattern at position 1 (EOF)"),
 		},
 		{
-			input: `>`,
+			input:    `>`,
 			expected: Pattern{Constant(">")},
 		},
 		{
-			input: `<!payload>`,
+			input:    `<!payload>`,
 			expected: []Value{Payload(Field(""))},
 		},
 		{
-			input: `<!payload:custom> And this is just <<neat>`,
+			input:    `<!payload:custom> And this is just <<neat>`,
 			expected: []Value{Payload(Field("custom")), Constant(` And this is just <<neat>`)},
 		},
 		{
-			input: `<dot.fields> are cool too`,
+			input:    `<dot.fields> are cool too`,
 			expected: []Value{Field("dot.fields"), Constant(` are cool too`)},
 		},
 	} {

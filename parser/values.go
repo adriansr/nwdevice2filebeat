@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Value interface{
+type Value interface {
 	fmt.Stringer
 	Operation
 	// TODO: Move token to it's own interface. Value should be anything that
@@ -165,14 +165,12 @@ func (c Payload) Children() []Operation {
 	return nil
 }
 
-
 func (p Payload) Token() string {
 	if len(p) == 0 {
 		return "%{payload}"
 	}
 	return "%{" + string(p) + "}"
 }
-
 
 func newValue(s string, unquotedMeansField bool) (Value, error) {
 	n := len(s)
@@ -184,7 +182,7 @@ func newValue(s string, unquotedMeansField bool) (Value, error) {
 		if s[n-1] != '\'' {
 			return nil, errors.Errorf("badly quoted value: <<%s>>", s)
 		}
-		return Constant(s[1:n-1]), nil
+		return Constant(s[1 : n-1]), nil
 	case '*':
 		name := s[1:]
 		if !fieldNameRegex.MatchString(name) {

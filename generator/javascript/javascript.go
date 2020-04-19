@@ -78,8 +78,8 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		out.Newline()
 		out.Writef("var map_%s = {", v.Name).Newline().
 			Indent().
-				JS("keyvaluepairs").Write(": {").Newline().
-				Indent()
+			JS("keyvaluepairs").Write(": {").Newline().
+			Indent()
 
 		for key, idx := range v.Mappings {
 			value := v.Nodes[idx]
@@ -120,9 +120,9 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 	case parser.Match:
 		out.Write("match({").Newline().
 			Indent().Write("dissect: {").Newline().
-				Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
-						 Write("field: ").JS(v.Input).Write(",").Newline().
-			    Unindent().Write("},").Newline()
+			Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
+			Write("field: ").JS(v.Input).Write(",").Newline().
+			Unindent().Write("},").Newline()
 		if len(v.OnSuccess) > 0 {
 			out.Write("on_success: processor_chain([").
 				Indent().Newline()

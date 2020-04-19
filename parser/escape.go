@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	escapedBackslash = "\\\\"
+	escapedBackslash   = "\\\\"
 	escapedSingleQuote = "\\'"
 )
 
@@ -20,7 +20,7 @@ var functionNameRegex = regexp.MustCompile(`^[A-Za-z_0-9]+$`)
 var constantEscapes = strings.NewReplacer("\\\\", "\\", "\\'", "'")
 
 func unescapeConstant(b string) string {
-	if strings.Index(b, "\\") != -1{
+	if strings.Index(b, "\\") != -1 {
 		return constantEscapes.Replace(b)
 	}
 	return b
@@ -34,7 +34,7 @@ func disambiguateFieldOrConstant(s string) Value {
 		return Constant(s)
 	}
 	if n > 1 && trimmed[0] == '\'' && trimmed[n-1] == '\'' {
-		return Constant(unescapeConstant(trimmed[1:n-1]))
+		return Constant(unescapeConstant(trimmed[1 : n-1]))
 	}
 	if fieldNameRegex.MatchString(trimmed) {
 		return Field(trimmed)

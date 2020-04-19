@@ -13,11 +13,11 @@ import (
 )
 
 var preprocessors = parser.PostprocessGroup{
-	Title:   "javascript transforms",
+	Title: "javascript transforms",
 	Actions: []parser.Action{
 		{
 			Name: "adjust overlapping payload capture",
-			Run: adjustOverlappingPayload,
+			Run:  adjustOverlappingPayload,
 		},
 		{
 			Name: "adjust field names",
@@ -31,7 +31,7 @@ var preprocessors = parser.PostprocessGroup{
 		// Fron here down root node belongs to JS
 		{
 			Name: "prepare file structure",
-			Run: adjustTree,
+			Run:  adjustTree,
 		},
 		{
 			Name: "remove duplicates",
@@ -39,7 +39,7 @@ var preprocessors = parser.PostprocessGroup{
 		},
 		{
 			Name: "extract variables",
-			Run: extractVariables,
+			Run:  extractVariables,
 		},
 	},
 }
@@ -58,7 +58,7 @@ func (p MainProcessor) Children() []parser.Operation {
 
 type File struct {
 	DeclarationPos int
-	Nodes []parser.Operation
+	Nodes          []parser.Operation
 }
 
 func (p File) Children() []parser.Operation {
@@ -193,13 +193,12 @@ func setTimestamp(p *parser.Parser) (err error) {
 	return nil
 }
 
-
 type VariableReference struct {
 	Name string
 }
 
 type Variable struct {
-	Name string
+	Name  string
 	Value parser.Operation
 }
 
@@ -285,7 +284,7 @@ func removeDuplicateNodes(p *parser.Parser) (err error) {
 	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
 		hash := node.Hashable()
 		if hash != "" {
-			total ++
+			total++
 			seen[hash] = append(seen[hash], node)
 		}
 		return parser.WalkContinue, nil
@@ -310,13 +309,13 @@ func removeDuplicateNodes(p *parser.Parser) (err error) {
 				var repl parser.Operation
 				if ref == nil {
 					name := fmt.Sprintf("dup%d", counter)
-					counter ++
+					counter++
 					vars = append(vars, Variable{
 						Name:  name,
 						Value: node,
 					})
 					//log.Printf("XXX duplicates var %s = %s", name, hash)
-					repl = VariableReference{Name:name}
+					repl = VariableReference{Name: name}
 					seen[hash] = []parser.Operation{repl}
 				} else {
 					repl = ref[0]

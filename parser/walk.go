@@ -19,7 +19,6 @@ func (parser *Parser) Walk(visitor WalkFn) WalkAction {
 	return walk(&parser.Root, visitor)
 }
 
-
 func (parser *Parser) WalkPostOrder(visitor WalkFn) WalkAction {
 	return walkPostOrder(&parser.Root, visitor)
 }
@@ -53,7 +52,7 @@ func walkPostOrder(ref *Operation, visitor WalkFn) WalkAction {
 		}
 	}
 	act, repl := visitor(*ref)
-	if act ==  WalkReplace {
+	if act == WalkReplace {
 		*ref = repl
 		act = WalkContinue
 	}

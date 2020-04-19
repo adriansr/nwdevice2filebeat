@@ -20,7 +20,7 @@ import (
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate a new Filebeat fileset from a NetWitness device",
-	Run: generateRun,
+	Run:   generateRun,
 }
 
 func init() {
@@ -66,7 +66,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 	}
 	log.Printf("XXX %d bytes for pipeline %s (%s) from %d original (%.2f%%)\n",
 		numBytes, dev.Description.DisplayName, dev.Description.Name,
-		size, 100.0*float64(numBytes) / float64(size))
+		size, 100.0*float64(numBytes)/float64(size))
 }
 
 func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
@@ -80,8 +80,10 @@ func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 		log.Printf("opts = %v\n", opts)
 		for _, o := range opts {
 			switch o {
-			case "globals": cfg.Opt.GlobalEntities = true
-			case "deduplicate": cfg.Opt.DetectDuplicates = true
+			case "globals":
+				cfg.Opt.GlobalEntities = true
+			case "deduplicate":
+				cfg.Opt.DetectDuplicates = true
 			}
 		}
 	}

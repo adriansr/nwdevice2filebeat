@@ -19,7 +19,7 @@ type Action struct {
 }
 
 type PostprocessGroup struct {
-	Title string
+	Title   string
 	Actions []Action
 }
 
@@ -37,18 +37,18 @@ var prechecks = PostprocessGroup{
 
 		// This checks that if a header uses a payload field (the payload
 		// overlaps part of the header), then this field must appear once.
-		{ "check overlapped payload fields", checkPayloadOverlap},
+		{"check overlapped payload fields", checkPayloadOverlap},
 	},
 }
 
 var preactions = PostprocessGroup{
-	Title:   "pre-actions",
+	Title: "pre-actions",
 	Actions: []Action{
-		{ "adjust payload field", setPayloadField},
+		{"adjust payload field", setPayloadField},
 	},
 }
 
-var transforms = PostprocessGroup {
+var transforms = PostprocessGroup{
 	Title: "transforms",
 	Actions: []Action{
 		// Replaces a Call() to a MalueMap with a ValueMapCall.
@@ -56,11 +56,11 @@ var transforms = PostprocessGroup {
 		{"translate PARMVAL calls", translateParmval},
 
 		// Remove unnecessary $MSG and $HDR as first argument to calls
-		{ "remove special fields from some calls", removeSpecialFields},
-		{ "log special field usage", checkSpecialFields},
+		{"remove special fields from some calls", removeSpecialFields},
+		{"log special field usage", checkSpecialFields},
 
 		// Convert EVNTTIME calls
-		{ "convert EVNTTIME calls", convertEventTime},
+		{"convert EVNTTIME calls", convertEventTime},
 		// TODO:
 		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
 
@@ -69,7 +69,7 @@ var transforms = PostprocessGroup {
 }
 
 var optimizations = PostprocessGroup{
-	Title:   "optimizations",
+	Title: "optimizations",
 	Actions: []Action{
 		{"evaluate constant functions", evalConstantFunctions},
 	},
@@ -121,7 +121,7 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 	var payload string
 	for _, hdr := range parser.Headers {
 		if payload, err = hdr.content.PayloadField(); err != nil {
-			return errors.Wrapf(err,"at %s", hdr.pos)
+			return errors.Wrapf(err, "at %s", hdr.pos)
 		}
 		if payload == "" || payload == "$START" {
 			continue
@@ -129,7 +129,7 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 		count := 0
 		for _, elem := range hdr.content {
 			if fld, ok := elem.(Field); ok && fld.Name() == payload {
-				count ++
+				count++
 			}
 		}
 		if count != 1 {
@@ -139,12 +139,11 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 	return nil
 }
 
-
 func removeSpecialFields(parser *Parser) (err error) {
 	parser.Walk(func(node Operation) (WalkAction, Operation) {
 		switch call := node.(type) {
 		case Call:
-			if len(call.Args)>0 {
+			if len(call.Args) > 0 {
 				if fld, ok := call.Args[0].(Field); ok && (fld.Name() == "$MSG" || fld.Name() == "$HDR") {
 					call.Args = call.Args[1:]
 					return WalkReplace, call
@@ -182,9 +181,9 @@ func convertValueMapReferences(parser *Parser) error {
 				}
 				return WalkReplace, ValueMapCall{
 					SourceContext: call.SourceContext,
-					MapName: call.Function,
-					Target:  call.Target,
-					Key:     []Operation{call.Args[0]},
+					MapName:       call.Function,
+					Target:        call.Target,
+					Key:           []Operation{call.Args[0]},
 				}
 			}
 		}
@@ -203,7 +202,7 @@ func translateParmval(parser *Parser) (err error) {
 			repl := SetField{
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
-				Value:         []Operation{ call.Args[0]},
+				Value:         []Operation{call.Args[0]},
 			}
 			return WalkReplace, repl
 		}
@@ -225,7 +224,7 @@ func convertEventTime(p *Parser) (err error) {
 				err = errors.Errorf("at %s: EVNTTIME call format is not a constant: %s", call.Source(), call.Args[0])
 				return WalkCancel, nil
 			}
-			fields := make([]string, len(call.Args) - 1)
+			fields := make([]string, len(call.Args)-1)
 			for idx, arg := range call.Args[1:] {
 				if field, ok := arg.(Field); ok {
 					fields[idx] = field.Name()
@@ -236,7 +235,7 @@ func convertEventTime(p *Parser) (err error) {
 			}
 			fmt, err := parseDateTimeFormat(ct.Value())
 			if err != nil {
-				err = errors.Wrapf(err,"at %s: failed to parse EVNTTIME format '%s'", call.Source(), ct.Value())
+				err = errors.Wrapf(err, "at %s: failed to parse EVNTTIME format '%s'", call.Source(), ct.Value())
 				return WalkCancel, nil
 			}
 			repl := DateTime{
@@ -265,11 +264,11 @@ func splitDissect(p *Parser) (err error) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
 			var repl AllMatch
 			input, partCounter := match.Input, 0
-			for pos := 0;; pos ++ {
+			for pos := 0; ; pos++ {
 				end := pos
 				var found bool
 				var alt Alternatives
-				for ;end < len(match.Pattern); end++ {
+				for ; end < len(match.Pattern); end++ {
 					if alt, found = match.Pattern[end].(Alternatives); found {
 						break
 					}
@@ -353,7 +352,7 @@ func evalConstantFunctions(parser *Parser) (err error) {
 			repl := SetField{
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
-				Value:         []Operation{ Constant(constant)},
+				Value:         []Operation{Constant(constant)},
 			}
 			return WalkReplace, repl
 		}
@@ -392,4 +391,3 @@ func validate(parser *Parser) (err error) {
 	log.Printf("Validated tree of %d nodes\n", count)
 	return
 }
-

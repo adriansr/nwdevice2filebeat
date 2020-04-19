@@ -46,7 +46,7 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 		return p, err
 	}
 
-	root := Chain {
+	root := Chain{
 		SourceContext: SourceContext(dev.Description.Pos()),
 	}
 
@@ -144,8 +144,8 @@ func processMessages(input []*model.Message) (output []message, err error) {
 	return output, nil
 }
 
-var valueMapNullValues = map[string]bool {
-	"": true,
+var valueMapNullValues = map[string]bool{
+	"":      true,
 	"$NONE": true,
 	"$NULL": true,
 }
@@ -155,7 +155,7 @@ func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 	if !valueMapNullValues[xml.Default] {
 		v, err := newValue(xml.Default, false)
 		if err != nil {
-			return vm, errors.Wrapf(err,"cannot parse VALUEMAP default value '%s'", xml.Default)
+			return vm, errors.Wrapf(err, "cannot parse VALUEMAP default value '%s'", xml.Default)
 		}
 		vm.Default = &v
 	}
@@ -196,11 +196,11 @@ func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 }
 
 type header struct {
-	pos model.XMLPos
-	id2 string
+	pos       model.XMLPos
+	id2       string
 	messageID Operation
 	functions []Operation
-	content Pattern
+	content   Pattern
 
 	// This field is not in the XML. We're adding this information to help
 	// capture payload when the payload overlaps part of the header.
@@ -215,13 +215,13 @@ func newHeader(xml *model.Header) (h header, err error) {
 	if xml.Content == "" {
 		return h, errors.Errorf("empty content attribute")
 	}
-	h = header {
+	h = header{
 		pos: xml.Pos(),
 		id2: xml.ID2,
 	}
 	if xml.MessageID != "" {
 		if h.messageID, err = parseCall(xml.MessageID, false, SourceContext(xml.Pos())); err != nil {
-			return h, errors.Wrap(err,"error parsing messageid")
+			return h, errors.Wrap(err, "error parsing messageid")
 		}
 		switch v := h.messageID.(type) {
 		case Call:
@@ -233,21 +233,21 @@ func newHeader(xml *model.Header) (h header, err error) {
 		}
 	}
 	if h.content, err = ParsePatternWithAlternatives(xml.Content); err != nil {
-		return h, errors.Wrap(err,"error parsing content")
+		return h, errors.Wrap(err, "error parsing content")
 	}
 	if h.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
-		return h, errors.Wrap(err,"error parsing functions")
+		return h, errors.Wrap(err, "error parsing functions")
 	}
 	return h, err
 }
 
 type message struct {
-	pos model.XMLPos
-	id1 string
-	id2 string
+	pos           model.XMLPos
+	id1           string
+	id2           string
 	eventcategory string
-	functions []Operation
-	content Pattern
+	functions     []Operation
+	content       Pattern
 }
 
 func (m message) String() string {
@@ -269,14 +269,14 @@ func newMessage(xml *model.Message) (m message, err error) {
 	//if xml.Functions == "" {
 	//	return m, errors.Errorf("no functions in MESSAGE at %s", xml.Pos())
 	//}
-	m = message {
-		id1: xml.ID1,
-		id2: xml.ID2,
+	m = message{
+		id1:           xml.ID1,
+		id2:           xml.ID2,
 		eventcategory: xml.EventCategory,
 	}
 
 	if m.content, err = ParsePatternWithAlternatives(xml.Content); err != nil {
-		return m, errors.Wrap(err,"error parsing content")
+		return m, errors.Wrap(err, "error parsing content")
 	}
 	if m.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
 		return m, errors.Wrap(err, "error parsing functions")
@@ -288,7 +288,8 @@ func newMessage(xml *model.Message) (m message, err error) {
 func parseFunctions(s string, loc SourceContext) (calls []Operation, err error) {
 	// Skip leading spaces
 	i := 0
-	for n := len(s);i<n && s[i] == ' '; i++ {}
+	for n := len(s); i < n && s[i] == ' '; i++ {
+	}
 	s = s[i:]
 	if s == "" {
 		return nil, nil
@@ -304,11 +305,11 @@ func parseFunctions(s string, loc SourceContext) (calls []Operation, err error) 
 	if end == -1 {
 		return nil, errors.New("no closing brace")
 	}
-	for n := len(s);; {
-		strCall := s[start+1:end]
+	for n := len(s); ; {
+		strCall := s[start+1 : end]
 		call, err := parseCall(strCall, true, loc)
 		if err != nil {
-			return nil, errors.Wrapf(err,"can't parse call at %d:%d : '%s'", start, end, strCall)
+			return nil, errors.Wrapf(err, "can't parse call at %d:%d : '%s'", start, end, strCall)
 		}
 		calls = append(calls, call)
 		for start = end + 1; start < n && s[start] == ' '; start++ {
@@ -345,7 +346,7 @@ func parseCall(s string, allowTarget bool, location SourceContext) (op Operation
 			return SetField{
 				SourceContext: location,
 				Target:        target,
-				Value:         []Operation{ Constant(s) },
+				Value:         []Operation{Constant(s)},
 			}, nil
 		}
 		s = s[1:]
@@ -356,7 +357,7 @@ func parseCall(s string, allowTarget bool, location SourceContext) (op Operation
 	}
 	p, err := ParseCall(s)
 	if err != nil {
-		return op, errors.Wrapf(err,"bad function call at '%s'", s)
+		return op, errors.Wrapf(err, "bad function call at '%s'", s)
 	}
 	p.SourceContext = location
 	p.Target = target

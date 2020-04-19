@@ -9,7 +9,7 @@ import "github.com/pkg/errors"
 func ParsePatternWithAlternatives(data string) (pattern Pattern, err error) {
 	alts, err := splitAlternatives(data)
 	if err != nil {
-		return nil, errors.Wrapf(err,"failed to split alternatives in <<%s>>", data)
+		return nil, errors.Wrapf(err, "failed to split alternatives in <<%s>>", data)
 	}
 	return dissectRecursive(alts)
 }

@@ -7,7 +7,7 @@ package config
 type Config struct {
 	DevicePath string
 	OutputPath string
-	Opt Optimizations
+	Opt        Optimizations
 }
 
 type Optimizations struct {
@@ -22,4 +22,3 @@ type Optimizations struct {
 	// readability.
 	DetectDuplicates bool
 }
-

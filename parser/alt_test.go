@@ -12,10 +12,10 @@ import (
 
 func TestSplitAlternatives(t *testing.T) {
 	for _, test := range []struct {
-		input string
+		input    string
 		expected []interface{}
-		err error
-	} {
+		err      error
+	}{
 		{
 			input: "one pattern {alternative 1|alternative 2} final",
 			expected: []interface{}{
@@ -37,7 +37,6 @@ func TestSplitAlternatives(t *testing.T) {
 					"3",
 				},
 			},
-
 		},
 		{
 			input: "one pattern",
@@ -59,14 +58,14 @@ func TestSplitAlternatives(t *testing.T) {
 		},
 		{
 			input: "broken { a | b",
-			expected: []interface{} {
+			expected: []interface{}{
 				"broken ",
 			},
 			err: errSplitAltFailed,
 		},
 		{
 			input: "broken { a |}",
-			expected: []interface{} {
+			expected: []interface{}{
 				"broken ",
 			},
 			err: errSplitAltFailed,
@@ -84,10 +83,10 @@ func TestSplitAlternatives(t *testing.T) {
 
 func TestPatternWithAlternatives(t *testing.T) {
 	for _, test := range []struct {
-		input string
+		input    string
 		expected Pattern
-		err error
-	} {
+		err      error
+	}{
 		{
 			input: "one <a> {alternative <c> 1|alternative 2 <d>} <e>",
 			expected: Pattern{

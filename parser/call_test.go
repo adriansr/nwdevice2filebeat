@@ -12,13 +12,13 @@ import (
 
 func TestCall(t *testing.T) {
 	for _, testCase := range []struct {
-		input string
+		input    string
 		expected Call
-		err bool
-	} {
+		err      bool
+	}{
 		{
 			input: "STRCAT('CISCOIPORTESA','_','GENERIC')",
-			expected: Call {
+			expected: Call{
 				Function: "STRCAT",
 				Args: []Value{
 					Constant("CISCOIPORTESA"),
@@ -29,7 +29,7 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: "STRCAT('header_' , id2)",
-			expected: Call {
+			expected: Call{
 				Function: "STRCAT",
 				Args: []Value{
 					Constant("header_"),
@@ -39,7 +39,7 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: "STRCAT('header_' , id2)",
-			expected: Call {
+			expected: Call{
 				Function: "STRCAT",
 				Args: []Value{
 					Constant("header_"),
@@ -49,27 +49,27 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: `PARMVAL($MSG)`,
-			expected: Call {
+			expected: Call{
 				Function: "PARMVAL",
-				Args: []Value {
+				Args: []Value{
 					Field("$MSG"),
 				},
 			},
 		},
 		{
 			input: `PARMVAL($MSG)`,
-			expected: Call {
+			expected: Call{
 				Function: "PARMVAL",
-				Args: []Value {
+				Args: []Value{
 					Field("$MSG"),
 				},
 			},
 		},
 		{
 			input: `MyCall($HDR,'%G/%F/%W %H:%U:%O',hdate1,htime)`,
-			expected: Call {
+			expected: Call{
 				Function: "MyCall",
-				Args: []Value {
+				Args: []Value{
 					Field("$HDR"),
 					Constant(`%G/%F/%W %H:%U:%O`),
 					Field("hdate1"),
@@ -79,7 +79,7 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: `ESCAPED('here\'s a quote', 'and a \\ slash') `,
-			expected: Call {
+			expected: Call{
 				Function: "ESCAPED",
 				Args: []Value{
 					Constant("here's a quote"),
@@ -89,7 +89,7 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: "MY_FUN(field)",
-			expected: Call {
+			expected: Call{
 				Function: "MY_FUN",
 				Args: []Value{
 					Field("field"),
@@ -98,7 +98,7 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: "  MY_FUN(   field ) ",
-			expected: Call {
+			expected: Call{
 				Function: "MY_FUN",
 				Args: []Value{
 					Field("field"),
@@ -107,39 +107,39 @@ func TestCall(t *testing.T) {
 		},
 		{
 			input: "PERFECTLY_VALID()",
-			expected:Call{
+			expected: Call{
 				Function: "PERFECTLY_VALID",
 			},
 		},
 		{
 			input: "INVALID ",
-			err: true,
+			err:   true,
 		},
 		{
 			input: "INVALID (what is this)",
-			err: true,
+			err:   true,
 		},
 		{
 			input: "ALSO INVALID",
-			err: true,
+			err:   true,
 		},
 		{
 			input: `*THIS('is\'just'plain'wrong')`,
-			err: true,
+			err:   true,
 		},
 		{
 			input: `THIS('is not terminated`,
-			err: true,
+			err:   true,
 		},
 		{
 			input: `NEITHER(`,
-			err: true,
+			err:   true,
 		},
 		{
 			input: "UNQUOTED('this is fine', at some point someone got tired of quotes, \t, my.field)",
 			expected: Call{
 				Function: "UNQUOTED",
-				Args:     []Value{
+				Args: []Value{
 					Constant("this is fine"),
 					Constant("at some point someone got tired of quotes"),
 					Constant("\t"),
@@ -158,7 +158,6 @@ func TestCall(t *testing.T) {
 	}
 }
 
-
 func TestCall2(t *testing.T) {
 	loc := SourceContext{
 		Path: "call_test.go",
@@ -174,20 +173,20 @@ func TestCall2(t *testing.T) {
 			input: "@target:*APPEND('hola',:,feo)",
 			expected: Call{
 				SourceContext: loc,
-				Function: "APPEND",
-				Target:   "target",
-				Args:     []Value{Constant("hola"), Constant(":"), Field("feo")},
+				Function:      "APPEND",
+				Target:        "target",
+				Args:          []Value{Constant("hola"), Constant(":"), Field("feo")},
 			},
 		},
 		{
 			input: "@target:SOMETHING()",
 			expected: SetField{
 				SourceContext: loc,
-				Target:   "target",
-				Value:     []Operation{Constant("SOMETHING()")},
+				Target:        "target",
+				Value:         []Operation{Constant("SOMETHING()")},
 			},
 		},
-	}{
+	} {
 		result, err := parseCall(testCase.input, true, loc)
 		if !testCase.err {
 			assert.NoError(t, err)

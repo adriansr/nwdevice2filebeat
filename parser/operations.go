@@ -96,24 +96,24 @@ func (am AllMatch) Children() []Operation {
 
 func (am AllMatch) Hashable() string {
 	return "All{n:" + OpList(am.Processors()).Hashable() +
-				",succ=" + OpList(am.OnSuccess()).Hashable() +
-				",fail=" + OpList(am.OnFailure()).Hashable() +
+		",succ=" + OpList(am.OnSuccess()).Hashable() +
+		",fail=" + OpList(am.OnFailure()).Hashable() +
 		"}"
 }
 
 type SwitchSelect struct {
 	LinearSelect
-	Key Field
+	Key       Field
 	KeyLength int
-	Mapping map[string]*Operation
+	Mapping   map[string]*Operation
 }
 
 type Match struct {
 	SourceContext
-	Input   string
-	Pattern Pattern
+	Input        string
+	Pattern      Pattern
 	PayloadField string
-	OnSuccess []Operation
+	OnSuccess    []Operation
 }
 
 func (m Match) Children() []Operation {
@@ -135,7 +135,7 @@ func (m Match) Hashable() string {
 type SetField struct {
 	SourceContext
 	Target string
-	Value []Operation
+	Value  []Operation
 }
 
 func (c SetField) Children() []Operation {
@@ -183,7 +183,7 @@ func (c Call) Children() []Operation {
 func (c Call) String() string {
 	var target string
 	if c.Target != "" {
-		target = "target="+ c.Target + ","
+		target = "target=" + c.Target + ","
 	}
 	args := make([]string, len(c.Args))
 	for idx, val := range c.Args {
@@ -209,7 +209,7 @@ func (c Call) Hashable() string {
 // TODO: Values are either quoted (single) or refs to fields (*dport)
 type ValueMap struct {
 	SourceContext
-	Nodes 	 []Operation
+	Nodes    []Operation
 	Name     string
 	Default  *Value
 	Mappings map[string]int
@@ -242,7 +242,6 @@ func (v ValueMap) Hashable() string {
 	sb.WriteString("}}")
 	return sb.String()
 }
-
 
 type ValueMapCall struct {
 	SourceContext

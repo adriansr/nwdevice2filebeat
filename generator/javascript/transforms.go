@@ -243,11 +243,15 @@ func extractVariables(p *parser.Parser) (err error) {
 	var gen nameGenerator
 	p.WalkPostOrder(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
 		var name string
-		switch node.(type) {
+		switch v := node.(type) {
 		case parser.Chain:
 			name = gen.New("chain")
 		case parser.Match:
-			name = gen.New("match")
+			prefix := "msg"
+			if v.Input == "message" {
+				prefix = "hdr"
+			}
+			name = gen.New(prefix)
 		case parser.LinearSelect:
 			name = gen.New("select")
 		}

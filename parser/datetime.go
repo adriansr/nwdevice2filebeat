@@ -37,7 +37,7 @@ type DateTime struct {
 	Target string
 	Fields []string
 	// Content is either DateTimeSpec or Constant
-	Format []DateTimeItem
+	Formats [][]DateTimeItem
 }
 
 func (DateTime) Children() []Operation {
@@ -50,11 +50,15 @@ func (v DateTime) Hashable() string {
 	sb.WriteString(v.Target)
 	sb.WriteString(",Fields:")
 	sb.WriteString(strings.Join(v.Fields, ","))
-	sb.WriteString(",Format:[")
-	for _, f := range v.Format {
-		sb.WriteByte(f.Spec())
-		sb.WriteString(f.Value())
-		sb.WriteByte(',')
+	sb.WriteString(",Formats:[")
+	for _, ff := range v.Formats {
+		sb.WriteString("[")
+		for _, f := range ff {
+			sb.WriteByte(f.Spec())
+			sb.WriteString(f.Value())
+			sb.WriteByte(',')
+		}
+		sb.WriteString("],")
 	}
 	sb.WriteString("]}")
 	return sb.String()

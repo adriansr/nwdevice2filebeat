@@ -36,7 +36,7 @@ function match(options) {
     options.dissect["target_prefix"] = "nwparser";
     options.dissect["ignore_failure"] = true;
     options.dissect["overwrite_keys"] = true;
-
+    //console.debug("create tokenizer: " + options.dissect.tokenizer);
     var dissect = new processor.Dissect(options.dissect);
     return function(evt) {
         dissect.Run(evt);
@@ -110,8 +110,27 @@ function STRCAT(evt, args) {
     The value attribute "id1" must be used as key.
  */
 function SYSVAL(evt, args) {
-    return undefined
 }
+
+// TODO: Prune this from the tree.
+function HDR(evt, args) {
+}
+
+// TODO: Implement?
+function DIRCHK(evt, args) {
+}
+
+function DUR(evt, args) {
+}
+
+function URL(evt, args) {
+
+}
+
+// TODO: Implement in build time
+function CALC(evt, args) {
+}
+
 function call(opts) {
     return function(evt) {
         // TODO: Optimize this
@@ -156,31 +175,53 @@ function dump(label) {
     }
 }
 
-function date_time(opts) {
+function date_time_join_args(evt, arglist) {
+    var str = "";
+    for (var i = 0; i < arglist.length; i++) {
+        var fname = FIELDS_PREFIX + arglist[i];
+        var val = evt.Get(fname);
+        if (val != null) {
+            if (str != "") str += " ";
+            str += val;
+        } else {
+            console.warn("in date_time: input arg " + fname + " is not set");
+        }
+    }
+    return str;
+}
+
+function date_time_try_pattern(evt, opts, fmt, str) {
+    var date = new Date();
+    var pos = 0;
+    var len = str.length;
+    for (var proc=0; pos!==undefined && pos<len && proc<fmt.length; proc++) {
+        //console.warn("in date_time: enter proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
+        pos = fmt[proc](str, pos, date);
+        //console.warn("in date_time: leave proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
+    }
+    var done = pos !== undefined;
+    if (done) evt.Put(FIELDS_PREFIX + opts.dest, date);
+    return done;
+}
+
+function date_times(opts) {
     return function(evt) {
-        var str = "";
-        for (var i = 0; i < opts.args.length; i++) {
-            var fname = FIELDS_PREFIX + opts.args[i];
-            var val = evt.Get(fname);
-            if (val != null) {
-                if (str != "") str += " ";
-                str += val;
-            } else {
-                console.warn("in date_time: input arg " + fname + " is not set");
+        var str = date_time_join_args(evt, opts.args);
+        var i;
+        for (i=0; i<opts.fmts; i++) {
+            if (date_time_try_pattern(evt, opts, opts.fmts[i], str)) {
+                //console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
+                return;
             }
         }
-        var date = new Date();
-        var pos = 0;
-        var len = str.length;
-        for (var proc=0; pos!==undefined && pos<len && proc<opts.fmt.length; proc++) {
-            //console.warn("in date_time: enter proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
-            pos = opts.fmt[proc](str, pos, date);
-            //console.warn("in date_time: leave proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
-        }
-        if (pos !== undefined) {
-            evt.Put(FIELDS_PREFIX + opts.dest, date);
-        }
-        //console.warn("in date_time: result=" + date);
+        console.warn("in date_times: FAILED: " + str);
+    }
+}
+
+function date_time(opts) {
+    return function(evt) {
+        var str = date_time_join_args(evt, opts.args);
+        date_time_try_pattern(evt, opts, opts.fmt, str);
     }
 }
 
@@ -190,7 +231,7 @@ function dc(ct) {
         if (n - pos < ct.length) return;
         var part = str.substr(pos, ct.length);
         if (part != ct) {
-            console.warn("parsing date_time '" + str + "' at " + pos + ": '" + part + "' is not '" + ct + "'");
+            //console.warn("parsing date_time '" + str + "' at " + pos + ": '" + part + "' is not '" + ct + "'");
             return;
         }
         return pos + ct.length;
@@ -276,7 +317,7 @@ function dateVariableWidthNumber(fmtChar, min, max, setter) {
             setter.call(date, value);
             return pos;
         }
-        console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
+        //console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
         return;
     }
 }
@@ -293,7 +334,7 @@ function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
             setter.call(date, value);
             return pos + width;
         }
-        console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
+        //console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
         return;
     }
 }
@@ -310,7 +351,7 @@ function dateMonthName(long) {
             idx = shortMonths[mon.toLowerCase()];
         }
         if (idx === undefined) {
-            console.warn("parsing date_time: '" + mon + "' is not a valid short month (%B)");
+            //console.warn("parsing date_time: '" + mon + "' is not a valid short month (%B)");
             return;
         }
         date.setMonth(idx[0]);

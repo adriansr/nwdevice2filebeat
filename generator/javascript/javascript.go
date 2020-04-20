@@ -6,6 +6,7 @@ package javascript
 
 import (
 	"io"
+	"sort"
 
 	"github.com/pkg/errors"
 
@@ -81,7 +82,13 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 			JS("keyvaluepairs").Write(": {").Newline().
 			Indent()
 
-		for key, idx := range v.Mappings {
+		keys := make([]string, 0, len(v.Mappings))
+		for key := range v.Mappings {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
+			idx := v.Mappings[key]
 			value := v.Nodes[idx]
 			out.JS(key).Write(": ")
 			generate(value, out)
@@ -191,21 +198,43 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		out.Write("})")
 
 	case parser.DateTime:
-		out.Write("date_time({").Newline().Indent().
-			Write("dest: ").JS(v.Target).Write(",").Newline().
-			Write("args: ").JS(v.Fields).Write(",").Newline().
-			Write("fmt: [")
-		for idx, fmt := range v.Format {
-			if idx > 0 {
-				out.Write(",")
+		if len(v.Formats) == 1 {
+			out.Write("date_time({").Newline().Indent().
+				Write("dest: ").JS(v.Target).Write(",").Newline().
+				Write("args: ").JS(v.Fields).Write(",").Newline().
+				Write("fmt: [")
+			for idx, fmt := range v.Formats[0] {
+				if idx > 0 {
+					out.Write(",")
+				}
+				if spec := fmt.Spec(); spec != parser.DateTimeConstant {
+					out.Writef("d%c", spec)
+				} else {
+					out.Write("dc(").JS(fmt.Value()).Write(")")
+				}
 			}
-			if spec := fmt.Spec(); spec != parser.DateTimeConstant {
-				out.Writef("d%c", spec)
-			} else {
-				out.Write("dc(").JS(fmt.Value()).Write(")")
+			out.Write("],").Newline().Unindent().Write("})")
+		} else {
+			out.Write("date_times({").Newline().Indent().
+				Write("dest: ").JS(v.Target).Write(",").Newline().
+				Write("args: ").JS(v.Fields).Write(",").Newline().
+				Write("fmts: [").Newline().Indent()
+			for fmtIdx := range v.Formats {
+				out.Write("[")
+				for idx, fmt := range v.Formats[fmtIdx] {
+					if idx > 0 {
+						out.Write(",")
+					}
+					if spec := fmt.Spec(); spec != parser.DateTimeConstant {
+						out.Writef("d%c", spec)
+					} else {
+						out.Write("dc(").JS(fmt.Value()).Write(")")
+					}
+				}
+				out.Write("],").Newline()
 			}
+			out.Unindent().Write("],").Newline().Unindent().Write("})")
 		}
-		out.Write("],").Newline().Unindent().Write("})")
 
 	default:
 		out.Writef("/* TODO: here goes a %T */", v)

@@ -219,30 +219,43 @@ func convertEventTime(p *Parser) (err error) {
 				err = errors.Errorf("at %s: EVNTTIME call has too little arguments: %d", call.Source(), numArgs)
 				return WalkCancel, nil
 			}
-			ct, ok := call.Args[0].(Constant)
-			if !ok {
+			var numFormats int
+			for numFormats = range call.Args {
+				if _, ok := call.Args[numFormats].(Constant); !ok {
+					break
+				}
+			}
+			if numFormats == 0 {
 				err = errors.Errorf("at %s: EVNTTIME call format is not a constant: %s", call.Source(), call.Args[0])
 				return WalkCancel, nil
+			} else if numFormats == numArgs {
+				err = errors.Errorf("at %s: EVNTTIME has no fields", call.Source())
+				return WalkCancel, nil
 			}
-			fields := make([]string, len(call.Args)-1)
-			for idx, arg := range call.Args[1:] {
+
+			fields := make([]string, numArgs-numFormats)
+			for idx, arg := range call.Args[numFormats:] {
 				if field, ok := arg.(Field); ok {
 					fields[idx] = field.Name()
 				} else {
-					err = errors.Errorf("at %s: EVNTTIME call argument %d is not a field", call.Source(), idx+2)
+					err = errors.Errorf("at %s: EVNTTIME call argument %d is not a field", call.Source(), idx+numFormats)
 					return WalkCancel, nil
 				}
-			}
-			fmt, err := parseDateTimeFormat(ct.Value())
-			if err != nil {
-				err = errors.Wrapf(err, "at %s: failed to parse EVNTTIME format '%s'", call.Source(), ct.Value())
-				return WalkCancel, nil
 			}
 			repl := DateTime{
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
 				Fields:        fields,
-				Format:        fmt,
+			}
+			repl.Formats = make([][]DateTimeItem, numFormats)
+			for idx, value := range call.Args[:numFormats] {
+				ct, _ := value.(Constant)
+				fmt, err := parseDateTimeFormat(ct.Value())
+				if err != nil {
+					err = errors.Wrapf(err, "at %s: failed to parse EVNTTIME format '%s'", call.Source(), ct.Value())
+					return WalkCancel, nil
+				}
+				repl.Formats[idx] = fmt
 			}
 			return WalkReplace, repl
 		}

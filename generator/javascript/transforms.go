@@ -28,6 +28,13 @@ var preprocessors = parser.PostprocessGroup{
 			Run:  setTimestamp,
 		},
 
+		// Some MESSAGE parsers don't capture anything. That's an error for
+		// dissect so let's add an empty capture at the end.
+		{
+			Name: "Fix non-capturing dissects",
+			Run:  fixNonCapturingDissects,
+		},
+
 		// Fron here down root node belongs to JS
 		{
 			Name: "prepare file structure",
@@ -57,8 +64,7 @@ func (p MainProcessor) Children() []parser.Operation {
 }
 
 type File struct {
-	DeclarationPos int
-	Nodes          []parser.Operation
+	Nodes []parser.Operation
 }
 
 func (p File) Children() []parser.Operation {
@@ -91,11 +97,10 @@ func (p RawJS) Children() []parser.Operation {
 func adjustTree(p *parser.Parser) (err error) {
 	var file File
 	file.Nodes = append(file.Nodes, RawJS(header))
+	file.Nodes = append(file.Nodes, MainProcessor{inner: []parser.Operation{p.Root}})
 	for _, vm := range p.ValueMaps {
 		file.Nodes = append(file.Nodes, vm)
 	}
-	file.DeclarationPos = len(file.Nodes)
-	file.Nodes = append(file.Nodes, MainProcessor{inner: []parser.Operation{p.Root}})
 	p.Root = file
 	return nil
 }
@@ -326,5 +331,22 @@ func removeDuplicateNodes(p *parser.Parser) (err error) {
 		return parser.WalkContinue, nil
 	})
 	p.Root = file.WithVars(vars)
+	return nil
+}
+
+func fixNonCapturingDissects(p *parser.Parser) error {
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		if match, ok := node.(parser.Match); ok {
+			if len(match.Pattern) != 1 {
+				return parser.WalkContinue, nil
+			}
+			if _, ok := match.Pattern[0].(parser.Constant); !ok {
+				return parser.WalkContinue, nil
+			}
+			match.Pattern = append(match.Pattern, parser.Field(""))
+			return parser.WalkReplace, match
+		}
+		return parser.WalkContinue, nil
+	})
 	return nil
 }

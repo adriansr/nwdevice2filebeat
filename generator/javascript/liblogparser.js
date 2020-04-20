@@ -21,7 +21,6 @@ function linear_select(subprocessors) {
         var i;
         for (i=0; i<subprocessors.length; i++) {
             evt.Delete(FLAG_FIELD);
-            // TODO: What if dissect sets FLAG_FIELD? :)
             subprocessors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) == null) break;
@@ -48,7 +47,6 @@ function match(options) {
 
 function all_match(opts) {
     return function(evt) {
-        //var saved_flags = evt.Get(FLAG_FIELD);
         var i;
         for (i=0; i<opts.processors.length; i++) {
             evt.Delete(FLAG_FIELD);
@@ -62,9 +60,6 @@ function all_match(opts) {
             }
             //console.warn("all_match success at " + i + JSON.stringify(evt));
         }
-        /*if (saved_flags !== null) {
-            evt.Put(FLAG_FIELD, saved_flags);
-        }*/
         if (opts.on_success != null) opts.on_success(evt);
     }
 }

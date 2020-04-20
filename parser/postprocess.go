@@ -275,7 +275,9 @@ func splitDissect(p *Parser) (err error) {
 	// Control with a flag.
 	p.WalkPostOrder(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
-			var repl AllMatch
+			repl := AllMatch{
+				SourceContext: match.SourceContext,
+			}
 			input, partCounter := match.Input, 0
 			for pos := 0; ; pos++ {
 				end := pos

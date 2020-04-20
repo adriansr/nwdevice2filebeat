@@ -38,7 +38,6 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 	if p.Messages, err = processMessages(dev.Messages); err != nil {
 		return p, err
 	}
-
 	if err = p.Apply(prechecks); err != nil {
 		return p, err
 	}
@@ -49,7 +48,6 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 	root := Chain{
 		SourceContext: SourceContext(dev.Description.Pos()),
 	}
-
 	hNodes := make([]Operation, 0, len(p.Headers))
 	for _, h := range p.Headers {
 		match := Match{
@@ -270,6 +268,7 @@ func newMessage(xml *model.Message) (m message, err error) {
 	//	return m, errors.Errorf("no functions in MESSAGE at %s", xml.Pos())
 	//}
 	m = message{
+		pos: 		   xml.Pos(),
 		id1:           xml.ID1,
 		id2:           xml.ID2,
 		eventcategory: xml.EventCategory,

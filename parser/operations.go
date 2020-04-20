@@ -71,6 +71,7 @@ func (c LinearSelect) Hashable() string {
 }
 
 type AllMatch struct {
+	SourceContext
 	Nodes []Operation
 	// Nodes must be a list of all operations contained so we can optimize it.
 	// so it's necessary to know were some start and others end.

@@ -64,6 +64,8 @@ var transforms = PostprocessGroup{
 		// TODO:
 		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
 
+		{"fix dissect consecutive captures", fixDissectCaptures},
+
 		{"split alternatives into dissect patterns", splitDissect},
 	},
 }
@@ -333,6 +335,50 @@ func splitDissect(p *Parser) (err error) {
 			repl.onFailurePos = len(repl.Nodes)
 			// TODO: cleanup on failure
 			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func fixDissectCaptures(p *Parser) (err error) {
+	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			// First check if a pattern has consecutive captures outside of an
+			// alternative.
+			var fixes []int
+			lastWasCapture, lastCapture := false, ""
+			for idx, op := range match.Pattern {
+				isCapture, capture := false, ""
+				switch v := op.(type) {
+				case Field:
+					isCapture = true
+					capture = v.Name()
+				case Payload:
+					isCapture = true
+					capture = v.FieldName()
+				}
+				if isCapture && lastWasCapture {
+					// This happens a lot. I think the proper thing is to add
+					// a space in between.
+					// TODO: Revisit decision and check rsa2elk
+					fixes = append(fixes, idx)
+					log.Printf("INFO at %s: pattern has two consecutive captures: %s and %s (fixed)",
+							match.Source(), lastCapture, capture)
+				}
+				lastWasCapture = isCapture
+				lastCapture = capture
+			}
+			if len(fixes) > 0 {
+				for offset, pos := range fixes {
+					pattern := make([]Value, 0, len(match.Pattern) + len(fixes))
+					pattern = append(pattern, match.Pattern[:pos+offset]...)
+					pattern = append(pattern, Constant(" "))
+					pattern = append(pattern, match.Pattern[pos+offset:]...)
+					match.Pattern = pattern
+				}
+				return WalkReplace, match
+			}
 		}
 		return WalkContinue, nil
 	})

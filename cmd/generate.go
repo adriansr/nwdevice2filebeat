@@ -44,7 +44,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 	p, err := parser.New(dev, cfg)
 	if err != nil {
 		LogError("Failed to parse device", "path", cfg.DevicePath, "reason", err)
-		//return
+		return
 	}
 	writer := ioutil.Discard
 	if outfile := cfg.OutputPath; outfile != "" {

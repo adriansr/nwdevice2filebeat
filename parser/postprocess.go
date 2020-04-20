@@ -64,7 +64,9 @@ var transforms = PostprocessGroup{
 		// TODO:
 		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
 
-		{"fix dissect consecutive captures", fixDissectCaptures},
+		{"fix consecutive dissect captures", fixDissectCaptures},
+
+		{"fix consecutive dissect captures in alternatives", fixAlternativesEndingInCapture},
 
 		{"split alternatives into dissect patterns", splitDissect},
 	},
@@ -383,6 +385,104 @@ func fixDissectCaptures(p *Parser) (err error) {
 		return WalkContinue, nil
 	})
 	return err
+}
+
+func getLastOp(pattern Pattern) Value {
+	n := len(pattern)
+	if n == 0 {
+		return nil
+	}
+	return pattern[n-1]
+}
+
+func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern, error) {
+	if pos + 1 == len(parent) {
+		// Alternatives at the end of the pattern don't need adjustment.
+		return nil, nil
+	}
+	var endInField []int
+	for idx, pattern := range alt {
+		lastOp := getLastOp(pattern)
+		if lastOp == nil {
+			return nil, errors.New("empty pattern inside alternatives")
+		}
+		switch v := lastOp.(type) {
+		case Constant:
+		case Field:
+			endInField = append(endInField, idx)
+		case Payload:
+			return nil, errors.New("payload inside alternative")
+		default:
+			return nil, errors.Errorf("unsupported type inside alternative: %T", v)
+		}
+	}
+	if len(endInField) == 0 {
+		// No alternatives end in a field capture: Nothing to fix.
+		return nil, nil
+	}
+
+	// From here there's alternatives ending in field (endInField)
+	// and potentially others ending in a constant.
+
+	// Value after the alternative. Only need if it is a constant.
+	ct, nextIsConstant := parent[pos+1].(Constant)
+
+	if nextIsConstant {
+		// If we have a constant after the alternative, inject into the alternatives.
+		alt = alt.InjectRight(ct)
+		// Two consecutive constants in some alternatives can cause problems
+		// somewhere else.
+		for idx, pattern := range alt {
+			alt[idx] = pattern.SquashConstants()
+		}
+		// Remove it from the parent.
+		parent = append(parent[:pos+1], parent[pos+2:]...)
+
+		log.Printf("INFO - Fixed constant collision by moving a constant")
+		return parent, nil
+	}
+	// We have two field captures in sequence, insert whitespace in between.
+	for _, altIdx := range endInField {
+		alt[altIdx] = alt[altIdx].InjectRight(Constant(" "))
+	}
+	log.Printf("INFO - Fixed constant collision by injecting a constant")
+	return nil, nil
+}
+
+func fixAlternativesEndingInCapture(p *Parser) (err error) {
+	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			// The alternatives may be modified without the enclosing Match
+			// needing to be modified.
+			modified := false
+			n := len(match.Pattern)
+			// Alternatives at the end of the pattern are no problem.
+			for pos := 0; pos < n-1; pos++ {
+				if alt, ok := match.Pattern[pos].(Alternatives); ok {
+					var newPattern Pattern
+					newPattern, err = tryFixAlternativeAtPos(alt, pos, match.Pattern)
+					if err != nil {
+						err = errors.Wrapf(err, "at %s", match.Source())
+						return WalkCancel, nil
+					}
+					if newPattern !=nil {
+						// This modifies the actual pattern it's looping on,
+						// if a new element has been added to next pos.
+						// In this case it'll also be necessary to replace
+						// the match in the tree with an updated version.
+						match.Pattern = newPattern
+						n = len(newPattern)
+						modified = true
+					}
+				}
+			}
+			if modified {
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return
 }
 
 func evalFn(name string, params []string) (string, error) {

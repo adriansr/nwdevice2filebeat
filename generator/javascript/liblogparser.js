@@ -28,6 +28,11 @@ function linear_select(subprocessors) {
         if (saved_flags !== null) {
             evt.Put(FLAG_FIELD, saved_flags);
         }
+        if (i < subprocessors.length) {
+            console.warn("linear_select matched entry " + i);
+        } else {
+            console.warn("linear_select didn't match");
+        }
     }
 }
 

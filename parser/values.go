@@ -92,6 +92,27 @@ func (Alternatives) Token() string {
 	return "<<alternative>>"
 }
 
+func (alt Alternatives) InjectRight(v Value) Alternatives {
+	for idx, pattern := range alt {
+		alt[idx] = pattern.InjectRight(v)
+	}
+	return alt
+}
+
+func (alt Alternatives) SquashConstants() Alternatives {
+	for idx, pattern := range alt {
+		alt[idx] = pattern.SquashConstants()
+	}
+	return alt
+}
+
+func (alt Alternatives) InjectLeft(v Value) Alternatives {
+	for idx, pattern := range alt {
+		alt[idx] = pattern.InjectLeft(v)
+	}
+	return alt
+}
+
 type Pattern []Value
 
 func (p Pattern) String() string {
@@ -133,6 +154,48 @@ func (c Pattern) PayloadField() (field string, err error) {
 		}
 	}
 	return
+}
+
+func (p Pattern) StripLeft() Pattern {
+	if len(p) == 0 {
+		return nil
+	}
+	return p[1:]
+}
+
+func (p Pattern) StripRight() Pattern {
+	n := len(p)
+	if n == 0 {
+		return nil
+	}
+	return p[:n-1]
+}
+
+func (p Pattern) InjectRight(v Value) Pattern {
+	return append(p, v)
+}
+
+func (p Pattern) InjectLeft(v Value) Pattern {
+	return append(append(Pattern(nil), v), p...)
+}
+
+// SquashConstants joins together consecutive constants in a pattern.
+func (p Pattern) SquashConstants() Pattern {
+	var output Pattern
+	lastCt := -2
+	for _, entry := range p {
+		ct, isConstant := entry.(Constant)
+		if isConstant {
+			if n := len(output); lastCt == n-1 {
+				output[lastCt] = Constant(output[lastCt].(Constant).Value() + ct.Value())
+				continue
+			} else {
+				lastCt = n
+			}
+		}
+		output = append(output, entry)
+	}
+	return output
 }
 
 type Tokenizer interface {

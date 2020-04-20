@@ -160,7 +160,7 @@ func checkSpecialFields(parser *Parser) (err error) {
 		case Call:
 			for pos, arg := range call.Args {
 				if fld, ok := arg.(Field); ok && len(fld.Name()) > 0 && fld.Name()[0] == '$' {
-					log.Printf("XXX at %s: special field %s at position %d in call %s\n", call.Source(), fld.Name(), pos, call.String())
+					log.Printf("INFO at %s: special field %s at position %d in call %s\n", call.Source(), fld.Name(), pos, call.String())
 				}
 			}
 		}

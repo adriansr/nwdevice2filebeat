@@ -64,7 +64,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 	if st, err := os.Stat(dev.XMLPath); err == nil {
 		size = st.Size()
 	}
-	log.Printf("XXX %d bytes for pipeline %s (%s) from %d original (%.2f%%)\n",
+	log.Printf("INFO %d bytes for pipeline %s (%s) from %d original (%.2f%%)\n",
 		numBytes, dev.Description.DisplayName, dev.Description.Name,
 		size, 100.0*float64(numBytes)/float64(size))
 }

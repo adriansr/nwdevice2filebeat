@@ -298,7 +298,7 @@ func removeDuplicateNodes(p *parser.Parser) (err error) {
 	if dupes == 0 {
 		return err
 	}
-	log.Printf("XXX duplicates: %d", dupes)
+	log.Printf("INFO duplicates: %d", dupes)
 	for k, v := range seen {
 		if len(v) < 2 {
 			delete(seen, k)

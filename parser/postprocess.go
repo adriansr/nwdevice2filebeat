@@ -90,8 +90,10 @@ var validations = PostprocessGroup{
 	Actions: []Action{
 		{"generic validations", validate},
 		{"detect bad dissect patterns", detectBrokenDissectPatterns},
+		{"detect unknown function calls", detectUnknownFunctionCalls},
 	},
 }
+
 func checkPayloadInMessages(parser *Parser) error {
 	for _, msg := range parser.Messages {
 		if _, err := msg.content.PayloadField(); err == nil {
@@ -718,6 +720,40 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 		}
 		return WalkContinue, nil
 	})
+	return nil
+}
+
+var KnownFunctions = map[string]struct{} {
+	"CALC": {},
+	"DIRCHK": {},
+	"DUR": {},
+	"STRCAT": {},
+	"URL": {},
+	// TODO: Prune this ones
+	"SYSVAL": {},
+	"HDR": {},
+}
+
+func detectUnknownFunctionCalls(parser *Parser) error {
+	unknown := make(map[string]string)
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok {
+			if _, found := KnownFunctions[call.Function]; !found {
+				unknown[call.Function] = fmt.Sprintf("'%s' first seen at %s",
+					call.Function,
+					call.Source())
+			}
+		}
+		return WalkContinue, nil
+	})
+	if len(unknown) > 0 {
+		var values []string
+		for _, v := range unknown {
+			values = append(values, v)
+		}
+		return errors.Errorf("Found %d unknown functions:\n%s",
+			len(values), strings.Join(values, "\n"))
+	}
 	return nil
 }
 

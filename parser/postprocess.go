@@ -681,16 +681,25 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 				switch v := elem.(type) {
 				case Constant:
 					if str := strings.TrimLeft(v.Value(), " "); str != v.Value() {
-						if len(str) == 0 {
-							v = Constant(" ")
+						if prevIsField {
+							// If the previous is a field, always keep one space
+							// otherwise the greedy -> option in dissect will not
+							// consume whitespace and it'll be added to the previous
+							// captured value.
+							v = Constant(" " + str)
 						} else {
-							v = Constant(str)
-						}
-						match.Pattern[pos] = v
-						if !prevIsField {
-							// Add an empty field capture before the constant.
+							// If the previous is not a field, then we're at the
+							// start of a pattern. Keep the constant (can't be
+							// empty) and add a dummy capture to consume any
+							// spaces.
+							if len(str) == 0 {
+								v = Constant(" ")
+							} else {
+								v = Constant(str)
+							}
 							inserts = append(inserts, pos)
 						}
+						match.Pattern[pos] = v
 					}
 				case Field:
 					isField = true

@@ -29,7 +29,7 @@ function DeviceProcessor() {
 
 var dup0 = match({
 	dissect: {
-		tokenizer: "%{hostname->}ossec: Alert Level: %{severity->}; Rule: %{rule->}- %{event_description->}; Location: %{p0->}",
+		tokenizer: "%{hostname->} ossec: Alert Level: %{severity->}; Rule: %{rule->} - %{event_description->}; Location: %{p0->}",
 		field: "nwparser.payload",
 	},
 });
@@ -129,7 +129,7 @@ var all1 = all_match({
 
 var msg2 = match({
 	dissect: {
-		tokenizer: "%{fld1->}\\ossec-agent\\active-response\\active-responses.log; %{event_time_string->}\"%{action->}\" %{param->}",
+		tokenizer: "%{fld1->}\\ossec-agent\\active-response\\active-responses.log; %{event_time_string->} \"%{action->}\" %{param->}",
 		field: "nwparser.p1",
 	},
 });

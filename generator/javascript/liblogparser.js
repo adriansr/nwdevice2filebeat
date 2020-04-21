@@ -69,6 +69,22 @@ function all_match(opts) {
     }
 }
 
+function msgid_select(mapping) {
+    return function(evt) {
+        var msgid = evt.Get(FIELDS_PREFIX + "messageid");
+        if (msgid == null) {
+            console.warn("no messageid captured!")
+            return;
+        }
+        var next = mapping[msgid];
+        if (next === undefined) {
+            console.warn("no mapping for messageid:" + msgid);
+            return;
+        }
+        return next(evt);
+    }
+}
+
 function save_flags(evt) {
     saved_flags = evt.Get(FLAG_FIELD);
 }

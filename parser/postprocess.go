@@ -438,14 +438,14 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 		// Remove it from the parent.
 		parent = append(parent[:pos+1], parent[pos+2:]...)
 
-		log.Printf("INFO - Fixed constant collision by moving a constant")
+		log.Printf("INFO - Fixed field collision by moving a constant")
 		return parent, nil
 	}
 	// We have two field captures in sequence, insert whitespace in between.
 	for _, altIdx := range endInField {
 		alt[altIdx] = alt[altIdx].InjectRight(Constant(" "))
 	}
-	log.Printf("INFO - Fixed constant collision by injecting a constant")
+	log.Printf("INFO - Fixed field collision by injecting a constant")
 	return nil, nil
 }
 

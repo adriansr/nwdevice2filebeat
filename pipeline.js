@@ -109,6 +109,10 @@ var all1 = all_match({
 	],
 	on_success: processor_chain([
 		dup2,
+		set_field({
+			dest: "nwparser.msg_id1",
+			value: constant("ossec:01"),
+		}),
 		dup3,
 		date_time({
 			dest: "event_time",
@@ -138,6 +142,10 @@ var all2 = all_match({
 	],
 	on_success: processor_chain([
 		dup2,
+		set_field({
+			dest: "nwparser.msg_id1",
+			value: constant("ossec:02"),
+		}),
 		dup3,
 		set_field({
 			dest: "nwparser.event_log",
@@ -165,6 +173,10 @@ var all3 = all_match({
 			dest: "nwparser.eventcategory",
 			value: constant("1001000000"),
 		}),
+		set_field({
+			dest: "nwparser.msg_id1",
+			value: constant("ossec:03"),
+		}),
 		dup3,
 		dup4,
 	]),
@@ -178,7 +190,9 @@ var select2 = linear_select([
 
 var chain1 = processor_chain([
 	select1,
-	select2,
+	msgid_select({
+		"ossec": select2,
+	}),
 	set_field({
 		dest: "@timestamp",
 		value: field("event_time"),

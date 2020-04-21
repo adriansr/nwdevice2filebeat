@@ -63,34 +63,15 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 		hNodes = append(hNodes, match)
 	}
 
-	mNodes := make([]Operation, 0, len(p.Messages))
-	for _, m := range p.Messages {
-		match := Match{
-			SourceContext: SourceContext(m.pos),
-			Input:         "payload",
-			Pattern:       m.content,
-		}
-		match.OnSuccess = make([]Operation, 0, 1+len(m.functions))
-		if m.eventcategory != "" {
-			match.OnSuccess = append(match.OnSuccess, SetField{
-				SourceContext: match.SourceContext,
-				Target:        "eventcategory",
-				Value:         []Operation{Constant(m.eventcategory)},
-			})
-		}
-		for _, fn := range m.functions {
-			match.OnSuccess = append(match.OnSuccess, fn)
-		}
-		mNodes = append(mNodes, match)
+	msgNode, err := makeMessagesNode(p.Messages)
+	if err != nil {
+		return p, err
 	}
 	root.Nodes = append(root.Nodes, LinearSelect{
 		SourceContext: SourceContext{},
 		Nodes:         hNodes,
 	})
-	root.Nodes = append(root.Nodes, LinearSelect{
-		SourceContext: SourceContext{},
-		Nodes:         mNodes,
-	})
+	root.Nodes = append(root.Nodes, msgNode)
 	p.Root = root
 	if err := p.Apply(transforms); err != nil {
 		return p, err
@@ -99,6 +80,57 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 		return p, err
 	}
 	return p, validate(&p)
+}
+
+func makeMessagesNode(msgs []message) (Operation, error) {
+	byID2 := make(map[string][]Operation)
+	for _, msg := range msgs {
+		match := Match{
+			SourceContext: SourceContext(msg.pos),
+			Input:         "payload",
+			Pattern:       msg.content,
+		}
+		match.OnSuccess = make([]Operation, 0, 2+len(msg.functions))
+		if msg.eventcategory != "" {
+			match.OnSuccess = append(match.OnSuccess, SetField{
+				SourceContext: match.SourceContext,
+				Target:        "eventcategory",
+				Value:         []Operation{Constant(msg.eventcategory)},
+			})
+		}
+		if msg.id1 != "" {
+			match.OnSuccess = append(match.OnSuccess, SetField{
+				SourceContext: match.SourceContext,
+				Target:		   "msg_id1",
+				Value:		   []Operation{Constant(msg.id1)},
+			})
+		}
+		if msg.id2 == "" {
+			return nil, errors.Errorf("at %s: MESSAGE has no ID2", msg.pos)
+		}
+		for _, fn := range msg.functions {
+			match.OnSuccess = append(match.OnSuccess, fn)
+		}
+		byID2[msg.id2] = append(byID2[msg.id2], match)
+	}
+	msgIdSelect := MsgIdSelect{
+		Map: make(map[string]int, len(byID2)),
+	}
+	counter := 0
+	for k, list := range byID2 {
+		var elem Operation
+		if len(list) == 1 {
+			elem = list[0]
+		} else {
+			elem = LinearSelect{
+				Nodes: list,
+			}
+		}
+		msgIdSelect.Nodes = append(msgIdSelect.Nodes, elem)
+		msgIdSelect.Map[k] = counter
+		counter ++
+	}
+	return msgIdSelect, nil
 }
 
 func processValueMaps(input []*model.ValueMap) (output []ValueMap, byName map[string]*ValueMap, err error) {

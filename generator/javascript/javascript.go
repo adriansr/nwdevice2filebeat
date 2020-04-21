@@ -79,22 +79,9 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		out.Newline()
 		out.Writef("var map_%s = {", v.Name).Newline().
 			Indent().
-			JS("keyvaluepairs").Write(": {").Newline().
-			Indent()
-
-		keys := make([]string, 0, len(v.Mappings))
-		for key := range v.Mappings {
-			keys = append(keys, key)
-		}
-		sort.Strings(keys)
-		for _, key := range keys {
-			idx := v.Mappings[key]
-			value := v.Nodes[idx]
-			out.JS(key).Write(": ")
-			generate(value, out)
-			out.Write(",").Newline()
-		}
-		out.Unindent().Write("},").Newline()
+			Write("keyvaluepairs: ")
+		writeMapping(v.Mappings, v.Nodes, out)
+		out.Write(",").Newline()
 		if v.Default != nil {
 			out.JS("default").Write(": ")
 			generate(*v.Default, out)
@@ -123,6 +110,11 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 			out.Write(",").Newline()
 		}
 		out.Unindent().Write("])")
+
+	case parser.MsgIdSelect:
+		out.Write("msgid_select(")
+		writeMapping(v.Map, v.Nodes, out)
+		out.Write(")")
 
 	case parser.Match:
 		out.Write("match({").Newline().
@@ -240,4 +232,23 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		out.Writef("/* TODO: here goes a %T */", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))
 	}
+}
+
+func writeMapping(m map[string]int, nodes []parser.Operation, out *generator.CodeWriter) {
+	out.Write("{").Newline().Indent()
+	keys := make([]string, len(m))
+	pos := 0
+	for key := range m {
+		keys[pos] = key
+		pos ++
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		idx := m[key]
+		value := nodes[idx]
+		out.JS(key).Write(": ")
+		generate(value, out)
+		out.Write(",").Newline()
+	}
+	out.Unindent().Write("}")
 }

@@ -6,6 +6,7 @@ package parser
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/adriansr/nwdevice2filebeat/model"
@@ -68,6 +69,37 @@ func (c LinearSelect) Children() []Operation {
 
 func (c LinearSelect) Hashable() string {
 	return "LinearSelect{" + OpList(c.Nodes).Hashable() + "}"
+}
+
+
+type MsgIdSelect struct {
+	SourceContext
+	Nodes   []Operation
+	//Default int
+	Map     map[string]int
+}
+
+func (c MsgIdSelect) Children() []Operation {
+	return c.Nodes
+}
+
+func (c MsgIdSelect) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("MsgIdSelect{")
+	keys := make([]string, len(c.Map))
+	for k := range c.Map {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		sb.WriteByte('"')
+		sb.WriteString(k)
+		sb.WriteString("\":")
+		sb.WriteString(c.Nodes[c.Map[k]].Hashable())
+		sb.WriteByte(',')
+	}
+	//sb.WriteString(fmt.Sprintf("def=%d}", c.Default))
+	return sb.String()
 }
 
 type AllMatch struct {

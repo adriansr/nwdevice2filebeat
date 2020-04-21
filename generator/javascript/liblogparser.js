@@ -21,9 +21,11 @@ function linear_select(subprocessors) {
         var i;
         for (i=0; i<subprocessors.length; i++) {
             evt.Delete(FLAG_FIELD);
+            console.warn("linear_select trying entry " + i);
             subprocessors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) == null) break;
+            console.warn("linear_select failed entry " + i);
         }
         if (saved_flags !== null) {
             evt.Put(FLAG_FIELD, saved_flags);
@@ -44,19 +46,20 @@ function match(options) {
     var dissect = new processor.Dissect(options.dissect);
     return function(evt) {
         var src = evt.Get(options.dissect.field);
+        console.debug("dissect start: " + options.dissect.tokenizer);
         dissect.Run(evt);
         var failed = evt.Get(FLAG_FIELD) != null;
         if (failed) {
             console.debug("dissect fail: " + options.dissect.field);
-            console.debug("       input: <<" + src + ">>");
-            console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
         } else {
-            console.debug("dissect MATCH: " + options.dissect.field);
-            console.debug("        input: <<" + src + ">>");
-            console.debug("         expr: <<" + options.dissect.tokenizer + ">>");
+            console.debug("dissect   OK: " + options.dissect.field);
         }
+        console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
+        console.debug("       input: <<" + src + ">>");
         if (options.on_success != null && !failed) {
+            console.debug("  -> on_success");
             options.on_success(evt);
+            console.debug("  <- on_success");
         }
     }
 }
@@ -70,11 +73,11 @@ function all_match(opts) {
             opts.processors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) != null) {
-                //console.warn("all_match failure at " + i + ":" + JSON.stringify(evt));
+                console.warn("all_match failure at " + i + ":" + JSON.stringify(evt));
                 if (opts.on_failure != null) opts.on_failure(evt);
                 return;
             }
-            //console.warn("all_match success at " + i + JSON.stringify(evt));
+            console.warn("all_match success at " + i + JSON.stringify(evt));
         }
         if (opts.on_success != null) opts.on_success(evt);
     }
@@ -84,14 +87,15 @@ function msgid_select(mapping) {
     return function(evt) {
         var msgid = evt.Get(FIELDS_PREFIX + "messageid");
         if (msgid == null) {
-            console.warn("no messageid captured!")
+            console.warn("msgid_select: no messageid captured!")
             return;
         }
         var next = mapping[msgid];
         if (next === undefined) {
-            console.warn("no mapping for messageid:" + msgid);
+            console.warn("msgid_select: no mapping for messageid:" + msgid);
             return;
         }
+        console.info("msgid_select: matched key=" + msgid);
         return next(evt);
     }
 }

@@ -66,10 +66,15 @@ var transforms = PostprocessGroup{
 
 		{"fix consecutive dissect captures", fixDissectCaptures},
 
-		{"fix space repetition at edge of alternatives", fixAlternativesEdgeSpace},
+		{"fix repetition at edge of alternatives", fixAlternativesEdgeSpace},
+
 		{"fix consecutive dissect captures in alternatives", fixAlternativesEndingInCapture},
 
+		{"fix extra leading space in constants", fixExtraLeadingSpaceInConstants},
+
 		{"split alternatives into dissect patterns", splitDissect},
+
+		{"fix extra leading space in constants", fixExtraLeadingSpaceInConstants},
 	},
 }
 
@@ -80,6 +85,13 @@ var optimizations = PostprocessGroup{
 	},
 }
 
+var validations = PostprocessGroup{
+	Title:   "validations",
+	Actions: []Action{
+		{"generic validations", validate},
+		{"detect bad dissect patterns", detectBrokenDissectPatterns},
+	},
+}
 func checkPayloadInMessages(parser *Parser) error {
 	for _, msg := range parser.Messages {
 		if _, err := msg.content.PayloadField(); err == nil {
@@ -314,7 +326,7 @@ func splitDissect(p *Parser) (err error) {
 				sel := LinearSelect{SourceContext: match.SourceContext}
 				curInput := input
 				var part Value
-				if pos < len(match.Pattern) {
+				if pos < len(match.Pattern) - 1{
 					input = fmt.Sprintf("p%d", partCounter)
 					part = Field(input)
 					partCounter++
@@ -451,18 +463,60 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 }
 
 func extractLeadingConstantPrefix(alt Alternatives) (string, Alternatives) {
+	return extractEdgeConstant(alt,
+		func(p Pattern) *Value {
+			return &p[0]
+		},
+		func(s string, idx int) byte {
+			return s[idx]
+		},
+		Pattern.StripLeft,
+		func(s string, prefix int) string {
+			return s[:prefix]
+		},
+		func(s string, prefix int) string {
+			return s[prefix:]
+		})
+}
+
+func extractTrailingConstantPrefix(alt Alternatives) (string, Alternatives) {
+	return extractEdgeConstant(alt,
+		func(p Pattern) *Value {
+			return &p[len(p)-1]
+		},
+		func(s string, idx int) byte {
+			return s[len(s)-1-idx]
+		},
+		Pattern.StripRight,
+		func(s string, prefix int) string {
+			return s[len(s)-prefix:]
+		},
+		func(s string, prefix int) string {
+			return s[:len(s)-prefix]
+		})
+}
+
+func extractEdgeConstant(
+	alt Alternatives,
+	patternAccessor func(p Pattern) *Value,
+	stringAccessor  func(s string, idx int) byte,
+	stripFn         func(Pattern) Pattern,
+	edgeFn  func(string, int) string,
+	stripEdgeFn func(string, int) string,
+) (string, Alternatives) {
+
 	if len(alt) == 0 {
 		return "", alt
 	}
 
-	// First get a list of all the constant prefixes
+	// First get a list of all the constant pre/su/fixes
 	cts := make([]string, len(alt))
 	minLen := -1
 	for idx, pattern := range alt {
 		if len(pattern) == 0 {
 			return "", alt
 		}
-		ct, ok := pattern[0].(Constant)
+		ct, ok := (*patternAccessor(pattern)).(Constant)
 		if !ok {
 			return "", alt
 		}
@@ -476,9 +530,9 @@ func extractLeadingConstantPrefix(alt Alternatives) (string, Alternatives) {
 	prefixLen := 0
 outer:
 	for ; prefixLen < minLen; prefixLen ++ {
-		chr := cts[0][prefixLen]
+		chr := stringAccessor(cts[0], prefixLen)
 		for _, str := range cts[1:] {
-			if str[prefixLen] != chr {
+			if stringAccessor(str, prefixLen) != chr {
 				break outer
 			}
 		}
@@ -487,11 +541,11 @@ outer:
 	var toRemove []int
 	// Then strip all the leading constants
 	for idx, pattern := range alt {
-		if asCt, ok := pattern[0].(Constant); ok {
+		if asCt, ok := (*patternAccessor(pattern)).(Constant); ok {
 			if len(asCt.Value()) > prefixLen {
-				pattern[0] = Constant(asCt.Value()[prefixLen:])
+				*patternAccessor(pattern) = Constant(stripEdgeFn(asCt.Value(), prefixLen))
 			} else {
-				if alt[idx] = pattern.StripLeft(); len(alt[idx]) == 0 {
+				if alt[idx] = stripFn(pattern); len(alt[idx]) == 0 {
 					toRemove = append(toRemove, idx)
 				}
 			}
@@ -504,64 +558,7 @@ outer:
 		}
 	}
 	// Return the common prefix
-	return cts[0][:prefixLen], alt
-}
-
-func extractTrailingConstantPrefix(alt Alternatives) (string, Alternatives) {
-	if len(alt) == 0 {
-		return "", alt
-	}
-
-	// First get a list of all the constant suffixes
-	cts := make([]string, len(alt))
-	minLen := -1
-	for idx, pattern := range alt {
-		if len(pattern) == 0 {
-			return "", alt
-		}
-		ct, ok := pattern[len(pattern)-1].(Constant)
-		if !ok {
-			return "", alt
-		}
-		cts[idx] = ct.Value()
-		if n := len(ct.Value()); minLen == -1 || n < minLen {
-			minLen = n
-		}
-	}
-
-	// Then find the common suffix
-	suffixLen := 0
-outer:
-	for ; suffixLen < minLen; suffixLen ++ {
-		chr := cts[0][len(cts[0]) - 1 - suffixLen]
-		for _, str := range cts[1:] {
-			if str[len(str) - 1 - suffixLen] != chr {
-				break outer
-			}
-		}
-	}
-
-	var toRemove []int
-	// Then strip all the leading constants
-	for idx, pattern := range alt {
-		if asCt, ok := pattern[len(pattern)-1].(Constant); ok {
-			if len(asCt.Value()) > suffixLen {
-				pattern[len(pattern)-1] = Constant(asCt.Value()[:len(asCt.Value())-suffixLen-1])
-			} else {
-				if alt[idx] = pattern.StripRight(); len(alt[idx]) == 0 {
-					toRemove = append(toRemove, idx)
-				}
-			}
-		}
-	}
-	// Remove patterns that become empty
-	if len(toRemove) > 0 {
-		for shift, idx := range toRemove {
-			alt = append(alt[:idx-shift], alt[idx+1-shift:]...)
-		}
-	}
-	// Return the common prefix
-	return cts[0][len(cts[0])-suffixLen-1:], alt
+	return edgeFn(cts[0], prefixLen), alt
 }
 
 func fixAlternativesEdgeSpace(p *Parser) (err error) {
@@ -606,18 +603,18 @@ func fixAlternativesEdgeSpace(p *Parser) (err error) {
 				if !ok {
 					continue
 				}
-				prefix, newAlt := extractLeadingConstantPrefix(alt)
+				prefix, newAlt := extractTrailingConstantPrefix(alt)
 				if prefix == "" {
 					continue
 				}
 				match.Pattern[pos] = newAlt
-				if pos > 0 {
-					if ct, ok := match.Pattern[pos-1].(Constant); ok {
-						match.Pattern[pos-1] = Constant(ct.Value() + prefix)
+				if pos < len(match.Pattern)-1 {
+					if ct, ok := match.Pattern[pos+1].(Constant); ok {
+						match.Pattern[pos+1] = Constant(prefix + ct.Value())
 						continue
 					}
 				}
-				inserts = append(inserts, insert{pos, Constant(prefix)})
+				inserts = append(inserts, insert{pos+1, Constant(prefix)})
 			}
 			if len(inserts) > 0 {
 				match.Pattern = append(match.Pattern, make(Pattern, len(inserts))...)
@@ -672,6 +669,47 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 		return WalkContinue, nil
 	})
 	return
+}
+
+func fixExtraLeadingSpaceInConstants(parser *Parser) error {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		var inserts []int
+		if match, ok := node.(Match); ok {
+			prevIsField := false
+			for pos, elem := range match.Pattern {
+				isField := false
+				switch v := elem.(type) {
+				case Constant:
+					if str := strings.TrimLeft(v.Value(), " "); str != v.Value() {
+						if len(str) == 0 {
+							v = Constant(" ")
+						} else {
+							v = Constant(str)
+						}
+						match.Pattern[pos] = v
+						if !prevIsField {
+							// Add an empty field capture before the constant.
+							inserts = append(inserts, pos)
+						}
+					}
+				case Field:
+					isField = true
+				case Alternatives:
+				}
+				prevIsField = isField
+			}
+			if len(inserts) > 0 {
+				match.Pattern = append(match.Pattern, make(Pattern, len(inserts))...)
+				for shift, pos := range inserts {
+					copy(match.Pattern[pos+shift+1:], match.Pattern[pos+shift:])
+					match.Pattern[pos+shift] = Field("")
+				}
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return nil
 }
 
 func evalFn(name string, params []string) (string, error) {
@@ -740,4 +778,31 @@ func validate(parser *Parser) (err error) {
 	})
 	log.Printf("Validated tree of %d nodes\n", count)
 	return
+}
+
+// This detects if we've generated a broken dissect pattern with two consecutive
+// field captures, which currently causes the dissect processor to hang.
+// TODO: Fix dissect hanging
+func detectBrokenDissectPatterns(parser *Parser) error {
+	var errs multierror.Errors
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			prevIsField := false
+			var prev string
+			for _, item := range match.Pattern {
+				fld, isField := item.(Field)
+				if isField {
+					if prevIsField {
+						errs = append(errs,
+							errors.Errorf("at %s: consecutive field captures generated (fields %s and %s)",
+								match.Source(), prev, fld.Name()))
+					}
+					prev = fld.Name()
+				}
+				prevIsField = isField
+			}
+		}
+		return WalkContinue, nil
+	})
+	return errs.Err()
 }

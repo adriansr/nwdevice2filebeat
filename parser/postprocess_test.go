@@ -326,12 +326,12 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 			},
 		},
 		{
-			title: "first item no-op",
+			title: "first item",
 			input: Match{
 				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant(" hello")},
-						Pattern{Constant(" world")},
+						Pattern{Constant(" world!")},
 					},
 				},
 			},
@@ -340,8 +340,180 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 					Constant(" "),
 					Alternatives{
 						Pattern{Constant("hello")},
+						Pattern{Constant("world!")},
+					},
+				},
+			},
+		},
+		{
+			title: "trailing space",
+			input: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("hello ")},
+						Pattern{Constant("worldo ")},
+					},
+				},
+			},
+			expected: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("hell")},
 						Pattern{Constant("world")},
 					},
+					Constant("o "),
+				},
+			},
+		},
+		{
+			title: "trailing and leading",
+			input: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("banana")},
+						Pattern{Constant("banda")},
+					},
+				},
+			},
+			expected: Match{
+				Pattern: Pattern{
+					Constant("ban"),
+					Alternatives{
+						Pattern{Constant("an")},
+						Pattern{Constant("d")},
+					},
+					Constant("a"),
+				},
+			},
+		},
+		{
+			title: "two alternatives",
+			input: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("logs ")},
+						Pattern{Constant("files ")},
+					},
+					Alternatives{
+						Pattern{Constant("scan")},
+						Pattern{Constant("skipped")},
+					},
+				},
+			},
+			expected: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("log")},
+						Pattern{Constant("file")},
+					},
+					Constant("s s"),
+					Alternatives{
+						Pattern{Constant("can")},
+						Pattern{Constant("kipped")},
+					},
+				},
+			},
+		},
+		{
+			title: "two alternatives with field",
+			input: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("logs ")},
+						Pattern{Constant("files ")},
+					},
+					Field("z"),
+					Alternatives{
+						Pattern{Constant("scan")},
+						Pattern{Constant("skipped")},
+					},
+				},
+			},
+			expected: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant("log")},
+						Pattern{Constant("file")},
+					},
+					Constant("s "),
+					Field("z"),
+					Constant("s"),
+					Alternatives{
+						Pattern{Constant("can")},
+						Pattern{Constant("kipped")},
+					},
+				},
+			},
+		},
+	})
+}
+
+func TestFixExtraLeadingSpaceInConstants(t *testing.T) {
+	testAction(t, fixExtraLeadingSpaceInConstants, []actionTestCase{
+		{
+			title: "leading space",
+			input: LinearSelect{
+				Nodes: []Operation{
+					LinearSelect{},
+					LinearSelect{
+						Nodes: []Operation{
+							Match{
+								Pattern: Pattern{
+									Constant("  hello"),
+									Alternatives{
+										Pattern{Constant("world")},
+										Pattern{Field("capture")},
+									},
+									Constant(" space here"),
+								},
+							},
+						},
+					},
+					MsgIdSelect{},
+				},
+			},
+			expected: LinearSelect{
+				Nodes: []Operation{
+					LinearSelect{},
+					LinearSelect{
+						Nodes: []Operation{
+							Match{
+								Pattern: Pattern{
+									Field(""),
+									Constant("hello"),
+									Alternatives{
+										Pattern{Constant("world")},
+										Pattern{Field("capture")},
+									},
+									Field(""),
+									Constant("space here"),
+								},
+							},
+						},
+					},
+					MsgIdSelect{},
+				},
+			},
+		},
+		{
+			title: "Extra space after alternative",
+			input: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Field("a")},
+						Pattern{Field("b")},
+					},
+					Constant(" :"),
+				},
+			},
+			expected: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Field("a")},
+						Pattern{Field("b")},
+					},
+					Field(""),
+					Constant(":"),
 				},
 			},
 		},

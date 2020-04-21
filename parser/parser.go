@@ -79,7 +79,10 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 	if err := p.Apply(optimizations); err != nil {
 		return p, err
 	}
-	return p, validate(&p)
+	if err := p.Apply(validations); err != nil {
+		return p, err
+	}
+	return p, nil
 }
 
 func makeMessagesNode(msgs []message) (Operation, error) {

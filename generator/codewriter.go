@@ -5,6 +5,7 @@
 package generator
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -64,10 +65,21 @@ func (c *CodeWriter) Newline() *CodeWriter {
 	return c.write([]byte{'\n'})
 }
 
+var (
+	escapedClosingAngleBracket = []byte("\\u003e")
+	angleBracket = []byte(">")
+)
+
 func (c *CodeWriter) JS(v interface{}) *CodeWriter {
+
 	b, err := json.Marshal(v)
 	c.Err(err)
-	return c.Write(string(b))
+	// The pain with json.Marshal is that it wants to escape > which is
+	// wildly used in our patterns.
+	// The alternative is to use json.NewEncoder, which in turns adds a
+	// newline after the entity.
+	// So let's just strip those annoying characters:
+	return c.WriteBytes(bytes.ReplaceAll(b, escapedClosingAngleBracket, angleBracket))
 }
 
 func (c *CodeWriter) Write(s string) *CodeWriter {

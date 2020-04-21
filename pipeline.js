@@ -29,7 +29,7 @@ function DeviceProcessor() {
 
 var dup0 = match({
 	dissect: {
-		tokenizer: "%{hostname} ossec: Alert Level: %{severity}; Rule: %{rule} - %{event_description}; Location: %{p0}",
+		tokenizer: "%{hostname->}ossec: Alert Level: %{severity->}; Rule: %{rule->}- %{event_description->}; Location: %{p0->}",
 		field: "nwparser.payload",
 	},
 });
@@ -37,13 +37,13 @@ var dup0 = match({
 var dup1 = linear_select([
 	match({
 		dissect: {
-			tokenizer: "(%{shost}) %{saddr}-\u003e%{p1}",
+			tokenizer: "(%{shost->}) %{saddr->}->%{p1->}",
 			field: "nwparser.p0",
 		},
 	}),
 	match({
 		dissect: {
-			tokenizer: "%{shost}-\u003e%{p1}",
+			tokenizer: "%{shost->}->%{p1->}",
 			field: "nwparser.p0",
 		},
 	}),
@@ -70,7 +70,7 @@ var dup4 = call({
 
 var hdr1 = match({
 	dissect: {
-		tokenizer: "%{hfld1} %{hdate} %{htime} %{hfld2} %{messageid}: Alert Level: %{hfld3}; Rule:%{payload}",
+		tokenizer: "%{hfld1->} %{hdate->} %{htime->} %{hfld2->} %{messageid->}: Alert Level: %{hfld3->}; Rule:%{payload->}",
 		field: "message",
 	},
 	on_success: processor_chain([
@@ -96,7 +96,7 @@ var select1 = linear_select([
 
 var msg1 = match({
 	dissect: {
-		tokenizer: "%{fld1}/ossec/logs/active-responses.log;  %{fld2} %{fld3} %{fld4} %{fld5} %{timezone} %{fld7} %{action} %{param}",
+		tokenizer: "%{fld1->}/ossec/logs/active-responses.log;  %{fld2->} %{fld3->} %{fld4->} %{fld5->} %{timezone->} %{fld7->} %{action->} %{param->}",
 		field: "nwparser.p1",
 	},
 });
@@ -129,7 +129,7 @@ var all1 = all_match({
 
 var msg2 = match({
 	dissect: {
-		tokenizer: "%{fld1}\\ossec-agent\\active-response\\active-responses.log; %{event_time_string} \"%{action}\" %{param}",
+		tokenizer: "%{fld1->}\\ossec-agent\\active-response\\active-responses.log; %{event_time_string->}\"%{action->}\" %{param->}",
 		field: "nwparser.p1",
 	},
 });
@@ -157,7 +157,7 @@ var all2 = all_match({
 
 var msg3 = match({
 	dissect: {
-		tokenizer: "%{event_log}; %{info}",
+		tokenizer: "%{event_log->}; %{info->}",
 		field: "nwparser.p1",
 	},
 });

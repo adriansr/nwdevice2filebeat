@@ -43,8 +43,19 @@ function match(options) {
     //console.debug("create tokenizer: " + options.dissect.tokenizer);
     var dissect = new processor.Dissect(options.dissect);
     return function(evt) {
+        var src = evt.Get(options.dissect.field);
         dissect.Run(evt);
-        if (options.on_success != null && evt.Get(FLAG_FIELD) === null) {
+        var failed = evt.Get(FLAG_FIELD) != null;
+        if (failed) {
+            console.debug("dissect fail: " + options.dissect.field);
+            console.debug("       input: <<" + src + ">>");
+            console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
+        } else {
+            console.debug("dissect MATCH: " + options.dissect.field);
+            console.debug("        input: <<" + src + ">>");
+            console.debug("         expr: <<" + options.dissect.tokenizer + ">>");
+        }
+        if (options.on_success != null && !failed) {
             options.on_success(evt);
         }
     }

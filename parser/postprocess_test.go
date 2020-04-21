@@ -23,13 +23,31 @@ func treeEquals(t *testing.T, expected , actual Operation) {
 	//assert.Equal(t, expected.Hashable(), actual.Hashable())
 }
 
+type actionTestCase struct {
+	title string
+	input Operation
+	expected Operation
+	err error
+}
+
+func testAction(t *testing.T, act func(*Parser) error, cases []actionTestCase) {
+	for _, test := range cases {
+		t.Run(test.title, func(t *testing.T) {
+			result, err := testPostprocessTree(act, test.input)
+			if test.err != nil {
+				if assert.Error(t, err) {
+					assert.EqualError(t, test.err, err.Error())
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+			treeEquals(t, test.expected, result)
+		})
+	}
+}
+
 func TestFixAlternativesEndInCapture(t *testing.T) {
-	for _, test := range []struct {
-		title string
-		input Operation
-		expected Operation
-		err error
-	} {
+	testAction(t, fixAlternativesEndingInCapture, []actionTestCase{
 		{
 			// Both the alternative patterns end in a field capture.
 			// The alternative is followed by a constant.
@@ -165,17 +183,167 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				},
 			},
 		},
+	})
+}
+
+func TestExtractLeadingConstantPrefix(t *testing.T) {
+	for _, test := range []struct {
+		input Alternatives
+		expected Alternatives
+		prefix string
 	} {
-		t.Run(test.title, func(t *testing.T) {
-			result, err := testPostprocessTree(fixAlternativesEndingInCapture, test.input)
-			if test.err != nil {
-				if assert.Error(t, err) {
-					assert.EqualError(t, test.err, err.Error())
-				}
-			} else {
-				assert.NoError(t, err)
-			}
-			treeEquals(t, test.expected, result)
-		})
+		{
+			input: Alternatives{
+				Pattern{Constant("Hello world")},
+				Pattern{Constant("Hell is "), Field("f")},
+				Pattern{Constant("Helium")},
+				Pattern{Constant("Hel"), Field("z")},
+				Pattern{Constant("Hel")},
+			},
+			expected: Alternatives{
+				Pattern{Constant("lo world")},
+				Pattern{Constant("l is "), Field("f")},
+				Pattern{Constant("ium")},
+				Pattern{Field("z")},
+			},
+			prefix: "Hel",
+		},
+		{
+			input: Alternatives{
+				Pattern{Constant("Repetition is bad.")},
+				Pattern{Constant("Repetition is bad.")},
+				Pattern{Constant("Repetition is bad.")},
+			},
+			expected: Alternatives{},
+			prefix: "Repetition is bad.",
+		},
+		{
+			input: Alternatives{
+				Pattern{Constant("Repetition is bad.")},
+				Pattern{Constant("Repetition is bad."), Field("isit")},
+				Pattern{Constant("Repetition is bad.")},
+			},
+			expected: Alternatives{
+				Pattern{Field("isit")},
+			},
+			prefix: "Repetition is bad.",
+		},
+	} {
+		prefix, result := extractLeadingConstantPrefix(test.input)
+		assert.Equal(t, test.prefix, prefix)
+		assert.Equal(t, test.expected, result)
 	}
+}
+
+func TestExtractTrailingConstantPrefix(t *testing.T) {
+	for _, test := range []struct {
+		input Alternatives
+		expected Alternatives
+		prefix string
+	} {
+		{
+			input: Alternatives{
+				Pattern{Constant("Bananan")},
+				Pattern{Constant("nananananan")},
+				Pattern{Field("f"), Constant("Batman")},
+				Pattern{Constant("an")},
+			},
+			expected: Alternatives{
+				Pattern{Constant("Banan")},
+				Pattern{Constant("nanananan")},
+				Pattern{Field("f"), Constant("Batm")},
+			},
+			prefix: "an",
+		},
+		{
+			input: Alternatives{
+				Pattern{Constant("Repetition is bad.")},
+				Pattern{Constant("Repetition is bad.")},
+				Pattern{Constant("Repetition is bad.")},
+			},
+			expected: Alternatives{},
+			prefix: "Repetition is bad.",
+		},
+		{
+			input: Alternatives{
+				Pattern{Constant("Repetition is bad.")},
+				Pattern{ Field("isit"), Constant("Repetition is bad."),},
+				Pattern{Constant("Repetition is bad.")},
+			},
+			expected: Alternatives{
+				Pattern{Field("isit")},
+			},
+			prefix: "Repetition is bad.",
+		},
+	} {
+		prefix, result := extractTrailingConstantPrefix(test.input)
+		assert.Equal(t, test.prefix, prefix)
+		assert.Equal(t, test.expected, result)
+	}
+}
+
+
+func TestFixAlternativesEdgeSpace(t *testing.T) {
+	testAction(t, fixAlternativesEdgeSpace, []actionTestCase{
+		{
+			title: "leading space",
+			input: LinearSelect{
+				Nodes: []Operation{
+					LinearSelect{},
+					LinearSelect{
+						Nodes: []Operation{
+							Match{
+								Pattern:       Pattern{
+									Constant("hello"),
+									Alternatives{
+										Pattern{Constant(" world")},
+										Pattern{Constant(" "), Field("capture")},
+										Pattern{Constant(" ")},
+									}},
+							},
+						},
+					},
+					MsgIdSelect{},
+				},
+			},
+			expected: LinearSelect{
+				Nodes: []Operation{
+					LinearSelect{},
+					LinearSelect{
+						Nodes: []Operation{
+							Match{
+								Pattern:       Pattern{
+									Constant("hello "),
+									Alternatives{
+										Pattern{Constant("world")},
+										Pattern{Field("capture")},
+									}},
+							},
+						},
+					},
+					MsgIdSelect{},
+				},
+			},
+		},
+		{
+			title: "first item no-op",
+			input: Match{
+				Pattern: Pattern{
+					Alternatives{
+						Pattern{Constant(" hello")},
+						Pattern{Constant(" world")},
+					},
+				},
+			},
+			expected: Match{
+				Pattern: Pattern{
+					Constant(" "),
+					Alternatives{
+						Pattern{Constant("hello")},
+						Pattern{Constant("world")},
+					},
+				},
+			},
+		},
+	})
 }

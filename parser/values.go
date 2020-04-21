@@ -52,7 +52,7 @@ func (c Field) Name() string {
 }
 
 func (f Field) Token() string {
-	return "%{" + string(f) + "}"
+	return "%{" + string(f) + "->}"
 }
 
 func (c Field) Children() []Operation {
@@ -109,6 +109,20 @@ func (alt Alternatives) SquashConstants() Alternatives {
 func (alt Alternatives) InjectLeft(v Value) Alternatives {
 	for idx, pattern := range alt {
 		alt[idx] = pattern.InjectLeft(v)
+	}
+	return alt
+}
+
+func (alt Alternatives) StripLeft() Alternatives {
+	for idx, pattern := range alt {
+		alt[idx] = pattern.StripLeft()
+	}
+	return alt
+}
+
+func (alt Alternatives) StripRight() Alternatives {
+	for idx, pattern := range alt {
+		alt[idx] = pattern.StripRight()
 	}
 	return alt
 }

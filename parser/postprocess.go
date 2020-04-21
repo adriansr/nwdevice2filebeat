@@ -66,6 +66,7 @@ var transforms = PostprocessGroup{
 
 		{"fix consecutive dissect captures", fixDissectCaptures},
 
+		{"fix space repetition at edge of alternatives", fixAlternativesEdgeSpace},
 		{"fix consecutive dissect captures in alternatives", fixAlternativesEndingInCapture},
 
 		{"split alternatives into dissect patterns", splitDissect},
@@ -449,9 +450,197 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 	return nil, nil
 }
 
+func extractLeadingConstantPrefix(alt Alternatives) (string, Alternatives) {
+	if len(alt) == 0 {
+		return "", alt
+	}
+
+	// First get a list of all the constant prefixes
+	cts := make([]string, len(alt))
+	minLen := -1
+	for idx, pattern := range alt {
+		if len(pattern) == 0 {
+			return "", alt
+		}
+		ct, ok := pattern[0].(Constant)
+		if !ok {
+			return "", alt
+		}
+		cts[idx] = ct.Value()
+		if n := len(ct.Value()); minLen == -1 || n < minLen {
+			minLen = n
+		}
+	}
+
+	// Then find the common prefix
+	prefixLen := 0
+outer:
+	for ; prefixLen < minLen; prefixLen ++ {
+		chr := cts[0][prefixLen]
+		for _, str := range cts[1:] {
+			if str[prefixLen] != chr {
+				break outer
+			}
+		}
+	}
+
+	var toRemove []int
+	// Then strip all the leading constants
+	for idx, pattern := range alt {
+		if asCt, ok := pattern[0].(Constant); ok {
+			if len(asCt.Value()) > prefixLen {
+				pattern[0] = Constant(asCt.Value()[prefixLen:])
+			} else {
+				if alt[idx] = pattern.StripLeft(); len(alt[idx]) == 0 {
+					toRemove = append(toRemove, idx)
+				}
+			}
+		}
+	}
+	// Remove patterns that become empty
+	if len(toRemove) > 0 {
+		for shift, idx := range toRemove {
+			alt = append(alt[:idx-shift], alt[idx+1-shift:]...)
+		}
+	}
+	// Return the common prefix
+	return cts[0][:prefixLen], alt
+}
+
+func extractTrailingConstantPrefix(alt Alternatives) (string, Alternatives) {
+	if len(alt) == 0 {
+		return "", alt
+	}
+
+	// First get a list of all the constant suffixes
+	cts := make([]string, len(alt))
+	minLen := -1
+	for idx, pattern := range alt {
+		if len(pattern) == 0 {
+			return "", alt
+		}
+		ct, ok := pattern[len(pattern)-1].(Constant)
+		if !ok {
+			return "", alt
+		}
+		cts[idx] = ct.Value()
+		if n := len(ct.Value()); minLen == -1 || n < minLen {
+			minLen = n
+		}
+	}
+
+	// Then find the common suffix
+	suffixLen := 0
+outer:
+	for ; suffixLen < minLen; suffixLen ++ {
+		chr := cts[0][len(cts[0]) - 1 - suffixLen]
+		for _, str := range cts[1:] {
+			if str[len(str) - 1 - suffixLen] != chr {
+				break outer
+			}
+		}
+	}
+
+	var toRemove []int
+	// Then strip all the leading constants
+	for idx, pattern := range alt {
+		if asCt, ok := pattern[len(pattern)-1].(Constant); ok {
+			if len(asCt.Value()) > suffixLen {
+				pattern[len(pattern)-1] = Constant(asCt.Value()[:len(asCt.Value())-suffixLen-1])
+			} else {
+				if alt[idx] = pattern.StripRight(); len(alt[idx]) == 0 {
+					toRemove = append(toRemove, idx)
+				}
+			}
+		}
+	}
+	// Remove patterns that become empty
+	if len(toRemove) > 0 {
+		for shift, idx := range toRemove {
+			alt = append(alt[:idx-shift], alt[idx+1-shift:]...)
+		}
+	}
+	// Return the common prefix
+	return cts[0][len(cts[0])-suffixLen-1:], alt
+}
+
+func fixAlternativesEdgeSpace(p *Parser) (err error) {
+	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
+			type insert struct{
+				pos   int
+				ct    Constant
+			}
+			var inserts []insert
+			modified := false
+			for pos, item := range match.Pattern {
+				alt, ok := item.(Alternatives)
+				if !ok {
+					continue
+				}
+				prefix, newAlt := extractLeadingConstantPrefix(alt)
+				if prefix == "" {
+					continue
+				}
+				match.Pattern[pos] = newAlt
+				if pos > 0 {
+					if ct, ok := match.Pattern[pos-1].(Constant); ok {
+						match.Pattern[pos-1] = Constant(ct.Value() + prefix)
+						continue
+					}
+				}
+				inserts = append(inserts, insert{pos, Constant(prefix)})
+			}
+			if len(inserts) > 0 {
+				match.Pattern = append(match.Pattern, make(Pattern, len(inserts))...)
+				for shift, is := range inserts {
+					copy(match.Pattern[is.pos+shift+1:], match.Pattern[is.pos+shift:])
+					match.Pattern[is.pos+shift] = is.ct
+				}
+				modified = true
+				inserts = inserts[:0]
+			}
+
+			for pos, item := range match.Pattern {
+				alt, ok := item.(Alternatives)
+				if !ok {
+					continue
+				}
+				prefix, newAlt := extractLeadingConstantPrefix(alt)
+				if prefix == "" {
+					continue
+				}
+				match.Pattern[pos] = newAlt
+				if pos > 0 {
+					if ct, ok := match.Pattern[pos-1].(Constant); ok {
+						match.Pattern[pos-1] = Constant(ct.Value() + prefix)
+						continue
+					}
+				}
+				inserts = append(inserts, insert{pos, Constant(prefix)})
+			}
+			if len(inserts) > 0 {
+				match.Pattern = append(match.Pattern, make(Pattern, len(inserts))...)
+				for shift, is := range inserts {
+					copy(match.Pattern[is.pos+shift+1:], match.Pattern[is.pos+shift:])
+					match.Pattern[is.pos+shift] = is.ct
+				}
+				modified = true
+				inserts = inserts[:0]
+			}
+
+			if modified {
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
 func fixAlternativesEndingInCapture(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
-		if match, ok := node.(Match); ok {
+		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
 			// The alternatives may be modified without the enclosing Match
 			// needing to be modified.
 			modified := false

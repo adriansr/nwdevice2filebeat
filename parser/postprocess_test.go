@@ -11,23 +11,23 @@ import (
 )
 
 func testPostprocessTree(act func(*Parser) error, input Operation) (output Operation, err error) {
-	parser := Parser {
+	parser := Parser{
 		Root: input,
 	}
 	err = act(&parser)
 	return parser.Root, err
 }
 
-func treeEquals(t *testing.T, expected , actual Operation) {
+func treeEquals(t *testing.T, expected, actual Operation) {
 	assert.Equal(t, expected, actual)
 	//assert.Equal(t, expected.Hashable(), actual.Hashable())
 }
 
 type actionTestCase struct {
-	title string
-	input Operation
+	title    string
+	input    Operation
 	expected Operation
-	err error
+	err      error
 }
 
 func testAction(t *testing.T, act func(*Parser) error, cases []actionTestCase) {
@@ -55,9 +55,9 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 			title: "move constant into alternative",
 
 			input: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Constant("x"), Field("b"), Constant("c"),
 					Alternatives{
 						Pattern{Constant("y"), Field("c")},
@@ -68,13 +68,13 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				},
 			},
 			expected: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Constant("x"), Field("b"), Constant("c"),
 					Alternatives{
-						Pattern{Constant("y"), Field("c"), Constant("z"),},
-						Pattern{Field("d"), Constant("z"),},
+						Pattern{Constant("y"), Field("c"), Constant("z")},
+						Pattern{Field("d"), Constant("z")},
 					},
 					Field("e"),
 				},
@@ -87,9 +87,9 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 			title: "inject space into alternatives",
 
 			input: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("y"), Field("c")},
 						Pattern{Field("d")},
@@ -98,12 +98,12 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				},
 			},
 			expected: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"), Field("c"), Constant(" "),},
-						Pattern{Field("d"), Constant(" "),},
+						Pattern{Constant("y"), Field("c"), Constant(" ")},
+						Pattern{Field("d"), Constant(" ")},
 					},
 					Field("e"),
 				},
@@ -114,9 +114,9 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 			title: "ignore final alternative",
 
 			input: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("y"), Field("c")},
 						Pattern{Field("d")},
@@ -124,12 +124,12 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				},
 			},
 			expected: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"), Field("c"),},
-						Pattern{Field("d"),},
+						Pattern{Constant("y"), Field("c")},
+						Pattern{Field("d")},
 					},
 				},
 			},
@@ -137,22 +137,22 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 		{
 			title: "mixed alternatives followed by field",
 			input: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"),},
+						Pattern{Constant("y")},
 						Pattern{Field("d")},
 					},
 					Field("z"),
 				},
 			},
 			expected: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"),},
+						Pattern{Constant("y")},
 						Pattern{Field("d"), Constant(" ")},
 					},
 					Field("z"),
@@ -162,20 +162,20 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 		{
 			title: "mixed alternatives followed by a constant",
 			input: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"),},
+						Pattern{Constant("y")},
 						Pattern{Field("d")},
 					},
 					Constant("z"),
 				},
 			},
 			expected: Match{
-				Input:         "input",
-				OnSuccess:	   OpList{ SetField{Target: "a", Value: []Operation{Constant("b")}}},
-				Pattern:       Pattern{
+				Input:     "input",
+				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
+				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("yz")},
 						Pattern{Field("d"), Constant("z")},
@@ -188,10 +188,10 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 
 func TestExtractLeadingConstantPrefix(t *testing.T) {
 	for _, test := range []struct {
-		input Alternatives
+		input    Alternatives
 		expected Alternatives
-		prefix string
-	} {
+		prefix   string
+	}{
 		{
 			input: Alternatives{
 				Pattern{Constant("Hello world")},
@@ -215,7 +215,7 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 				Pattern{Constant("Repetition is bad.")},
 			},
 			expected: Alternatives{},
-			prefix: "Repetition is bad.",
+			prefix:   "Repetition is bad.",
 		},
 		{
 			input: Alternatives{
@@ -237,10 +237,10 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 
 func TestExtractTrailingConstantPrefix(t *testing.T) {
 	for _, test := range []struct {
-		input Alternatives
+		input    Alternatives
 		expected Alternatives
-		prefix string
-	} {
+		prefix   string
+	}{
 		{
 			input: Alternatives{
 				Pattern{Constant("Bananan")},
@@ -262,12 +262,12 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 				Pattern{Constant("Repetition is bad.")},
 			},
 			expected: Alternatives{},
-			prefix: "Repetition is bad.",
+			prefix:   "Repetition is bad.",
 		},
 		{
 			input: Alternatives{
 				Pattern{Constant("Repetition is bad.")},
-				Pattern{ Field("isit"), Constant("Repetition is bad."),},
+				Pattern{Field("isit"), Constant("Repetition is bad.")},
 				Pattern{Constant("Repetition is bad.")},
 			},
 			expected: Alternatives{
@@ -282,7 +282,6 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 	}
 }
 
-
 func TestFixAlternativesEdgeSpace(t *testing.T) {
 	testAction(t, fixAlternativesEdgeSpace, []actionTestCase{
 		{
@@ -293,7 +292,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 					LinearSelect{
 						Nodes: []Operation{
 							Match{
-								Pattern:       Pattern{
+								Pattern: Pattern{
 									Constant("hello"),
 									Alternatives{
 										Pattern{Constant(" world")},
@@ -312,7 +311,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 					LinearSelect{
 						Nodes: []Operation{
 							Match{
-								Pattern:       Pattern{
+								Pattern: Pattern{
 									Constant("hello "),
 									Alternatives{
 										Pattern{Constant("world")},
@@ -514,6 +513,124 @@ func TestFixExtraLeadingSpaceInConstants(t *testing.T) {
 					},
 					Field(""),
 					Constant(":"),
+				},
+			},
+		},
+	})
+}
+
+func TestRemoveNops(t *testing.T) {
+	testAction(t, removeNoops, []actionTestCase{
+		{
+			title: "single argument",
+			input: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Noop{},
+				},
+			},
+			expected: Match{
+				Input:     "test",
+				OnSuccess: []Operation{},
+			},
+		},
+		{
+			title: "first",
+			input: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Noop{},
+					Call{},
+					SetField{},
+				},
+			},
+			expected: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					SetField{},
+				},
+			},
+		},
+		{
+			title: "last",
+			input: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					SetField{},
+					Noop{},
+				},
+			},
+			expected: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					SetField{},
+				},
+			},
+		},
+		{
+			title: "middle",
+			input: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					Noop{},
+					DateTime{},
+					SetField{},
+				},
+			},
+			expected: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					DateTime{},
+					SetField{},
+				},
+			},
+		},
+		{
+			title: "multiple",
+			input: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Noop{},
+					Call{},
+					Noop{},
+					Noop{},
+					Noop{},
+					DateTime{},
+					Noop{},
+					SetField{},
+					Noop{},
+				},
+			},
+			expected: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					DateTime{},
+					SetField{},
+				},
+			},
+		},
+		{
+			title: "none",
+			input: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					DateTime{},
+					SetField{},
+				},
+			},
+			expected: Match{
+				Input: "test",
+				OnSuccess: []Operation{
+					Call{},
+					DateTime{},
+					SetField{},
 				},
 			},
 		},

@@ -18,12 +18,13 @@ type Parser struct {
 	Config config.Config
 
 	ValueMaps []ValueMap
+	Regexs    []Regex
 	Headers   []header
 	Messages  []message
 
 	ValueMapsByName map[string]*ValueMap
-
-	Root Operation
+	RegexsByName    map[string]*Regex
+	Root            Operation
 }
 
 func New(dev model.Device, cfg config.Config) (p Parser, err error) {
@@ -31,8 +32,10 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 	if p.ValueMaps, p.ValueMapsByName, err = processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
 	}
-	p.Headers, err = processHeaders(dev.Headers)
-	if err != nil {
+	if p.Regexs, p.RegexsByName, err = processRegexs(dev.Regexs); err != nil {
+		return p, err
+	}
+	if p.Headers, err = processHeaders(dev.Headers); err != nil {
 		return p, err
 	}
 	if p.Messages, err = processMessages(dev.Messages); err != nil {
@@ -104,8 +107,8 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 		if msg.id1 != "" {
 			match.OnSuccess = append(match.OnSuccess, SetField{
 				SourceContext: match.SourceContext,
-				Target:		   "msg_id1",
-				Value:		   []Operation{Constant(msg.id1)},
+				Target:        "msg_id1",
+				Value:         []Operation{Constant(msg.id1)},
 			})
 		}
 		if msg.id2 == "" {
@@ -131,7 +134,7 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 		}
 		msgIdSelect.Nodes = append(msgIdSelect.Nodes, elem)
 		msgIdSelect.Map[k] = counter
-		counter ++
+		counter++
 	}
 	return msgIdSelect, nil
 }
@@ -149,6 +152,23 @@ func processValueMaps(input []*model.ValueMap) (output []ValueMap, byName map[st
 		}
 		output[idx] = vm
 		byName[vm.Name] = &output[idx]
+	}
+	return output, byName, nil
+}
+
+func processRegexs(input []*model.RegX) (output []Regex, byName map[string]*Regex, err error) {
+	byName = make(map[string]*Regex, len(input))
+	output = make([]Regex, len(input))
+	for idx, xml := range input {
+		regex := Regex{
+			SourceContext: SourceContext(xml.Pos()),
+			Name:          xml.Name,
+		}
+		if byName[regex.Name] != nil {
+			return output, byName, errors.Errorf("duplicated REGX name at %s", xml.Pos())
+		}
+		output[idx] = regex
+		byName[regex.Name] = &output[idx]
 	}
 	return output, byName, nil
 }
@@ -303,7 +323,7 @@ func newMessage(xml *model.Message) (m message, err error) {
 	//	return m, errors.Errorf("no functions in MESSAGE at %s", xml.Pos())
 	//}
 	m = message{
-		pos: 		   xml.Pos(),
+		pos:           xml.Pos(),
 		id1:           xml.ID1,
 		id2:           xml.ID2,
 		eventcategory: xml.EventCategory,

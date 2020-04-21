@@ -52,8 +52,10 @@ var transforms = PostprocessGroup{
 	Title: "transforms",
 	Actions: []Action{
 		// Replaces a Call() to a MalueMap with a ValueMapCall.
-		{"translate valuemap references", convertValueMapReferences},
+		{"translate VALUEMAP references", convertValueMapReferences},
 		{"translate PARMVAL calls", translateParmval},
+		{"strip REGX calls", stripRegex},
+		{"remove no-ops in function lists", removeNoops},
 
 		// Remove unnecessary $MSG and $HDR as first argument to calls
 		{"remove special fields from some calls", removeSpecialFields},
@@ -86,7 +88,7 @@ var optimizations = PostprocessGroup{
 }
 
 var validations = PostprocessGroup{
-	Title:   "validations",
+	Title: "validations",
 	Actions: []Action{
 		{"generic validations", validate},
 		{"detect bad dissect patterns", detectBrokenDissectPatterns},
@@ -230,6 +232,40 @@ func translateParmval(parser *Parser) (err error) {
 	return err
 }
 
+func stripRegex(parser *Parser) error {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok {
+			if _, found := parser.RegexsByName[call.Function]; found {
+				log.Printf("INFO - at %s: Stripping call to REGX %s (unsupported feature)",
+					call.Source(),
+					call.Function)
+				return WalkReplace, Noop{}
+			}
+		}
+		return WalkContinue, nil
+	})
+	return nil
+}
+
+func removeNoops(parser *Parser) error {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			var remove []int
+			for pos, act := range match.OnSuccess {
+				if _, isNop := act.(Noop); isNop {
+					remove = append(remove, pos)
+				}
+			}
+			if len(remove) > 0 {
+				match.OnSuccess = OpList(match.OnSuccess).Remove(remove)
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return nil
+}
+
 func convertEventTime(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if call, ok := node.(Call); ok && call.Function == "EVNTTIME" {
@@ -328,7 +364,7 @@ func splitDissect(p *Parser) (err error) {
 				sel := LinearSelect{SourceContext: match.SourceContext}
 				curInput := input
 				var part Value
-				if pos < len(match.Pattern) - 1{
+				if pos < len(match.Pattern)-1 {
 					input = fmt.Sprintf("p%d", partCounter)
 					part = Field(input)
 					partCounter++
@@ -381,14 +417,14 @@ func fixDissectCaptures(p *Parser) (err error) {
 					// TODO: Revisit decision and check rsa2elk
 					fixes = append(fixes, idx)
 					log.Printf("INFO at %s: pattern has two consecutive captures: %s and %s (fixed)",
-							match.Source(), lastCapture, capture)
+						match.Source(), lastCapture, capture)
 				}
 				lastWasCapture = isCapture
 				lastCapture = capture
 			}
 			if len(fixes) > 0 {
 				for offset, pos := range fixes {
-					pattern := make([]Value, 0, len(match.Pattern) + len(fixes))
+					pattern := make([]Value, 0, len(match.Pattern)+len(fixes))
 					pattern = append(pattern, match.Pattern[:pos+offset]...)
 					pattern = append(pattern, Constant(" "))
 					pattern = append(pattern, match.Pattern[pos+offset:]...)
@@ -411,7 +447,7 @@ func getLastOp(pattern Pattern) Value {
 }
 
 func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern, error) {
-	if pos + 1 == len(parent) {
+	if pos+1 == len(parent) {
 		// Alternatives at the end of the pattern don't need adjustment.
 		return nil, nil
 	}
@@ -501,9 +537,9 @@ func extractTrailingConstantPrefix(alt Alternatives) (string, Alternatives) {
 func extractEdgeConstant(
 	alt Alternatives,
 	patternAccessor func(p Pattern) *Value,
-	stringAccessor  func(s string, idx int) byte,
-	stripFn         func(Pattern) Pattern,
-	edgeFn  func(string, int) string,
+	stringAccessor func(s string, idx int) byte,
+	stripFn func(Pattern) Pattern,
+	edgeFn func(string, int) string,
 	stripEdgeFn func(string, int) string,
 ) (string, Alternatives) {
 
@@ -531,7 +567,7 @@ func extractEdgeConstant(
 	// Then find the common prefix
 	prefixLen := 0
 outer:
-	for ; prefixLen < minLen; prefixLen ++ {
+	for ; prefixLen < minLen; prefixLen++ {
 		chr := stringAccessor(cts[0], prefixLen)
 		for _, str := range cts[1:] {
 			if stringAccessor(str, prefixLen) != chr {
@@ -540,7 +576,7 @@ outer:
 		}
 	}
 
-	var toRemove []int
+	var remove []int
 	// Then strip all the leading constants
 	for idx, pattern := range alt {
 		if asCt, ok := (*patternAccessor(pattern)).(Constant); ok {
@@ -548,14 +584,14 @@ outer:
 				*patternAccessor(pattern) = Constant(stripEdgeFn(asCt.Value(), prefixLen))
 			} else {
 				if alt[idx] = stripFn(pattern); len(alt[idx]) == 0 {
-					toRemove = append(toRemove, idx)
+					remove = append(remove, idx)
 				}
 			}
 		}
 	}
 	// Remove patterns that become empty
-	if len(toRemove) > 0 {
-		for shift, idx := range toRemove {
+	if len(remove) > 0 {
+		for shift, idx := range remove {
 			alt = append(alt[:idx-shift], alt[idx+1-shift:]...)
 		}
 	}
@@ -566,9 +602,9 @@ outer:
 func fixAlternativesEdgeSpace(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
-			type insert struct{
-				pos   int
-				ct    Constant
+			type insert struct {
+				pos int
+				ct  Constant
 			}
 			var inserts []insert
 			modified := false
@@ -616,7 +652,7 @@ func fixAlternativesEdgeSpace(p *Parser) (err error) {
 						continue
 					}
 				}
-				inserts = append(inserts, insert{pos+1, Constant(prefix)})
+				inserts = append(inserts, insert{pos + 1, Constant(prefix)})
 			}
 			if len(inserts) > 0 {
 				match.Pattern = append(match.Pattern, make(Pattern, len(inserts))...)
@@ -653,7 +689,7 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 						err = errors.Wrapf(err, "at %s", match.Source())
 						return WalkCancel, nil
 					}
-					if newPattern !=nil {
+					if newPattern != nil {
 						// This modifies the actual pattern it's looping on,
 						// if a new element has been added to next pos.
 						// In this case it'll also be necessary to replace
@@ -723,15 +759,15 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 	return nil
 }
 
-var KnownFunctions = map[string]struct{} {
-	"CALC": {},
+var KnownFunctions = map[string]struct{}{
+	"CALC":   {},
 	"DIRCHK": {},
-	"DUR": {},
+	"DUR":    {},
 	"STRCAT": {},
-	"URL": {},
+	"URL":    {},
 	// TODO: Prune this ones
 	"SYSVAL": {},
-	"HDR": {},
+	"HDR":    {},
 }
 
 func detectUnknownFunctionCalls(parser *Parser) error {

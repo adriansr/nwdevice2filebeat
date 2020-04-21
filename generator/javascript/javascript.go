@@ -228,6 +228,11 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 			out.Unindent().Write("],").Newline().Unindent().Write("})")
 		}
 
+	case parser.Noop:
+		// Removing nodes from the tree is complicated.
+		out.Write("nop")
+		out.Err(errors.New("WARN: Found a Noop in the tree."))
+
 	default:
 		out.Writef("/* TODO: here goes a %T */", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))
@@ -240,7 +245,7 @@ func writeMapping(m map[string]int, nodes []parser.Operation, out *generator.Cod
 	pos := 0
 	for key := range m {
 		keys[pos] = key
-		pos ++
+		pos++
 	}
 	sort.Strings(keys)
 	for _, key := range keys {

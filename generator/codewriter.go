@@ -67,7 +67,7 @@ func (c *CodeWriter) Newline() *CodeWriter {
 
 var (
 	escapedClosingAngleBracket = []byte("\\u003e")
-	angleBracket = []byte(">")
+	angleBracket               = []byte(">")
 )
 
 func (c *CodeWriter) JS(v interface{}) *CodeWriter {

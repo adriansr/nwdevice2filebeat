@@ -71,12 +71,11 @@ func (c LinearSelect) Hashable() string {
 	return "LinearSelect{" + OpList(c.Nodes).Hashable() + "}"
 }
 
-
 type MsgIdSelect struct {
 	SourceContext
-	Nodes   []Operation
+	Nodes []Operation
 	//Default int
-	Map     map[string]int
+	Map map[string]int
 }
 
 func (c MsgIdSelect) Children() []Operation {
@@ -177,11 +176,11 @@ func (c SetField) Children() []Operation {
 
 type OpList []Operation
 
-func (c OpList) Hashable() string {
+func (list OpList) Hashable() string {
 	var sb strings.Builder
 	comma := false
 	sb.WriteByte('[')
-	for _, op := range c {
+	for _, op := range list {
 		if comma {
 			sb.WriteByte(',')
 		}
@@ -190,6 +189,20 @@ func (c OpList) Hashable() string {
 	}
 	sb.WriteByte(']')
 	return sb.String()
+}
+
+func (list OpList) Remove(indices []int) []Operation {
+	sort.Ints(indices)
+	last := -1
+	removed, n := 0, len(list)
+	for shift, pos := range indices {
+		if pos != last && pos >= 0 && pos < n {
+			copy(list[pos-shift:], list[pos-shift+1:])
+			last = pos
+			removed++
+		}
+	}
+	return list[:len(list)-removed]
 }
 
 func (c SetField) Hashable() string {
@@ -297,4 +310,32 @@ func (v ValueMapCall) Hashable() string {
 	sb.WriteString(OpList(v.Key).Hashable())
 	sb.WriteByte('}')
 	return sb.String()
+}
+
+// TODO: Regex is unsupported.
+type Regex struct {
+	SourceContext
+	Name string
+}
+
+func (v Regex) Children() []Operation {
+	return nil
+}
+
+func (v Regex) Hashable() string {
+	var sb strings.Builder
+	sb.WriteString("Regex{Name:")
+	sb.WriteString(v.Name)
+	sb.WriteByte('}')
+	return sb.String()
+}
+
+type Noop struct{}
+
+func (v Noop) Children() []Operation {
+	return nil
+}
+
+func (v Noop) Hashable() string {
+	return "Noop{}"
 }

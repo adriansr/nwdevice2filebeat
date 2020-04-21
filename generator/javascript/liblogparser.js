@@ -176,6 +176,8 @@ function call(opts) {
     }
 }
 
+function nop(evt) {}
+
 function lookup(opts) {
     return function(evt) {
         var key = opts.key(evt);

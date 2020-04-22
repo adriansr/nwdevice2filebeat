@@ -38,6 +38,8 @@ var prechecks = PostprocessGroup{
 		// This checks that if a header uses a payload field (the payload
 		// overlaps part of the header), then this field must appear once.
 		{"check overlapped payload fields", checkPayloadOverlap},
+
+		{"check function arity", checkFunctionsArity},
 	},
 }
 
@@ -158,6 +160,62 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 		}
 	}
 	return nil
+}
+
+func checkFunctionsArity(parser *Parser) (err error) {
+	var errs multierror.Errors
+
+	checkFnArity := func(parser *Parser, op Operation) error {
+		displayRange := func(min, max int) string {
+			if max == 0 {
+				return fmt.Sprintf("%d or more", min)
+			}
+			if min == max {
+				return fmt.Sprintf("%d", min)
+			}
+			return fmt.Sprintf("between %d and %d", min, max)
+		}
+		if call, ok := op.(Call); ok {
+			n := len(call.Args)
+			fn := call.Function
+			min, max := 0, 0
+			if info, ok := KnownFunctions[fn]; ok {
+				min, max = info.MinArgs, info.MaxArgs
+			} else if _, ok := parser.RegexsByName[fn]; ok {
+				min, max = 1, 1
+			} else if _, ok := parser.ValueMapsByName[fn]; ok {
+				min, max = 1, 1
+			} else {
+				return errors.Errorf("at %s: can't check arguments on unknown function: %s (%d)", call.Source(), fn, n)
+			}
+			warn := ""
+			if n < min {
+				warn = "few"
+			} else if max > 0 && n > max {
+				warn = "many"
+			}
+			if warn != "" {
+				return errors.Errorf("at %s: too %s arguments for '%s' call. Got: %d wanted: %s", call.Source(), warn, fn, n, displayRange(min, max))
+			}
+		}
+		return nil
+	}
+
+	checkFnListArity := func(parser *Parser, ops []Operation) {
+		for _, op := range ops {
+			if err := checkFnArity(parser, op); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	for _, hdr := range parser.Headers {
+		checkFnListArity(parser, hdr.functions)
+	}
+	for _, msg := range parser.Messages {
+		checkFnListArity(parser, msg.functions)
+	}
+	return errs.Err()
 }
 
 func removeSpecialFields(parser *Parser) (err error) {
@@ -759,29 +817,50 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 	return nil
 }
 
-var KnownFunctions = map[string]struct{}{
-	"CALC":   {},
-	"DIRCHK": {},
-	"DUR":    {},
-	"STRCAT": {},
-	"URL":    {},
-	// TODO: Prune this ones
-	"SYSVAL": {},
-	"HDR":    {},
+type FunctionInfo struct {
+	MinArgs, MaxArgs int
+	Stripped         bool
 }
 
-func detectUnknownFunctionCalls(parser *Parser) error {
+var KnownFunctions = map[string]FunctionInfo{
+	"CALC":       {MinArgs: 3, MaxArgs: 3},
+	"CNVTDOMAIN": {MinArgs: 1, MaxArgs: 1},
+	"DIRCHK":     {MinArgs: 1},
+	"DUR":        {MinArgs: 3},
+	"EVNTTIME":   {MinArgs: 2},
+	"RMQ":        {MinArgs: 1, MaxArgs: 1},
+	"STRCAT":     {MinArgs: 1},
+	"URL":        {MinArgs: 2, MaxArgs: 2},
+	"UTC":        {MinArgs: 3, MaxArgs: 3},
+
+	// TODO: Prune this ones
+	"HDR":     {MinArgs: 1, MaxArgs: 1 /*Stripped: true*/},
+	"SYSVAL":  {MinArgs: 1, MaxArgs: 2 /*Stripped: true*/},
+	"PARMVAL": {MinArgs: 1, MaxArgs: 1, Stripped: true},
+}
+
+func detectUnknownFunctionCalls(parser *Parser) (err error) {
 	unknown := make(map[string]string)
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if call, ok := node.(Call); ok {
-			if _, found := KnownFunctions[call.Function]; !found {
-				unknown[call.Function] = fmt.Sprintf("'%s' first seen at %s",
-					call.Function,
-					call.Source())
+			if _, seen := unknown[call.Function]; !seen {
+				if info, found := KnownFunctions[call.Function]; found {
+					if info.Stripped {
+						err = errors.Errorf("at %s: CALL to %s should've been stripped", call.Source(), call.Function)
+						return WalkCancel, nil
+					}
+				} else {
+					unknown[call.Function] = fmt.Sprintf("'%s' first seen at %s",
+						call.Function,
+						call.Source())
+				}
 			}
 		}
 		return WalkContinue, nil
 	})
+	if err != nil {
+		return err
+	}
 	if len(unknown) > 0 {
 		var values []string
 		for _, v := range unknown {

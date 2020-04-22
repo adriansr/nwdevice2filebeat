@@ -59,6 +59,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 	numBytes, err := javascript.Generate(p, writer)
 	if err != nil {
 		LogError("Failed to generate javascript pipeline", "reason", err)
+		return
 	}
 	var size int64
 	if st, err := os.Stat(dev.XMLPath); err == nil {

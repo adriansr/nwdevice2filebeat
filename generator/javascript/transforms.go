@@ -9,12 +9,17 @@ import (
 	"log"
 
 	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
 var preprocessors = parser.PostprocessGroup{
 	Title: "javascript transforms",
 	Actions: []parser.Action{
+		{
+			Name: "check calls to unknown functions",
+			Run:  checkFunctionCalls,
+		},
 		{
 			Name: "adjust overlapping payload capture",
 			Run:  adjustOverlappingPayload,
@@ -156,6 +161,31 @@ func adjustOverlappingPayload(p *parser.Parser) (err error) {
 		return parser.WalkContinue, nil
 	})
 	return err
+}
+
+var supportedJSFunctions = map[string]struct{}{
+	"STRCAT": {},
+	"SYSVAL": {},
+	"HDR":    {},
+	"DIRCHK": {},
+	"DUR":    {},
+	"URL":    {},
+	"CALC":   {},
+	"RMQ":    {},
+	"UTC":    {},
+}
+
+func checkFunctionCalls(p *parser.Parser) (err error) {
+	var errs multierror.Errors
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		if call, ok := node.(parser.Call); ok {
+			if _, found := supportedJSFunctions[call.Function]; !found {
+				errs = append(errs, errors.Errorf("at %s: found call to unsupported function '%s'", call.Source(), call.Function))
+			}
+		}
+		return parser.WalkContinue, nil
+	})
+	return errs.Err()
 }
 
 func setTimestamp(p *parser.Parser) (err error) {

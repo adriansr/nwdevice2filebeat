@@ -14,7 +14,7 @@ const (
 	escapedSingleQuote = "\\'"
 )
 
-var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_0-9$\.]+$`)
+var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_$][a-zA-Z_$\.0-9]+$`)
 var functionNameRegex = regexp.MustCompile(`^[A-Za-z_0-9]+$`)
 
 var constantEscapes = strings.NewReplacer("\\\\", "\\", "\\'", "'")

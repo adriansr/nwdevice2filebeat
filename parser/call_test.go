@@ -186,6 +186,19 @@ func TestCall2(t *testing.T) {
 				Value:         []Operation{Constant("SOMETHING()")},
 			},
 		},
+		{
+			input: "@duration:*CALC(duration,*,60)",
+			expected: Call{
+				SourceContext: loc,
+				Function:      "CALC",
+				Target:        "duration",
+				Args: []Value{
+					Field("duration"),
+					Constant("*"),
+					Constant("60"),
+				},
+			},
+		},
 	} {
 		result, err := parseCall(testCase.input, true, loc)
 		if !testCase.err {

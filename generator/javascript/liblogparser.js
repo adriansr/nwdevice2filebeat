@@ -157,8 +157,43 @@ function DUR(evt, args) {
 function URL(evt, args) {
 }
 
-// TODO: Implement in build time
 function CALC(evt, args) {
+    if (args.length != 3) {
+        console.warn("skipped call to CALC with " + args.length + " arguments.");
+        return;
+    }
+    var a = parseInt(args[0]);
+    var b = parseInt(args[2]);
+    if (isNaN(a) || isNaN(b)) {
+        console.warn("failed evaluating CALC arguments a='" + args[0] + "' b='" + args[2] + "'.");
+        return;
+    }
+    var result;
+    switch (args[1]) {
+        case "+":
+            result = a + b;
+            break;
+        case '-':
+            result = a - b;
+            break;
+        case '*':
+            result = a * b;
+            break;
+        default:
+            // Only * and + seen in the parsers.
+            console.warn("failed evaluating CALC operation '" + args[1] + "'.");
+            return;
+    }
+    // Always return a string
+    return result !== undefined? "" + result : result;
+}
+
+function RMQ(evt, args) {
+
+}
+
+function UTC(evt, args) {
+
 }
 
 function call(opts) {

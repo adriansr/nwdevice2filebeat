@@ -286,20 +286,22 @@ function date_times(opts) {
     return function(evt) {
         var str = date_time_join_args(evt, opts.args);
         var i;
-        for (i=0; i<opts.fmts; i++) {
+        for (i=0; i<opts.fmts.length; i++) {
             if (date_time_try_pattern(evt, opts, opts.fmts[i], str)) {
                 //console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
                 return;
             }
         }
-        console.warn("in date_times: FAILED: " + str);
+        console.warn("in date_time: id="+opts.id+" (s) FAILED: " + str);
     }
 }
 
 function date_time(opts) {
     return function(evt) {
         var str = date_time_join_args(evt, opts.args);
-        date_time_try_pattern(evt, opts, opts.fmt, str);
+        if (!date_time_try_pattern(evt, opts, opts.fmt, str)) {
+            console.warn("in date_time: id="+opts.id+" FAILED: " + str);
+        }
     }
 }
 

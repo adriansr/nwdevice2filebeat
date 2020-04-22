@@ -28,20 +28,23 @@ function DeviceProcessor() {
 }
 
 var dup0 = match({
+	id: "MESSAGE#0:ossec:01/0",
 	dissect: {
-		tokenizer: "%{hostname->} ossec: Alert Level: %{severity->}; Rule: %{rule->} - %{event_description->}; Location: %{p0->}",
+		tokenizer: "%{hostname->}ossec: Alert Level: %{severity->}; Rule: %{rule->}- %{event_description->}; Location: %{p0->}",
 		field: "nwparser.payload",
 	},
 });
 
 var dup1 = linear_select([
 	match({
+		id: "MESSAGE#0:ossec:01/1_0",
 		dissect: {
 			tokenizer: "(%{shost->}) %{saddr->}->%{p1->}",
 			field: "nwparser.p0",
 		},
 	}),
 	match({
+		id: "MESSAGE#0:ossec:01/1_1",
 		dissect: {
 			tokenizer: "%{shost->}->%{p1->}",
 			field: "nwparser.p0",
@@ -49,17 +52,9 @@ var dup1 = linear_select([
 	}),
 ]);
 
-var dup2 = set_field({
-	dest: "nwparser.eventcategory",
-	value: constant("1001020200"),
-});
+var dup2 = setf("msg","$MSG");
 
-var dup3 = set_field({
-	dest: "nwparser.msg",
-	value: field("$MSG"),
-});
-
-var dup4 = call({
+var dup3 = call({
 	dest: "nwparser.",
 	fn: SYSVAL,
 	args: [
@@ -69,11 +64,15 @@ var dup4 = call({
 });
 
 var hdr1 = match({
+	id: "HEADER#0:0001",
 	dissect: {
 		tokenizer: "%{hfld1->} %{hdate->} %{htime->} %{hfld2->} %{messageid->}: Alert Level: %{hfld3->}; Rule:%{payload->}",
 		field: "message",
 	},
 	on_success: processor_chain([
+		set({
+			"header_id": "0001",
+		}),
 		call({
 			dest: "nwparser.payload",
 			fn: STRCAT,
@@ -95,8 +94,9 @@ var select1 = linear_select([
 ]);
 
 var msg1 = match({
+	id: "MESSAGE#0:ossec:01/2",
 	dissect: {
-		tokenizer: "%{fld1->}/ossec/logs/active-responses.log;  %{fld2->} %{fld3->} %{fld4->} %{fld5->} %{timezone->} %{fld7->} %{action->} %{param->}",
+		tokenizer: "%{fld1->}/ossec/logs/active-responses.log; %{fld2->} %{fld3->} %{fld4->} %{fld5->} %{timezone->} %{fld7->} %{action->} %{param->}",
 		field: "nwparser.p1",
 	},
 });
@@ -108,28 +108,25 @@ var all1 = all_match({
 		msg1,
 	],
 	on_success: processor_chain([
-		dup2,
-		set_field({
-			dest: "nwparser.msg_id1",
-			value: constant("ossec:01"),
+		set({
+			"event_log": "/ossec/logs/active-responses.log",
+			"eventcategory": "1001020200",
+			"msg_id1": "ossec:01",
 		}),
-		dup3,
+		dup2,
 		date_time({
 			dest: "event_time",
 			args: ["fld3","fld4","fld7","fld5"],
 			fmt: [dB,dF,dW,dH,dc(":"),dU,dc(":"),dO],
 		}),
-		set_field({
-			dest: "nwparser.event_log",
-			value: constant("/ossec/logs/active-responses.log"),
-		}),
-		dup4,
+		dup3,
 	]),
 });
 
 var msg2 = match({
+	id: "MESSAGE#1:ossec:02/2",
 	dissect: {
-		tokenizer: "%{fld1->}\\ossec-agent\\active-response\\active-responses.log; %{event_time_string->} \"%{action->}\" %{param->}",
+		tokenizer: "%{fld1->}\\ossec-agent\\active-response\\active-responses.log; %{event_time_string->}\"%{action->}\" %{param->}",
 		field: "nwparser.p1",
 	},
 });
@@ -141,21 +138,18 @@ var all2 = all_match({
 		msg2,
 	],
 	on_success: processor_chain([
+		set({
+			"event_log": "\\ossec-agent\\active-response\\active-responses.log",
+			"eventcategory": "1001020200",
+			"msg_id1": "ossec:02",
+		}),
 		dup2,
-		set_field({
-			dest: "nwparser.msg_id1",
-			value: constant("ossec:02"),
-		}),
 		dup3,
-		set_field({
-			dest: "nwparser.event_log",
-			value: constant("\\ossec-agent\\active-response\\active-responses.log"),
-		}),
-		dup4,
 	]),
 });
 
 var msg3 = match({
+	id: "MESSAGE#2:ossec:03/2",
 	dissect: {
 		tokenizer: "%{event_log->}; %{info->}",
 		field: "nwparser.p1",
@@ -169,16 +163,12 @@ var all3 = all_match({
 		msg3,
 	],
 	on_success: processor_chain([
-		set_field({
-			dest: "nwparser.eventcategory",
-			value: constant("1001000000"),
+		set({
+			"eventcategory": "1001000000",
+			"msg_id1": "ossec:03",
 		}),
-		set_field({
-			dest: "nwparser.msg_id1",
-			value: constant("ossec:03"),
-		}),
+		dup2,
 		dup3,
-		dup4,
 	]),
 });
 

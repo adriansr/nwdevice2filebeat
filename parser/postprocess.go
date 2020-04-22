@@ -74,11 +74,11 @@ var transforms = PostprocessGroup{
 
 		{"fix consecutive dissect captures in alternatives", fixAlternativesEndingInCapture},
 
-		{"fix extra leading space in constants", fixExtraLeadingSpaceInConstants},
+		{"fix extra leading space in constants (1)", fixExtraLeadingSpaceInConstants},
 
 		{"split alternatives into dissect patterns", splitDissect},
 
-		{"fix extra leading space in constants", fixExtraLeadingSpaceInConstants},
+		{"fix extra leading space in constants (2)", fixExtraLeadingSpaceInConstants},
 	},
 }
 
@@ -95,6 +95,7 @@ var validations = PostprocessGroup{
 		{"generic validations", validate},
 		{"detect bad dissect patterns", detectBrokenDissectPatterns},
 		{"detect unknown function calls", detectUnknownFunctionCalls},
+		{"detect unnamed matches", detectUnnamedMatches},
 	},
 }
 
@@ -404,6 +405,7 @@ func splitDissect(p *Parser) (err error) {
 				if pos < end {
 					node := Match{
 						SourceContext: match.SourceContext,
+						ID:            fmt.Sprintf("%s/%d", match.ID, partCounter),
 						Input:         input,
 						Pattern:       dupPattern(match.Pattern[pos:end]),
 						PayloadField:  "", // TODO
@@ -430,6 +432,7 @@ func splitDissect(p *Parser) (err error) {
 				for _, pattern := range alt {
 					m := Match{
 						SourceContext: match.SourceContext,
+						ID:            fmt.Sprintf("%s/%d", match.ID, partCounter),
 						Input:         curInput,
 						PayloadField:  "", // TODO
 					}
@@ -782,7 +785,14 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 							// otherwise the greedy -> option in dissect will not
 							// consume whitespace and it'll be added to the previous
 							// captured value.
-							v = Constant(" " + str)
+
+							// This is generating weird patterns
+							// v = Constant( " " + str)
+							if len(str) == 0 {
+								v = Constant(" ")
+							} else {
+								v = Constant(str)
+							}
 						} else {
 							// If the previous is not a field, then we're at the
 							// start of a pattern. Keep the constant (can't be
@@ -870,6 +880,20 @@ func detectUnknownFunctionCalls(parser *Parser) (err error) {
 			len(values), strings.Join(values, "\n"))
 	}
 	return nil
+}
+
+func detectUnnamedMatches(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			if match.ID == "" {
+				err = errors.Errorf("at %s: detected unnamed match (pattern=<<%s>>)",
+					match.Source(), match.Pattern.Tokenizer())
+				return WalkCancel, nil
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
 }
 
 func evalFn(name string, params []string) (string, error) {

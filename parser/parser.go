@@ -52,13 +52,19 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 		SourceContext: SourceContext(dev.Description.Pos()),
 	}
 	hNodes := make([]Operation, 0, len(p.Headers))
-	for _, h := range p.Headers {
+	for idx, h := range p.Headers {
 		match := Match{
 			SourceContext: SourceContext(h.pos),
+			ID:            fmt.Sprintf("HEADER#%d:%s", idx, h.id2),
 			Input:         "message",
 			Pattern:       h.content,
 			PayloadField:  h.payloadField,
 		}
+		match.OnSuccess = append(match.OnSuccess, SetField{
+			SourceContext: match.SourceContext,
+			Target:        "header_id",
+			Value:         []Operation{Constant(h.id2)},
+		})
 		if h.messageID != nil {
 			match.OnSuccess = append(match.OnSuccess, h.messageID)
 		}
@@ -90,8 +96,9 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 
 func makeMessagesNode(msgs []message) (Operation, error) {
 	byID2 := make(map[string][]Operation)
-	for _, msg := range msgs {
+	for idx, msg := range msgs {
 		match := Match{
+			ID:            fmt.Sprintf("MESSAGE#%d:%s", idx, msg.id1),
 			SourceContext: SourceContext(msg.pos),
 			Input:         "payload",
 			Pattern:       msg.content,

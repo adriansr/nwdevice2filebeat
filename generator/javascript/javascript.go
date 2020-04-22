@@ -118,7 +118,8 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 
 	case parser.Match:
 		out.Write("match({").Newline().
-			Indent().Write("dissect: {").Newline().
+			Indent().Write("id: ").JS(v.ID).Write(",").Newline().
+			Write("dissect: {").Newline().
 			Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
 			Write("field: ").JS(v.Input).Write(",").Newline().
 			Unindent().Write("},").Newline()

@@ -142,6 +142,7 @@ type SwitchSelect struct {
 
 type Match struct {
 	SourceContext
+	ID           string
 	Input        string
 	Pattern      Pattern
 	PayloadField string

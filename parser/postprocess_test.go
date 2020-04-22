@@ -8,6 +8,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/adriansr/nwdevice2filebeat/config"
+	"github.com/adriansr/nwdevice2filebeat/model"
 )
 
 func testPostprocessTree(act func(*Parser) error, input Operation) (output Operation, err error) {
@@ -635,4 +638,23 @@ func TestRemoveNops(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAliens(t *testing.T) {
+	parser, err := New(model.Device{
+		XMLPath: "test",
+		Messages: []*model.Message{
+			{
+				ID1:     "id1",
+				ID2:     "id2",
+				Content: "Built outbound <protocol> connection <connectionid> for {<dinterface>:<fld1>|<dinterface>} :<daddr>/<dport> (<dtransaddr>/<dtransport>) to {<sinterface>:<fld2>:<saddr>|<sinterface>:<saddr>}/<sport> (<stransaddr>/<stransport>)",
+			},
+		},
+	}, config.Config{
+		DevicePath: "test",
+	})
+	if !assert.NoError(t, err) {
+		t.Fatal(err)
+	}
+	t.Log(parser.Root)
 }

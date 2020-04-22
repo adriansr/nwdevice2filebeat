@@ -46,13 +46,12 @@ function match(options) {
     var dissect = new processor.Dissect(options.dissect);
     return function(evt) {
         var src = evt.Get(options.dissect.field);
-        console.debug("dissect start: " + options.dissect.tokenizer);
         dissect.Run(evt);
         var failed = evt.Get(FLAG_FIELD) != null;
         if (failed) {
-            console.debug("dissect fail: " + options.dissect.field);
+            console.debug("dissect fail: " + options.id + " field:" + options.dissect.field);
         } else {
-            console.debug("dissect   OK: " + options.dissect.field);
+            console.debug("dissect   OK: " + options.id + " field:" + options.dissect.field);
         }
         console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
         console.debug("       input: <<" + src + ">>");

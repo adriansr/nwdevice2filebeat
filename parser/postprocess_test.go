@@ -208,6 +208,7 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 				Pattern{Constant("l is "), Field("f")},
 				Pattern{Constant("ium")},
 				Pattern{Field("z")},
+				Pattern{},
 			},
 			prefix: "Hel",
 		},
@@ -217,7 +218,7 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 				Pattern{Constant("Repetition is bad.")},
 				Pattern{Constant("Repetition is bad.")},
 			},
-			expected: Alternatives{},
+			expected: Alternatives{Pattern{}},
 			prefix:   "Repetition is bad.",
 		},
 		{
@@ -228,6 +229,7 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 			},
 			expected: Alternatives{
 				Pattern{Field("isit")},
+				Pattern{},
 			},
 			prefix: "Repetition is bad.",
 		},
@@ -255,6 +257,7 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 				Pattern{Constant("Banan")},
 				Pattern{Constant("nanananan")},
 				Pattern{Field("f"), Constant("Batm")},
+				Pattern{},
 			},
 			prefix: "an",
 		},
@@ -264,7 +267,7 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 				Pattern{Constant("Repetition is bad.")},
 				Pattern{Constant("Repetition is bad.")},
 			},
-			expected: Alternatives{},
+			expected: Alternatives{Pattern{}},
 			prefix:   "Repetition is bad.",
 		},
 		{
@@ -275,6 +278,7 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 			},
 			expected: Alternatives{
 				Pattern{Field("isit")},
+				Pattern{},
 			},
 			prefix: "Repetition is bad.",
 		},
@@ -319,6 +323,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 									Alternatives{
 										Pattern{Constant("world")},
 										Pattern{Field("capture")},
+										Pattern{},
 									}},
 							},
 						},
@@ -657,4 +662,27 @@ func TestAliens(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(parser.Root)
+}
+
+func TestRemoveExtraSpace(t *testing.T) {
+	for _, test := range []struct {
+		input    string
+		expected string
+	}{
+		{
+			input:    "hello  world",
+			expected: "hello world",
+		},
+		{
+			input:    "    hello  world ",
+			expected: " hello world ",
+		},
+		{
+			input:    "       ",
+			expected: " ",
+		},
+	} {
+		result := removeExtraSpace(test.input)
+		assert.Equal(t, test.expected, result)
+	}
 }

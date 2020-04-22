@@ -7,6 +7,7 @@ package parser
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -78,7 +79,8 @@ var transforms = PostprocessGroup{
 
 		{"split alternatives into dissect patterns", splitDissect},
 
-		{"fix extra leading space in constants (2)", fixExtraLeadingSpaceInConstants},
+		//{"fix extra leading space in constants (2)", fixExtraLeadingSpaceInConstants},
+		{"fix extra space in constants", fixExtraSpaceInConstants},
 	},
 }
 
@@ -424,15 +426,16 @@ func splitDissect(p *Parser) (err error) {
 				sel := LinearSelect{SourceContext: match.SourceContext}
 				curInput := input
 				var part Value
+				displayCounter := partCounter
 				if pos < len(match.Pattern)-1 {
 					input = fmt.Sprintf("p%d", partCounter)
 					part = Field(input)
 					partCounter++
 				}
-				for _, pattern := range alt {
+				for idx, pattern := range alt {
 					m := Match{
 						SourceContext: match.SourceContext,
-						ID:            fmt.Sprintf("%s/%d", match.ID, partCounter),
+						ID:            fmt.Sprintf("%s/%d_%d", match.ID, displayCounter, idx),
 						Input:         curInput,
 						PayloadField:  "", // TODO
 					}
@@ -516,7 +519,8 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 	for idx, pattern := range alt {
 		lastOp := getLastOp(pattern)
 		if lastOp == nil {
-			return nil, errors.New("empty pattern inside alternatives")
+			//return nil, errors.New("empty pattern inside alternatives")
+			continue
 		}
 		switch v := lastOp.(type) {
 		case Constant:
@@ -655,6 +659,9 @@ outer:
 		for shift, idx := range remove {
 			alt = append(alt[:idx-shift], alt[idx+1-shift:]...)
 		}
+		// Need to keep an empty pattern otherwise it's messing with the parsing:
+		// {JAVA URL|URL} -> {JAVA|} URL
+		alt = append(alt, Pattern{})
 	}
 	// Return the common prefix
 	return edgeFn(cts[0], prefixLen), alt
@@ -781,10 +788,12 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 				case Constant:
 					if str := strings.TrimLeft(v.Value(), " "); str != v.Value() {
 						if prevIsField {
-							// If the previous is a field, always keep one space
-							// otherwise the greedy -> option in dissect will not
-							// consume whitespace and it'll be added to the previous
-							// captured value.
+							// EDIT: Not needed anymore since dissect was modified
+							//       to strip extra whitespace.
+							// - If the previous is a field, always keep one space
+							// - otherwise the greedy -> option in dissect will not
+							// - consume whitespace and it'll be added to the previous
+							// - captured value.
 
 							// This is generating weird patterns
 							// v = Constant( " " + str)
@@ -819,6 +828,41 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 					copy(match.Pattern[pos+shift+1:], match.Pattern[pos+shift:])
 					match.Pattern[pos+shift] = Field("")
 				}
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return nil
+}
+
+var extraSpace = regexp.MustCompile(" +")
+
+func removeExtraSpace(str string) string {
+	return extraSpace.ReplaceAllString(str, " ")
+}
+
+func removeExtraSpaceInPattern(pattern Pattern) (modified bool) {
+	for pos, elem := range pattern {
+		switch v := elem.(type) {
+		case Constant:
+			if repl := removeExtraSpace(v.Value()); repl != v.Value() {
+				pattern[pos] = Constant(repl)
+				modified = true
+			}
+		case Alternatives:
+			for _, p := range v {
+				modified = removeExtraSpaceInPattern(p) || modified
+			}
+		}
+	}
+	return
+}
+
+func fixExtraSpaceInConstants(parser *Parser) error {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			if modified := removeExtraSpaceInPattern(match.Pattern); modified {
 				return WalkReplace, match
 			}
 		}

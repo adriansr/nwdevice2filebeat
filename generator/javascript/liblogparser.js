@@ -72,11 +72,11 @@ function all_match(opts) {
             opts.processors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) != null) {
-                console.warn("all_match failure at " + i + ":" + JSON.stringify(evt));
+                console.warn("all_match failure at " + i); // + ":" + JSON.stringify(evt));
                 if (opts.on_failure != null) opts.on_failure(evt);
                 return;
             }
-            console.warn("all_match success at " + i + JSON.stringify(evt));
+            console.warn("all_match success at " + i); // + ":" + JSON.stringify(evt));
         }
         if (opts.on_success != null) opts.on_success(evt);
     }

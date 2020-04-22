@@ -52,6 +52,9 @@ func (c Field) Name() string {
 }
 
 func (f Field) Token() string {
+	if len(f) == 0 {
+		return "%{}"
+	}
 	return "%{" + string(f) + "->}"
 }
 
@@ -221,7 +224,11 @@ func (c Pattern) Tokenizer() string {
 	for idx, val := range c {
 		parts[idx] = val.Token()
 	}
-	return strings.Join(parts, "")
+	s := strings.Join(parts, "")
+	if len(s) == 0 {
+		return "%{}"
+	}
+	return s
 }
 
 type Payload Field

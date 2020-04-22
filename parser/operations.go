@@ -122,6 +122,36 @@ func (am AllMatch) OnFailure() []Operation {
 	return am.Nodes[am.onFailurePos:]
 }
 
+func (am AllMatch) WithOnSuccess(list []Operation) (newAm AllMatch) {
+	if len(list) == len(am.OnSuccess()) {
+		copy(am.Nodes[am.onSuccessPos:am.onFailurePos], list)
+		return am
+	} else {
+		newAm.SourceContext = am.SourceContext
+		newAm.Nodes = append(newAm.Nodes, am.Processors()...)
+		newAm.onSuccessPos = len(newAm.Nodes)
+		newAm.Nodes = append(newAm.Nodes, list...)
+		newAm.onFailurePos = len(newAm.Nodes)
+		newAm.Nodes = append(newAm.Nodes, am.OnFailure()...)
+		return newAm
+	}
+}
+
+func (am AllMatch) WithOnFailure(list []Operation) (newAm AllMatch) {
+	if len(list) == len(am.OnFailure()) {
+		copy(am.Nodes[am.onFailurePos:], list)
+		return am
+	} else {
+		newAm.SourceContext = am.SourceContext
+		newAm.Nodes = make([]Operation, am.onFailurePos, am.onFailurePos+len(list))
+		copy(newAm.Nodes[:am.onFailurePos], am.Nodes[:am.onFailurePos])
+		newAm.onSuccessPos = am.onSuccessPos
+		newAm.onFailurePos = am.onFailurePos
+		newAm.Nodes = append(newAm.Nodes, list...)
+		return newAm
+	}
+}
+
 func (am AllMatch) Children() []Operation {
 	return am.Nodes
 }

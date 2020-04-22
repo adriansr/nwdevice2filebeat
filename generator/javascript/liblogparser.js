@@ -226,12 +226,24 @@ function lookup(opts) {
     }
 }
 
+function set(fields) {
+    return new processor.AddFields({
+        target: FIELDS_PREFIX,
+        fields: fields,
+    });
+}
+
+function setf(dst, src) {
+    return function(evt) {
+        var val = evt.Get(FIELDS_PREFIX + src);
+        if (val != null) evt.Put(FIELDS_PREFIX + dst, val);
+    }
+}
+
 function set_field(opts) {
     return function(evt) {
         var val = opts.value(evt);
-        if (val != null) {
-            evt.Put(opts.dest, opts.value(evt));
-        }
+        if (val != null) evt.Put(opts.dest, val);
     }
 }
 

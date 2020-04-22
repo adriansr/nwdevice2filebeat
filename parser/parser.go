@@ -95,6 +95,7 @@ func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 }
 
 func makeMessagesNode(msgs []message) (Operation, error) {
+	var keysInOrder []string
 	byID2 := make(map[string][]Operation)
 	for idx, msg := range msgs {
 		match := Match{
@@ -124,13 +125,18 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 		for _, fn := range msg.functions {
 			match.OnSuccess = append(match.OnSuccess, fn)
 		}
+		if _, exists := byID2[msg.id2]; !exists {
+			keysInOrder = append(keysInOrder, msg.id2)
+		}
 		byID2[msg.id2] = append(byID2[msg.id2], match)
 	}
 	msgIdSelect := MsgIdSelect{
 		Map: make(map[string]int, len(byID2)),
 	}
 	counter := 0
-	for k, list := range byID2 {
+	//for k, list := range byID2 {
+	for _, k := range keysInOrder {
+		list := byID2[k]
 		var elem Operation
 		if len(list) == 1 {
 			elem = list[0]

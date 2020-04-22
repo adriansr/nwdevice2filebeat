@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
 var preprocessors = parser.PostprocessGroup{
@@ -23,6 +24,20 @@ var preprocessors = parser.PostprocessGroup{
 		{
 			Name: "adjust overlapping payload capture",
 			Run:  adjustOverlappingPayload,
+		},
+		{
+			// Needs to run before adjustFieldNames so that SetField targets
+			// don't have the prefix added to them.
+			Name: "promote constant assignments",
+			Run:  promoteConstantSetField,
+		},
+		{
+			Name: "promote field copy operations",
+			Run:  promoteCopyField,
+		},
+		{
+			Name: "fuck",
+			Run:  fuckingShit,
 		},
 		{
 			Name: "adjust field names",
@@ -40,7 +55,7 @@ var preprocessors = parser.PostprocessGroup{
 			Run:  fixNonCapturingDissects,
 		},
 
-		// Fron here down root node belongs to JS
+		// From here down root node belongs to JS
 		{
 			Name: "prepare file structure",
 			Run:  adjustTree,
@@ -379,4 +394,134 @@ func fixNonCapturingDissects(p *parser.Parser) error {
 		return parser.WalkContinue, nil
 	})
 	return nil
+}
+
+type SetProcessor map[string]string
+
+func (s SetProcessor) Hashable() string {
+	return fmt.Sprintf("SetP{%v}", s)
+}
+
+func (s SetProcessor) Children() []parser.Operation {
+	return nil
+}
+
+func promoteConstantSetFieldList(list []parser.Operation) (newList []parser.Operation, err error) {
+	processor := SetProcessor{}
+	var delete []int
+	for idx, op := range list {
+		if set, isSet := op.(parser.SetField); isSet {
+			if ct, isCt := set.Value[0].(parser.Constant); isCt {
+				if prev, exists := processor[set.Target]; exists && prev != ct.Value() {
+					log.Printf("at %s: field '%s' is set more than once (values '%s' and '%s')",
+						set.Source(), set.Target, prev, ct.Value())
+				}
+				processor[set.Target] = ct.Value()
+				delete = append(delete, idx)
+			}
+		}
+	}
+	if len(processor) > 0 {
+		newList = append(append(newList, processor),
+			parser.OpList(list).Remove(delete)...)
+	}
+	return newList, nil
+}
+
+func promoteConstantSetField(p *parser.Parser) (err error) {
+	// This usually leads to a smaller JS even though now we cannot deduplicate
+	// constant fields set as hardly two messages will set the exact same fields.
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		var list []parser.Operation
+		switch v := node.(type) {
+		case parser.Match:
+			list, err = promoteConstantSetFieldList(v.OnSuccess)
+			if err != nil {
+				return parser.WalkCancel, nil
+			}
+			if list != nil {
+				v.OnSuccess = list
+				return parser.WalkReplace, v
+			}
+		case parser.AllMatch:
+			changed := false
+			list, err = promoteConstantSetFieldList(v.OnSuccess())
+			if err != nil {
+				return parser.WalkCancel, nil
+			}
+			if list != nil {
+				v = v.WithOnSuccess(list)
+				changed = true
+			}
+			list, err = promoteConstantSetFieldList(v.OnFailure())
+			if err != nil {
+				return parser.WalkCancel, nil
+			}
+			if list != nil {
+				v = v.WithOnFailure(list)
+				changed = true
+			}
+			if changed {
+				return parser.WalkReplace, v
+			}
+		}
+		return parser.WalkContinue, nil
+	})
+	return err
+}
+
+type SetField [2]string
+
+func (s SetField) Hashable() string {
+	return fmt.Sprintf("SetF{dst=%s,src=%s}", s[0], s[1])
+}
+
+func (s SetField) Children() []parser.Operation {
+	return nil
+}
+
+func promoteCopyFieldInList(list []parser.Operation) (changed bool) {
+	for idx, op := range list {
+		if set, isSet := op.(parser.SetField); isSet {
+			if field, isField := set.Value[0].(parser.Field); isField {
+				list[idx] = SetField{
+					set.Target,
+					field.Name(),
+				}
+				changed = true
+			}
+		}
+	}
+	return changed
+}
+
+func promoteCopyField(p *parser.Parser) error {
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		switch v := node.(type) {
+		case parser.Match:
+			if promoteCopyFieldInList(v.OnSuccess) {
+				return parser.WalkReplace, v
+			}
+		case parser.AllMatch:
+			changed := promoteCopyFieldInList(v.OnSuccess())
+			changed = promoteCopyFieldInList(v.OnFailure()) || changed
+			if changed {
+				return parser.WalkReplace, v
+			}
+		}
+		return parser.WalkContinue, nil
+	})
+	return nil
+}
+
+func fuckingShit(p *parser.Parser) (err error) {
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		switch v := node.(type) {
+		case parser.SetField:
+			err = errors.Errorf("parser.SetField found where it shouldn't: %s", v.Hashable())
+			return parser.WalkCancel, nil
+		}
+		return parser.WalkContinue, nil
+	})
+	return err
 }

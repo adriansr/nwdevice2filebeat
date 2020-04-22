@@ -181,6 +181,9 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 		out.Write(",").Newline().Unindent()
 		out.Write("})")
 
+	case SetField:
+		out.Write("setf(").JS(v[0]).Write(",").JS(v[1]).Write(")")
+
 	case parser.ValueMapCall:
 		out.Write("lookup({").Newline().Indent().
 			Write("dest: ").JS(v.Target).Write(",").Newline().
@@ -229,6 +232,11 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 			out.Unindent().Write("],").Newline().Unindent().Write("})")
 		}
 
+	case SetProcessor:
+		out.Write("set(")
+		writeMapString(v, out)
+		out.Write(")")
+
 	case parser.Noop:
 		// Removing nodes from the tree is complicated.
 		out.Write("nop")
@@ -255,6 +263,21 @@ func writeMapping(m map[string]int, nodes []parser.Operation, out *generator.Cod
 		out.JS(key).Write(": ")
 		generate(value, out)
 		out.Write(",").Newline()
+	}
+	out.Unindent().Write("}")
+}
+
+func writeMapString(m map[string]string, out *generator.CodeWriter) {
+	out.Write("{").Newline().Indent()
+	keys := make([]string, len(m))
+	pos := 0
+	for key := range m {
+		keys[pos] = key
+		pos++
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		out.JS(key).Write(": ").JS(m[key]).Write(",").Newline()
 	}
 	out.Unindent().Write("}")
 }

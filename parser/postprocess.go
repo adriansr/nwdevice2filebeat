@@ -77,6 +77,13 @@ var transforms = PostprocessGroup{
 
 		{"fix extra leading space in constants (1)", fixExtraLeadingSpaceInConstants},
 
+		// Reaching this point, if we have:
+		// constant<field>{alternative...}
+		// we will generate broken dissect due to the trailer {pN} used to
+		// terminate the pattern before the alternative. Inject the <field>
+		// into the alternatives to avoid this.
+		{"inject leading captures into alternatives", injectCapturesInAlts},
+
 		{"split alternatives into dissect patterns", splitDissect},
 
 		//{"fix extra leading space in constants (2)", fixExtraLeadingSpaceInConstants},
@@ -719,7 +726,16 @@ func fixAlternativesEdgeSpace(p *Parser) (err error) {
 				if !ok {
 					continue
 				}
-				prefix, newAlt := extractTrailingConstantPrefix(alt)
+
+				//prefix, newAlt := extractTrailingConstantPrefix(alt)
+				var prefix string
+				var newAlt Alternatives
+				if false {
+					prefix, newAlt = extractTrailingConstantPrefix(alt)
+				} else {
+					prefix, newAlt = "", Alternatives{}
+				}
+
 				if prefix == "" {
 					continue
 				}
@@ -1043,4 +1059,45 @@ func detectBrokenDissectPatterns(parser *Parser) error {
 		return WalkContinue, nil
 	})
 	return errs.Err()
+}
+
+func injectCapturesInAltsPattern(pattern Pattern) (Pattern, error) {
+	var lastField Value
+	var remove []int
+	for pos, item := range pattern {
+		switch v := item.(type) {
+		case Alternatives:
+			if lastField != nil {
+				pattern[pos] = v.InjectLeft(lastField)
+				remove = append(remove, pos-1)
+			}
+		case Field:
+			lastField = item
+		default:
+			lastField = nil
+		}
+	}
+	if len(remove) > 0 {
+		return pattern.Remove(remove), nil
+	}
+	return nil, nil
+}
+
+func injectCapturesInAlts(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok {
+			var newPattern Pattern
+			newPattern, err = injectCapturesInAltsPattern(match.Pattern)
+			if err != nil {
+				err = errors.Wrapf(err, "at %s: cannot inject trailing capture into alternative: ", match.Source())
+				return WalkCancel, nil
+			}
+			if newPattern != nil {
+				match.Pattern = newPattern
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
 }

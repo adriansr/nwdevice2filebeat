@@ -6,6 +6,7 @@ package parser
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -194,6 +195,20 @@ func (p Pattern) InjectRight(v Value) Pattern {
 
 func (p Pattern) InjectLeft(v Value) Pattern {
 	return append(append(Pattern(nil), v), p...)
+}
+
+func (p Pattern) Remove(indices []int) Pattern {
+	sort.Ints(indices)
+	last := -1
+	removed, n := 0, len(p)
+	for shift, pos := range indices {
+		if pos != last && pos >= 0 && pos < n {
+			copy(p[pos-shift:], p[pos-shift+1:])
+			last = pos
+			removed++
+		}
+	}
+	return p[:len(p)-removed]
 }
 
 // SquashConstants joins together consecutive constants in a pattern.

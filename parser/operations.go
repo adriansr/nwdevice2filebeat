@@ -370,3 +370,13 @@ func (v Noop) Children() []Operation {
 func (v Noop) Hashable() string {
 	return "Noop{}"
 }
+
+type RemoveFields []string
+
+func (r RemoveFields) Hashable() string {
+	return "Remove{" + strings.Join(r, ",") + "}"
+}
+
+func (r RemoveFields) Children() []Operation {
+	return nil
+}

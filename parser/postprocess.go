@@ -449,7 +449,17 @@ func splitDissect(p *Parser) (err error) {
 			}
 			repl.onSuccessPos = len(repl.Nodes)
 			repl.Nodes = append(repl.Nodes, match.OnSuccess...)
+			var tmpFields RemoveFields
+			for i := 0; i < partCounter; i++ {
+				tmpFields = append(tmpFields, fmt.Sprintf("p%d", i))
+			}
+			if len(tmpFields) > 0 {
+				repl.Nodes = append(repl.Nodes, tmpFields)
+			}
 			repl.onFailurePos = len(repl.Nodes)
+			if len(tmpFields) > 0 {
+				repl.Nodes = append(repl.Nodes, tmpFields)
+			}
 			// TODO: cleanup on failure
 			return WalkReplace, repl
 		}

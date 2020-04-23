@@ -3,7 +3,8 @@
 // you may not use this file except in compliance with the Elastic License.
 
 var FLAG_FIELD = "log.flags";
-var FIELDS_PREFIX = "nwparser.";
+var FIELDS_OBJECT = "nwparser";
+var FIELDS_PREFIX = FIELDS_OBJECT + ".";
 
 var saved_flags = null;
 
@@ -39,7 +40,7 @@ function linear_select(subprocessors) {
 }
 
 function match(options) {
-    options.dissect["target_prefix"] = "nwparser";
+    options.dissect["target_prefix"] = FIELDS_OBJECT;
     options.dissect["ignore_failure"] = true;
     options.dissect["overwrite_keys"] = true;
     //console.debug("create tokenizer: " + options.dissect.tokenizer);
@@ -99,7 +100,9 @@ function msgid_select(mapping) {
     }
 }
 
+var start;
 function save_flags(evt) {
+    start = Date.now();
     saved_flags = evt.Get(FLAG_FIELD);
 }
 
@@ -107,6 +110,8 @@ function restore_flags(evt) {
     if (saved_flags !== null) {
         evt.Put(FLAG_FIELD, saved_flags);
     }
+    var took = Date.now() - start;
+    evt.Put(FIELDS_PREFIX + "_took", took);
 }
 
 function constant(value) {
@@ -228,7 +233,7 @@ function lookup(opts) {
 
 function set(fields) {
     return new processor.AddFields({
-        target: FIELDS_PREFIX,
+        target: FIELDS_OBJECT,
         fields: fields,
     });
 }
@@ -301,6 +306,14 @@ function date_time(opts) {
         var str = date_time_join_args(evt, opts.args);
         if (!date_time_try_pattern(evt, opts, opts.fmt, str)) {
             console.warn("in date_time: id="+opts.id+" FAILED: " + str);
+        }
+    }
+}
+
+function remove(fields) {
+    return function(evt) {
+        for (var i=0; i<fields.length; i++) {
+            evt.Delete(FIELDS_PREFIX + fields[i]);
         }
     }
 }

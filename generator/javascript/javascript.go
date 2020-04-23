@@ -232,6 +232,9 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 			out.Unindent().Write("],").Newline().Unindent().Write("})")
 		}
 
+	case parser.RemoveFields:
+		out.Write("remove(").JS(v).Write(")")
+
 	case SetProcessor:
 		out.Write("set(")
 		writeMapString(v, out)

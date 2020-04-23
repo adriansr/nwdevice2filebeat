@@ -544,10 +544,10 @@ func getLastOp(pattern Pattern) Value {
 	return pattern[n-1]
 }
 
-func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern, error) {
+func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern, bool, error) {
 	if pos+1 == len(parent) {
 		// Alternatives at the end of the pattern don't need adjustment.
-		return nil, nil
+		return nil, false, nil
 	}
 	var endInField []int
 	for idx, pattern := range alt {
@@ -561,14 +561,14 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 		case Field:
 			endInField = append(endInField, idx)
 		case Payload:
-			return nil, errors.New("payload inside alternative")
+			return nil, false, errors.New("payload inside alternative")
 		default:
-			return nil, errors.Errorf("unsupported type inside alternative: %T", v)
+			return nil, false, errors.Errorf("unsupported type inside alternative: %T", v)
 		}
 	}
 	if len(endInField) == 0 {
 		// No alternatives end in a field capture: Nothing to fix.
-		return nil, nil
+		return nil, false, nil
 	}
 
 	// From here there's alternatives ending in field (endInField)
@@ -588,15 +588,13 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 		// Remove it from the parent.
 		parent = append(parent[:pos+1], parent[pos+2:]...)
 
-		log.Printf("INFO - Fixed field collision by moving a constant")
-		return parent, nil
+		return parent, false, nil
 	}
 	// We have two field captures in sequence, insert whitespace in between.
 	for _, altIdx := range endInField {
 		alt[altIdx] = alt[altIdx].InjectRight(Constant(" "))
 	}
-	log.Printf("INFO - Fixed field collision by injecting a constant")
-	return nil, nil
+	return nil, true, nil
 }
 
 func extractLeadingConstantPrefix(alt Alternatives) (string, Alternatives) {
@@ -785,6 +783,7 @@ func fixAlternativesEdgeSpace(p *Parser) (err error) {
 }
 
 func fixAlternativesEndingInCapture(p *Parser) (err error) {
+	var injected, moved int
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
 			// The alternatives may be modified without the enclosing Match
@@ -795,12 +794,18 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 			for pos := 0; pos < n-1; pos++ {
 				if alt, ok := match.Pattern[pos].(Alternatives); ok {
 					var newPattern Pattern
-					newPattern, err = tryFixAlternativeAtPos(alt, pos, match.Pattern)
+					var isInject bool
+					newPattern, isInject, err = tryFixAlternativeAtPos(alt, pos, match.Pattern)
 					if err != nil {
 						err = errors.Wrapf(err, "at %s", match.Source())
 						return WalkCancel, nil
 					}
 					if newPattern != nil {
+						if isInject {
+							injected++
+						} else {
+							moved++
+						}
 						// This modifies the actual pattern it's looping on,
 						// if a new element has been added to next pos.
 						// In this case it'll also be necessary to replace
@@ -817,7 +822,10 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 		}
 		return WalkContinue, nil
 	})
-	return
+	if injected+moved > 0 {
+		log.Printf("INFO - Fixed field collisions (%d constant moved, %d spaces injected)", moved, injected)
+	}
+	return err
 }
 
 func fixExtraLeadingSpaceInConstants(parser *Parser) error {

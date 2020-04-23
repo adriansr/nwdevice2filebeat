@@ -22,20 +22,20 @@ function linear_select(subprocessors) {
         var i;
         for (i=0; i<subprocessors.length; i++) {
             evt.Delete(FLAG_FIELD);
-            console.warn("linear_select trying entry " + i);
+            //console.warn("linear_select trying entry " + i);
             subprocessors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) == null) break;
-            console.warn("linear_select failed entry " + i);
+            //console.warn("linear_select failed entry " + i);
         }
         if (saved_flags !== null) {
             evt.Put(FLAG_FIELD, saved_flags);
         }
-        if (i < subprocessors.length) {
+        /*if (i < subprocessors.length) {
             console.warn("linear_select matched entry " + i);
         } else {
             console.warn("linear_select didn't match");
-        }
+        }*/
     }
 }
 
@@ -49,17 +49,15 @@ function match(options) {
         var src = evt.Get(options.dissect.field);
         dissect.Run(evt);
         var failed = evt.Get(FLAG_FIELD) != null;
-        if (failed) {
+        /*if (failed) {
             console.debug("dissect fail: " + options.id + " field:" + options.dissect.field);
         } else {
             console.debug("dissect   OK: " + options.id + " field:" + options.dissect.field);
         }
         console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
-        console.debug("       input: <<" + src + ">>");
+        console.debug("       input: <<" + src + ">>");*/
         if (options.on_success != null && !failed) {
-            console.debug("  -> on_success");
             options.on_success(evt);
-            console.debug("  <- on_success");
         }
     }
 }
@@ -73,11 +71,11 @@ function all_match(opts) {
             opts.processors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) != null) {
-                console.warn("all_match failure at " + i); // + ":" + JSON.stringify(evt));
+                //console.warn("all_match failure at " + i); // + ":" + JSON.stringify(evt));
                 if (opts.on_failure != null) opts.on_failure(evt);
                 return;
             }
-            console.warn("all_match success at " + i); // + ":" + JSON.stringify(evt));
+            //console.warn("all_match success at " + i); // + ":" + JSON.stringify(evt));
         }
         if (opts.on_success != null) opts.on_success(evt);
     }
@@ -95,7 +93,7 @@ function msgid_select(mapping) {
             console.warn("msgid_select: no mapping for messageid:" + msgid);
             return;
         }
-        console.info("msgid_select: matched key=" + msgid);
+        //console.info("msgid_select: matched key=" + msgid);
         return next(evt);
     }
 }
@@ -185,7 +183,7 @@ function CALC(evt, args) {
             break;
         default:
             // Only * and + seen in the parsers.
-            console.warn("failed evaluating CALC operation '" + args[1] + "'.");
+            console.warn("unknown CALC operation '" + args[1] + "'.");
             return;
     }
     // Always return a string

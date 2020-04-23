@@ -29,6 +29,20 @@ type Parser struct {
 
 func New(dev model.Device, cfg config.Config) (p Parser, err error) {
 	p.Config = cfg
+	//if len(dev.TagValMaps) > 0 {
+	//	return p, errors.Errorf("TAGVALMAP is not implemented (at %s)", dev.TagValMaps[0].Pos())
+	//}
+
+	if len(dev.Regexs) > 0 {
+		log.Printf("WARN - at %s: Device uses unsupported REGX transform: will be ignored.", dev.Regexs[0].Pos())
+	}
+	if len(dev.SumDatas) > 0 {
+		log.Printf("WARN - at %s: Device uses unsupported SUMDATA transform: will be ignored.", dev.SumDatas[0].Pos())
+	}
+	if len(dev.VarTypes) > 0 {
+		log.Printf("WARN - at %s: Device uses unsupported VARTYPE transform: will be ignored.", dev.VarTypes[0].Pos())
+	}
+
 	if p.ValueMaps, p.ValueMapsByName, err = processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
 	}

@@ -5,6 +5,7 @@
 package model
 
 import (
+	"compress/gzip"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -32,7 +33,7 @@ type Device struct {
 	SumDatas   []*SumData
 }
 
-// New turns a new Device from the given path path.
+// New turns a new Device from the given directory path.
 func NewDevice(path string) (Device, error) {
 	files, err := listFilesByExtensions(path)
 	if err != nil {
@@ -59,6 +60,17 @@ func NewDevice(path string) (Device, error) {
 	return dev, nil
 }
 
+// New turns a new Device from the given path to an (optionally compressed) XML.
+func NewDeviceFromXML(path string) (Device, error) {
+	dev := Device{
+		XMLPath: path,
+	}
+	if err := dev.load(); err != nil {
+		return dev, err
+	}
+	return dev, nil
+}
+
 func (dev *Device) String() string {
 	return fmt.Sprintf("device={%s, %s, xml:'%s'}", dev.Description.String(), dev.Version.String(), dev.XMLPath)
 }
@@ -69,7 +81,14 @@ func (dev *Device) load() error {
 		return err
 	}
 	defer fHandle.Close()
-	lineReader := util.NewLineReader(fHandle)
+	fileReader := io.ReadCloser(fHandle)
+	if strings.HasSuffix(dev.XMLPath, ".gz") {
+		if fileReader, err = gzip.NewReader(fHandle); err != nil {
+			return errors.Wrapf(err, "failed reading file in gzip format")
+		}
+		defer fileReader.Close()
+	}
+	lineReader := util.NewLineReader(fileReader)
 	decoder := xml.NewDecoder(lineReader)
 	// TODO: Config flag
 	decoder.Strict = true

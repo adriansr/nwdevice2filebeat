@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
@@ -47,6 +48,7 @@ var prechecks = PostprocessGroup{
 var preactions = PostprocessGroup{
 	Title: "pre-actions",
 	Actions: []Action{
+		{"strip leading space in messages", stripLeadingSpace},
 		{"adjust payload field", setPayloadField},
 	},
 }
@@ -475,42 +477,57 @@ func splitDissect(p *Parser) (err error) {
 	return err
 }
 
+func injectSpaceBetweenConsecutiveCaptures(pattern Pattern, loc model.XMLPos) Pattern {
+	var changed bool
+	var fixes []int
+	var lastCapture Value
+	for idx, op := range pattern {
+		switch v := op.(type) {
+		case Field:
+			if lastCapture != nil {
+				// This happens a lot. I think the proper thing is to add
+				// a space in between.
+				// TODO: Revisit decision and check rsa2elk
+				fixes = append(fixes, idx)
+				log.Printf("INFO at %s: pattern has two consecutive captures: %s and %s (injected space)",
+					loc, lastCapture, v)
+			}
+			lastCapture = op
+		case Payload:
+			lastCapture = op
+		case Alternatives:
+			for altID, alt := range v {
+				if newP := injectSpaceBetweenConsecutiveCaptures(alt, loc); newP != nil {
+					v[altID] = newP
+					changed = true
+				}
+			}
+			lastCapture = nil
+		default:
+			lastCapture = nil
+		}
+	}
+	if len(fixes) > 0 {
+		changed = true
+		for offset, pos := range fixes {
+			newP := make([]Value, 0, len(pattern)+len(fixes))
+			newP = append(newP, pattern[:pos+offset]...)
+			newP = append(newP, Constant(" "))
+			newP = append(newP, pattern[pos+offset:]...)
+			pattern = newP
+		}
+	}
+	if changed {
+		return pattern
+	}
+	return nil
+}
+
 func fixDissectCaptures(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok {
-			// First check if a pattern has consecutive captures outside of an
-			// alternative.
-			var fixes []int
-			lastWasCapture, lastCapture := false, ""
-			for idx, op := range match.Pattern {
-				isCapture, capture := false, ""
-				switch v := op.(type) {
-				case Field:
-					isCapture = true
-					capture = v.Name()
-				case Payload:
-					isCapture = true
-					capture = v.FieldName()
-				}
-				if isCapture && lastWasCapture {
-					// This happens a lot. I think the proper thing is to add
-					// a space in between.
-					// TODO: Revisit decision and check rsa2elk
-					fixes = append(fixes, idx)
-					log.Printf("INFO at %s: pattern has two consecutive captures: %s and %s (fixed)",
-						match.Source(), lastCapture, capture)
-				}
-				lastWasCapture = isCapture
-				lastCapture = capture
-			}
-			if len(fixes) > 0 {
-				for offset, pos := range fixes {
-					pattern := make([]Value, 0, len(match.Pattern)+len(fixes))
-					pattern = append(pattern, match.Pattern[:pos+offset]...)
-					pattern = append(pattern, Constant(" "))
-					pattern = append(pattern, match.Pattern[pos+offset:]...)
-					match.Pattern = pattern
-				}
+			if newP := injectSpaceBetweenConsecutiveCaptures(match.Pattern, match.Source()); newP != nil {
+				match.Pattern = newP
 				return WalkReplace, match
 			}
 		}
@@ -1100,4 +1117,28 @@ func injectCapturesInAlts(parser *Parser) (err error) {
 		return WalkContinue, nil
 	})
 	return err
+}
+
+func stripLeadingSpace(parser *Parser) error {
+	if !parser.Config.Fixes.StripLeadingSpace {
+		return nil
+	}
+	count := 0
+	for _, msg := range parser.Messages {
+		if n := len(msg.content); n < 1 {
+			continue
+		}
+		if ct, ok := msg.content[0].(Constant); ok {
+			if trimmed := strings.TrimLeft(ct.Value(), " "); trimmed != ct.Value() {
+				count++
+				if len(trimmed) > 0 {
+					msg.content[0] = Constant(trimmed)
+				} else {
+					msg.content = msg.content[1:]
+				}
+			}
+		}
+	}
+	log.Printf("INFO - Trimmed leading space from %d out of %d messages", count, len(parser.Messages))
+	return nil
 }

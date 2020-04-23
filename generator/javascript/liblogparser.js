@@ -360,11 +360,17 @@ var shortMonths = {
     "dec": [11, 4],
 };
 
+var monthSetter = {
+  call: function(date, value) {
+      date.setMonth(value-1);
+  }
+};
+
 // var dC = undefined;
 var dR = dateMonthName(true);
 var dB = dateMonthName(false);
-var dM = dateFixedWidthNumber('M', 2, 1, 12, function(date, value) { date.SetMonth(value-1); });
-var dG = dateVariableWidthNumber('G', 1, 12, function(date, value) { date.SetMonth(value-1); });
+var dM = dateFixedWidthNumber('M', 2, 1, 12, monthSetter);//function(date, value) { date.setMonth(value-1); });
+var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);//function(date, value) { date.setMonth(value-1); });
 var dD = dateFixedWidthNumber('D',2, 1, 31, Date.prototype.setDate);
 var dF = dateVariableWidthNumber('F', 1, 31, Date.prototype.setDate);
 var dH = dateFixedWidthNumber('H', 2, 0, 24, Date.prototype.setHours);

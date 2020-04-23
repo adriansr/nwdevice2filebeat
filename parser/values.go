@@ -56,7 +56,8 @@ func (f Field) Token() string {
 	if len(f) == 0 {
 		return "%{}"
 	}
-	return "%{" + string(f) + "->}"
+	//return "%{" + string(f) + "->}"
+	return "%{" + string(f) + "}"
 }
 
 func (c Field) Children() []Operation {

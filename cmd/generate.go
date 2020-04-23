@@ -27,6 +27,7 @@ func init() {
 	generateCmd.PersistentFlags().String("device", "", "Input device path")
 	generateCmd.PersistentFlags().String("output", "", "Output")
 	generateCmd.PersistentFlags().StringSliceP("optimize", "O", nil, "Optimizations")
+	generateCmd.PersistentFlags().StringSliceP("fix", "F", nil, "Fixes")
 	generateCmd.MarkPersistentFlagRequired("device")
 }
 
@@ -85,6 +86,15 @@ func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 				cfg.Opt.GlobalEntities = true
 			case "deduplicate":
 				cfg.Opt.DetectDuplicates = true
+			}
+		}
+	}
+	if opts, err := cmd.PersistentFlags().GetStringSlice("fix"); err == nil {
+		log.Printf("fixes = %v\n", opts)
+		for _, o := range opts {
+			switch o {
+			case "space", "whitespace", "w", "s":
+				cfg.Fixes.StripLeadingSpace = true
 			}
 		}
 	}

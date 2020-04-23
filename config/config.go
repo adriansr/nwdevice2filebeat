@@ -8,6 +8,7 @@ type Config struct {
 	DevicePath string
 	OutputPath string
 	Opt        Optimizations
+	Fixes      Fixes
 }
 
 type Optimizations struct {
@@ -21,4 +22,10 @@ type Optimizations struct {
 	// Makes the generated JS more compact and saves memory, but impacts
 	// readability.
 	DetectDuplicates bool
+}
+
+type Fixes struct {
+	// StripLeadingSpace strips space at the start of MESSAGES, as it seems
+	// to be a common error to add an extra space first.
+	StripLeadingSpace bool
 }

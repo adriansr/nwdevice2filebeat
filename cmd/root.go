@@ -32,6 +32,7 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(runCmd)
 }
 
 func LogError(msg string, keysAndValues ...interface{}) {

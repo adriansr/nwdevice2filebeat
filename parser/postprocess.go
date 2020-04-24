@@ -134,6 +134,9 @@ func checkPayloadPositionInHeaders(parser *Parser) error {
 }
 
 func setPayloadField(parser *Parser) error {
+	if !parser.Config.StripPayload {
+		return nil
+	}
 	for idx, hdr := range parser.Headers {
 		payload, err := hdr.content.PayloadField()
 		if err != nil {
@@ -396,8 +399,9 @@ func dupPattern(in []Value) (out []Value) {
 }
 
 func splitDissect(p *Parser) (err error) {
-	// TODO:
-	// Control with a flag.
+	if !p.Config.Dissect {
+		return nil
+	}
 	p.WalkPostOrder(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
 			repl := AllMatch{
@@ -553,7 +557,6 @@ func tryFixAlternativeAtPos(alt Alternatives, pos int, parent Pattern) (Pattern,
 	for idx, pattern := range alt {
 		lastOp := getLastOp(pattern)
 		if lastOp == nil {
-			//return nil, errors.New("empty pattern inside alternatives")
 			continue
 		}
 		switch v := lastOp.(type) {
@@ -700,6 +703,9 @@ outer:
 }
 
 func fixAlternativesEdgeSpace(p *Parser) (err error) {
+	if !p.Config.Dissect {
+		return nil
+	}
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
 			type insert struct {
@@ -829,6 +835,9 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 }
 
 func fixExtraLeadingSpaceInConstants(parser *Parser) error {
+	if !parser.Config.Dissect {
+		return nil
+	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		var inserts []int
 		if match, ok := node.(Match); ok {
@@ -911,6 +920,9 @@ func removeExtraSpaceInPattern(pattern Pattern) (modified bool) {
 }
 
 func fixExtraSpaceInConstants(parser *Parser) error {
+	if !parser.Config.Dissect {
+		return nil
+	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok {
 			if modified := removeExtraSpaceInPattern(match.Pattern); modified {
@@ -1109,6 +1121,9 @@ func injectCapturesInAltsPattern(pattern Pattern) (Pattern, error) {
 }
 
 func injectCapturesInAlts(parser *Parser) (err error) {
+	if !parser.Config.Dissect {
+		return nil
+	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok {
 			var newPattern Pattern

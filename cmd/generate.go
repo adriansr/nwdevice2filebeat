@@ -36,6 +36,10 @@ func generateRun(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Panic(err)
 	}
+	// TODO: Depend on output
+	cfg.Dissect = true
+	cfg.StripPayload = true
+
 	dev, err := model.NewDevice(cfg.DevicePath)
 	if err != nil {
 		LogError("Failed to load device", "path", cfg.DevicePath, "reason", err)

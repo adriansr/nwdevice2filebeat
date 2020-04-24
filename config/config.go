@@ -9,6 +9,9 @@ type Config struct {
 	OutputPath string
 	Opt        Optimizations
 	Fixes      Fixes
+	// These are set depending on what the output supports
+	Dissect      bool
+	StripPayload bool
 }
 
 type Optimizations struct {

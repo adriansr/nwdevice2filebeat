@@ -15,7 +15,8 @@ import (
 )
 
 type match struct {
-	pattern [][]pattern
+	pattern   [][]pattern
+	onSuccess []Node
 }
 
 func (m match) String() string {
@@ -273,13 +274,10 @@ func (m *match) Run(ctx *Context) error {
 		pos = nextPos
 	}
 	if len(fullCapture.fields) > 0 {
-		if ctx.Fields == nil {
-			ctx.Fields = make(Fields, len(fullCapture.fields))
-		}
 		for _, capture := range fullCapture.fields {
 			key, value := string(capture.field), string(ctx.Message[capture.start:capture.end])
 			/*THIS*/ fmt.Fprintf(os.Stderr, " + captured '%s'='%s'\n", key, value)
-			ctx.Fields[key] = value
+			ctx.Fields.Put(key, value)
 		}
 	} else {
 		/*THIS*/ fmt.Fprintf(os.Stderr, " ? captured zero fields\n")

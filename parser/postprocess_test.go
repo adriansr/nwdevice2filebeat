@@ -23,7 +23,6 @@ func testPostprocessTree(act func(*Parser) error, input Operation) (output Opera
 
 func treeEquals(t *testing.T, expected, actual Operation) {
 	assert.Equal(t, expected, actual)
-	//assert.Equal(t, expected.Hashable(), actual.Hashable())
 }
 
 type actionTestCase struct {

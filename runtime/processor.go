@@ -13,6 +13,8 @@ var ErrFieldNotFound = errors.New("field not found")
 
 type Processor struct {
 	Root Node
+
+	valueMaps map[string]*valueMap
 }
 
 type Fields map[string]string
@@ -24,9 +26,20 @@ func (f Fields) Get(name string) (string, error) {
 	return "", ErrFieldNotFound
 }
 
+func (f Fields) Put(name, value string) {
+	f[name] = value
+}
+
 func New(parser *parser.Parser) (p *Processor, err error) {
-	p = &Processor{}
-	p.Root, err = translate(parser.Root, parser)
+	p = &Processor{
+		valueMaps: make(map[string]*valueMap, len(parser.ValueMapsByName)),
+	}
+	for name, vm := range parser.ValueMapsByName {
+		if p.valueMaps[name], err = newValueMap(vm, parser); err != nil {
+			return nil, err
+		}
+	}
+	p.Root, err = p.translate(parser.Root, parser)
 	return p, err
 }
 

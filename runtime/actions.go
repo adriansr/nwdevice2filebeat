@@ -5,6 +5,10 @@
 package runtime
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/pkg/errors"
 )
 
@@ -103,4 +107,81 @@ func (m MapSelect) Run(ctx *Context) error {
 		return next.Run(ctx)
 	}
 	return ErrMessageIDNotFound
+}
+
+type valueMapEntry interface {
+	Get(ctx *Context) string
+}
+
+type ct string
+
+func (c ct) Get(*Context) string {
+	return string(c)
+}
+
+type fld string
+
+func (f fld) Get(ctx *Context) string {
+	value, err := ctx.Fields.Get(string(f))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Get of unset field: %s\n", string(f))
+		return ""
+	}
+	return value
+}
+
+func newValue(op parser.Operation) (valueMapEntry, error) {
+	switch v := op.(type) {
+	case parser.Constant:
+		return ct(v.Value()), nil
+	case parser.Field:
+		return fld(v.Name()), nil
+	default:
+		return nil, errors.Errorf("unexpected type in valuemap: %T", v)
+	}
+}
+
+type valueMap struct {
+	mappings map[string]valueMapEntry
+	def      *valueMapEntry
+}
+
+func newValueMap(vm *parser.ValueMap, p *parser.Parser) (out *valueMap, err error) {
+	out = &valueMap{
+		mappings: make(map[string]valueMapEntry, len(vm.Mappings)),
+	}
+	if vm.Default != nil {
+		def, err := newValue(*vm.Default)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed translating valuemap default")
+		}
+		out.def = &def
+	}
+	for k, idx := range vm.Mappings {
+		// parser.ValueMap nodes are actually only Values (Constant or Field),
+		// but are typed parser.Operation so that they can be traversed.
+		if out.mappings[k], err = newValue(vm.Nodes[idx]); err != nil {
+			return nil, errors.Wrap(err, "failed translating valuemap entry")
+		}
+	}
+	return out, nil
+}
+
+type valueMapCall struct {
+	valueMap *valueMap
+	key      valueMapEntry
+	target   string
+}
+
+func (call valueMapCall) Run(ctx *Context) error {
+	key := call.key.Get(ctx)
+	entry, found := call.valueMap.mappings[key]
+	if !found {
+		if call.valueMap.def == nil {
+			return nil
+		}
+		entry = *call.valueMap.def
+	}
+	ctx.Fields.Put(call.target, entry.Get(ctx))
+	return nil
 }

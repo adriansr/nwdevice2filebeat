@@ -114,11 +114,6 @@ func Test_newPattern(t *testing.T) {
 						element{value: s(".")},
 					},
 				},
-				{
-					{
-						element{value: s(""), isCapture: false, isPayload: true},
-					},
-				},
 			},
 		},
 		{
@@ -211,6 +206,7 @@ func Test_capture(t *testing.T) {
 			}
 			ctx := Context{
 				Message: []byte(test.message),
+				Fields:  make(map[string]string),
 			}
 			err = m.Run(&ctx)
 			if !test.err {

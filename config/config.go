@@ -4,11 +4,16 @@
 
 package config
 
+import "time"
+
 type Config struct {
 	DevicePath string
 	OutputPath string
 	Opt        Optimizations
 	Fixes      Fixes
+	// For datetime handling
+	Timezone *time.Location
+
 	// These are set depending on what the output supports
 	Dissect      bool
 	StripPayload bool

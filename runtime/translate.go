@@ -79,17 +79,7 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 		return node, nil
 
 	case parser.DateTime:
-		dt := dateTime{
-			target: v.Target,
-			fields: v.Fields,
-		}
-		dt.formats = make([]string, len(v.Formats))
-		for idx, fmt := range v.Formats {
-			if dt.formats[idx], err = dateTimeFormatToGolangLayout(fmt); err != nil {
-				return nil, err
-			}
-		}
-		return dt, nil
+		return newDateTime(v, p.Config.Timezone)
 
 	case parser.ValueMapCall:
 		vm, ok := proc.valueMaps[v.MapName]

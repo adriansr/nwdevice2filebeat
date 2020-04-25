@@ -18,6 +18,28 @@ type dateTime struct {
 	target  string
 	fields  []string
 	formats []string
+	parser  func(format, value string) (time.Time, error)
+}
+
+func newDateTime(ref parser.DateTime, loc *time.Location) (dt dateTime, err error) {
+	dt = dateTime{
+		target: ref.Target,
+		fields: ref.Fields,
+	}
+	dt.formats = make([]string, len(ref.Formats))
+	for idx, fmt := range ref.Formats {
+		if dt.formats[idx], err = dateTimeFormatToGolangLayout(fmt); err != nil {
+			return dt, err
+		}
+	}
+	if loc == nil {
+		dt.parser = time.Parse
+	} else {
+		dt.parser = func(format, value string) (time.Time, error) {
+			return time.ParseInLocation(format, value, loc)
+		}
+	}
+	return dt, nil
 }
 
 func (d dateTime) Run(ctx *Context) (err error) {
@@ -30,19 +52,28 @@ func (d dateTime) Run(ctx *Context) (err error) {
 	}
 	str := strings.Join(values, " ")
 
+	if !d.tryConvert(str, ctx) {
+		return errors.Errorf("EVNTTIME failed to convert date str=%s formats=%v",
+			str, d.formats)
+	}
+
+	return nil
+}
+
+func (d dateTime) tryConvert(str string, ctx *Context) bool {
 	for _, format := range d.formats {
-		if date, err := time.Parse(format, str); err == nil {
+		if date, err := d.parser(format, str); err == nil {
 			log.Printf("EVNTTIME succeeded str=%s format=%s result=%s",
 				str, format, date.String())
 			ctx.Fields.Put(d.target, date.String())
-			return nil
+			return true
 		}
 	}
-	return errors.Errorf("EVNTTIME failed to convert date str=%s formats=%v",
-		str, d.formats)
+	return false
 }
 
 var timeSpecToGolang = map[byte]string{
+	'C': "1/2/06 3:4:5",
 	'R': "January",
 	'B': "Jan",
 	'M': "01",
@@ -51,12 +82,12 @@ var timeSpecToGolang = map[byte]string{
 	'F': "2",
 	'H': "15",
 	'I': "03",
-	'N': "15", // This is supposed to be "3" but actually seems to mean 15.
+	'N': "15", // This is supposed to be "3" (am/pm) but actually seems to mean 15 (24h). TODO: cfg flag
 	'T': "04",
 	'U': "4",
-	// 'J': ... julian day
+	'J': "__2", // julian day, this won't be correct if padded with zeroes.
 	'P': "PM",
-	// 'Q': "p.m."
+	'Q': "PM", // This is supposed to be "P.M." which golang doesn't support.
 	'S': "05",
 	'O': "5",
 	'Y': "06",

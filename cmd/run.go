@@ -26,6 +26,7 @@ func init() {
 	runCmd.PersistentFlags().String("logs", "l", "Input logs file path")
 	runCmd.PersistentFlags().String("device", "", "Input device path")
 	runCmd.PersistentFlags().String("output", "", "TODO")
+	runCmd.PersistentFlags().String("tz", "", "Timezone")
 	runCmd.PersistentFlags().StringSliceP("optimize", "O", nil, "Optimizations")
 	runCmd.PersistentFlags().StringSliceP("fix", "F", nil, "Fixes")
 	runCmd.MarkPersistentFlagRequired("device")

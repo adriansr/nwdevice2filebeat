@@ -8,10 +8,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
-	"github.com/adriansr/nwdevice2filebeat/config"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/generator/javascript"
 	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/adriansr/nwdevice2filebeat/parser"
@@ -75,6 +77,22 @@ func generateRun(cmd *cobra.Command, args []string) {
 		size, 100.0*float64(numBytes)/float64(size))
 }
 
+var timezoneFormats = []string{"-07", "-0700", "-07:00"}
+
+// Copied from beats/libbeat/processor/timestamp.go
+func loadLocation(timezone string) (*time.Location, error) {
+	for _, format := range timezoneFormats {
+		t, err := time.Parse(format, timezone)
+		if err == nil {
+			name, offset := t.Zone()
+			return time.FixedZone(name, offset), nil
+		}
+	}
+
+	// Rest of location formats
+	return time.LoadLocation(timezone)
+}
+
 func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 	if cfg.DevicePath, err = cmd.PersistentFlags().GetString("device"); err != nil {
 		return cfg, err
@@ -102,6 +120,10 @@ func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 			}
 		}
 	}
-	log.Printf("no opts\n")
+	if tzName, err := cmd.PersistentFlags().GetString("tz"); err == nil {
+		if cfg.Timezone, err = loadLocation(tzName); err != nil {
+			return cfg, errors.Wrapf(err, "unable to parse timezone: '%s'", tzName)
+		}
+	}
 	return cfg, nil
 }

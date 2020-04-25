@@ -60,11 +60,13 @@ var transforms = PostprocessGroup{
 		{"translate VALUEMAP references", convertValueMapReferences},
 		{"translate PARMVAL calls", translateParmval},
 		{"strip REGX calls", stripRegex},
+		{"strip SYSVAL calls", pruneSysval},
 		{"remove no-ops in function lists", removeNoops},
 
+		{"translate HDR calls", translateHDR},
 		// Remove unnecessary $MSG and $HDR as first argument to calls
 		{"remove special fields from some calls", removeSpecialFields},
-		{"log special field usage", checkSpecialFields},
+		//{"log special field usage", checkSpecialFields},
 
 		// Convert EVNTTIME calls
 		{"convert EVNTTIME calls", convertEventTime},
@@ -231,6 +233,42 @@ func checkFunctionsArity(parser *Parser) (err error) {
 		checkFnListArity(parser, msg.functions)
 	}
 	return errs.Err()
+}
+
+func translateHDR(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (WalkAction, Operation) {
+		switch call := node.(type) {
+		case Call:
+			switch call.Function {
+			case "HDR":
+				if len(call.Args) != 1 {
+					err = errors.Errorf("at %s: HDR/SYSVAL call has more than one argument: %v", call.Source(), call.Hashable())
+					return WalkCancel, nil
+				}
+				return WalkReplace, SetField{
+					SourceContext: call.SourceContext,
+					Target:        call.Target,
+					Value:         []Operation{call.Args[0]},
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func pruneSysval(parser *Parser) (err error) {
+	parser.WalkPostOrder(func(node Operation) (WalkAction, Operation) {
+		if match, ok := node.(Match); ok {
+			for idx, op := range match.OnSuccess {
+				if call, ok := op.(Call); ok && call.Function == "SYSVAL" {
+					match.OnSuccess[idx] = Noop{}
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
 }
 
 func removeSpecialFields(parser *Parser) (err error) {
@@ -950,9 +988,8 @@ var KnownFunctions = map[string]FunctionInfo{
 	"URL":        {MinArgs: 2, MaxArgs: 2},
 	"UTC":        {MinArgs: 3, MaxArgs: 3},
 
-	// TODO: Prune this ones
-	"HDR":     {MinArgs: 1, MaxArgs: 1 /*Stripped: true*/},
-	"SYSVAL":  {MinArgs: 1, MaxArgs: 2 /*Stripped: true*/},
+	"HDR":     {MinArgs: 1, MaxArgs: 1, Stripped: true},
+	"SYSVAL":  {MinArgs: 1, MaxArgs: 2, Stripped: true},
 	"PARMVAL": {MinArgs: 1, MaxArgs: 1, Stripped: true},
 }
 

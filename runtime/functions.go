@@ -35,6 +35,7 @@ type Argument interface {
 }
 
 type Function struct {
+	Name    string
 	Target  string
 	Args    []Argument
 	Handler FunctionImpl
@@ -43,11 +44,13 @@ type Function struct {
 func (f Function) Run(ctx *Context) (err error) {
 	args := make([]string, len(f.Args))
 	for idx, arg := range f.Args {
-		args[idx], err = arg.Get(ctx)
+		if args[idx], err = arg.Get(ctx); err != nil {
+			return errors.Wrapf(err, "fetching argument %v for %s=%s call", arg, f.Target, f.Name)
+		}
 	}
 	value, err := f.Handler(args)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "running %s='%s' on args:%v", f.Target, f.Name, args)
 	}
 	ctx.Fields[f.Target] = value
 	return nil
@@ -71,6 +74,7 @@ func newFunction(name string, target string, args []parser.Value) (Node, error) 
 		return nil, errors.Errorf("unsupported function '%s'", name)
 	}
 	f := Function{
+		Name:    name,
 		Target:  target,
 		Args:    make([]Argument, len(args)),
 		Handler: handler,

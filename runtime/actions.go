@@ -82,7 +82,14 @@ func (c *CopyField) Run(ctx *Context) error {
 	if err != nil {
 		return errors.Errorf("fetching source field '%s' doesn't exists", c.Src)
 	}
-	ctx.Fields[c.Dst] = value
+	ctx.Fields.Put(c.Dst, value)
+	return nil
+}
+
+type CopyMsg string
+
+func (c CopyMsg) Run(ctx *Context) error {
+	ctx.Fields.Put(string(c), string(ctx.Message))
 	return nil
 }
 

@@ -282,16 +282,18 @@ func (m *match) Run(ctx *Context) error {
 	} else {
 		/*THIS*/ fmt.Fprintf(os.Stderr, " ? captured zero fields\n")
 	}
+	// Not sure about references to $MSG in function calls. Should it wait to
+	// update ctx.Message after functions applied?
+	for _, act := range m.onSuccess {
+		if err := act.Run(ctx); err != nil {
+			ctx.Errors = append(ctx.Errors, err)
+		}
+	}
 	if fullCapture.payload >= 0 {
 		ctx.Message = ctx.Message[fullCapture.payload:]
 		/*THIS*/ fmt.Fprintf(os.Stderr, " + payload ='%s'\n", ctx.Message)
 	} else {
 		ctx.Message = ctx.Message[pos:]
-	}
-	for _, act := range m.onSuccess {
-		if err := act.Run(ctx); err != nil {
-			ctx.Errors = append(ctx.Errors, err)
-		}
 	}
 	return nil
 }

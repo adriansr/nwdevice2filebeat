@@ -5,6 +5,8 @@
 package runtime
 
 import (
+	"log"
+
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/pkg/errors"
 )
@@ -42,7 +44,9 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 			pattern:   pattern,
 			onSuccess: make([]Node, len(v.OnSuccess)),
 		}
+		log.Printf("match %s has %d ops:", v.ID, len(v.OnSuccess))
 		for idx, op := range v.OnSuccess {
+			log.Printf("   [%d] = %s", idx, op.Hashable())
 			if match.onSuccess[idx], err = proc.translate(op, p); err != nil {
 				return nil, errors.Wrap(err, "error translating pattern's onsuccess")
 			}
@@ -57,6 +61,17 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 				Value: val.Value(),
 			}, nil
 		case parser.Field:
+			if len(val.Name()) == 0 {
+				return nil, errors.New("empty field name in SetField")
+			}
+			if val.Name()[0] == '$' {
+				switch val.Name() {
+				case "$MSG":
+					return CopyMsg(v.Target), nil
+				default:
+					return nil, errors.Errorf("Don't know how to SetField from '%s'", val.Name)
+				}
+			}
 			return &CopyField{
 				Dst: v.Target,
 				Src: val.Name(),

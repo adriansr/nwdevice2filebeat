@@ -412,6 +412,8 @@ func findConstant(msg []byte, pos int, pattern []byte) (start, end int) {
 				break
 			}
 		}
+		for ; pos < M && msg[pos] == ' '; pos++ {
+		}
 		if k == P {
 			return start, pos
 		}

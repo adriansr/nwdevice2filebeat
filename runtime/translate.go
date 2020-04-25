@@ -49,20 +49,6 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 		}
 		return &match, nil
 
-	/* Runtime doesn't receive AllMatch because it's not breaking patterns
-	   into dissect patterns.
-	case parser.AllMatch:
-		chain := AllMatch{
-			Nodes: make([]Node, len(v.Nodes)),
-		}
-		for idx, op := range v.Processors() {
-			if chain.Nodes[idx], err = translate(op, p); err != nil {
-				return nil, err
-			}
-		}
-		//onSuccess := v.OnSuccess()
-		return &chain, nil*/
-
 	case parser.SetField:
 		switch val := v.Value[0].(type) {
 		case parser.Constant:

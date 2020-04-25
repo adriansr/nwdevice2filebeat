@@ -188,10 +188,28 @@ func Test_capture(t *testing.T) {
 			pattern: P{F("leading"), C("hello "), F("f1"), C("! "), Y("")},
 			message: "Well, hello neighbour ! How are you",
 			expected: Context{
-				Message: s(" How are you"),
+				Message: s("How are you"),
 				Fields: Fields{
 					"leading": "Well,",
 					"f1":      "neighbour",
+				},
+			},
+		},
+		{
+			//-> run "<month> <day> <year> <hhour>:<hmin>:<hsec> <hostip>: %ASA-<level>-<messageid>:"
+			// > msg ='Jan  1 01:00:27 beats asa[1234]: %ASA-7-999999: This message is not filtered.'
+			title:   "alien",
+			pattern: P{F("month"), C(" "), F("day"), C(" "), F("year"), C(" "), F("hhour"), C(":"), F("hmin"), C(":"), F("hsec"), C(" ")},
+			message: "Jan  1 2017 01:00:27 beats asa[1234]: %ASA-7-999999: This message is not filtered.",
+			expected: Context{
+				Message: s("beats asa[1234]: %ASA-7-999999: This message is not filtered."),
+				Fields: Fields{
+					"month": "Jan",
+					"day":   "1",
+					"year":  "2017",
+					"hhour": "01",
+					"hmin":  "00",
+					"hsec":  "27",
 				},
 			},
 		},

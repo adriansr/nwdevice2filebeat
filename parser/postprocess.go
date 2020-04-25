@@ -69,7 +69,8 @@ var transforms = PostprocessGroup{
 		//{"log special field usage", checkSpecialFields},
 
 		// Convert EVNTTIME calls
-		{"convert EVNTTIME calls", convertEventTime},
+		{"convert EVNTTIME and DUR calls", convertEventTime},
+
 		// TODO:
 		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
 
@@ -379,10 +380,10 @@ func removeNoops(parser *Parser) error {
 
 func convertEventTime(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
-		if call, ok := node.(Call); ok && call.Function == "EVNTTIME" {
+		if call, ok := node.(Call); ok && call.Function == "EVNTTIME" || call.Function == "DUR" {
 			numArgs := len(call.Args)
 			if numArgs < 2 {
-				err = errors.Errorf("at %s: EVNTTIME call has too little arguments: %d", call.Source(), numArgs)
+				err = errors.Errorf("at %s: %s call has too little arguments: %d", call.Source(), call.Function, numArgs)
 				return WalkCancel, nil
 			}
 			var numFormats int
@@ -392,10 +393,10 @@ func convertEventTime(p *Parser) (err error) {
 				}
 			}
 			if numFormats == 0 {
-				err = errors.Errorf("at %s: EVNTTIME call format is not a constant: %s", call.Source(), call.Args[0])
+				err = errors.Errorf("at %s: %s call format is not a constant: %s", call.Source(), call.Function, call.Args[0])
 				return WalkCancel, nil
 			} else if numFormats == numArgs {
-				err = errors.Errorf("at %s: EVNTTIME has no fields", call.Source())
+				err = errors.Errorf("at %s: %s has no fields", call.Source(), call.Function)
 				return WalkCancel, nil
 			}
 
@@ -404,11 +405,73 @@ func convertEventTime(p *Parser) (err error) {
 				if field, ok := arg.(Field); ok {
 					fields[idx] = field.Name()
 				} else {
-					err = errors.Errorf("at %s: EVNTTIME call argument %d is not a field", call.Source(), idx+numFormats)
+					err = errors.Errorf("at %s: %s call argument %d is not a field", call.Source(), call.Function, idx+numFormats)
 					return WalkCancel, nil
 				}
 			}
 			repl := DateTime{
+				SourceContext: call.SourceContext,
+				Target:        call.Target,
+				Fields:        fields,
+			}
+			repl.Formats = make([][]DateTimeItem, numFormats)
+			for idx, value := range call.Args[:numFormats] {
+				ct, _ := value.(Constant)
+				fmt, err := parseDateTimeFormat(ct.Value())
+				if err != nil {
+					err = errors.Wrapf(err, "at %s: failed to parse %s format '%s'", call.Source(), call.Function, ct.Value())
+					return WalkCancel, nil
+				}
+				repl.Formats[idx] = fmt
+			}
+
+			var result Operation = repl
+			if call.Function == "DUR" {
+				result = Duration(repl)
+			}
+			return WalkReplace, result
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func convertDuration(p *Parser) (err error) {
+	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok && call.Function == "DUR" {
+			numArgs := len(call.Args)
+			if numArgs < 2 {
+				err = errors.Errorf("at %s: DUR call has too little arguments: %d", call.Source(), numArgs)
+				return WalkCancel, nil
+			}
+			var numFormats int
+			for numFormats = range call.Args {
+				if _, ok := call.Args[numFormats].(Constant); !ok {
+					break
+				}
+			}
+			if numFormats != 1 {
+				err = errors.Errorf("at %s: DUR call format is not a constant: %s", call.Source(), call.Args[0])
+				return WalkCancel, nil
+			}
+			if numFormats == 0 {
+				err = errors.Errorf("at %s: DUR call format is not a constant: %s", call.Source(), call.Args[0])
+				return WalkCancel, nil
+			} else if numFormats == numArgs {
+				err = errors.Errorf("at %s: DUR has no fields", call.Source())
+				return WalkCancel, nil
+			}
+
+			fields := make([]string, numArgs-numFormats)
+			for idx, arg := range call.Args[numFormats:] {
+				if field, ok := arg.(Field); ok {
+					fields[idx] = field.Name()
+				} else {
+					err = errors.Errorf("at %s: DUR call argument %d is not a field", call.Source(), idx+numFormats)
+					return WalkCancel, nil
+				}
+			}
+			repl := Duration{
 				SourceContext: call.SourceContext,
 				Target:        call.Target,
 				Fields:        fields,

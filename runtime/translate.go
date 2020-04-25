@@ -96,6 +96,9 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 	case parser.DateTime:
 		return newDateTime(v, p.Config.Timezone)
 
+	case parser.Duration:
+		return newDuration(v)
+
 	case parser.ValueMapCall:
 		vm, ok := proc.valueMaps[v.MapName]
 		if !ok {

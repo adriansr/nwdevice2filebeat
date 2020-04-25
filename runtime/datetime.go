@@ -6,6 +6,7 @@ package runtime
 
 import (
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -42,16 +43,22 @@ func newDateTime(ref parser.DateTime, loc *time.Location) (dt dateTime, err erro
 	return dt, nil
 }
 
-func (d dateTime) Run(ctx *Context) (err error) {
-	values := make([]string, len(d.fields))
-	for idx, fld := range d.fields {
+func loadValues(fields []string, ctx *Context) (value string, err error) {
+	values := make([]string, len(fields))
+	for idx, fld := range fields {
 		values[idx], err = ctx.Fields.Get(fld)
 		if err != nil {
-			return errors.Errorf("field '%s' missing for date conversion", fld)
+			return "", errors.Errorf("source field '%s' missing", fld)
 		}
 	}
-	str := strings.Join(values, " ")
+	return strings.Join(values, " "), nil
+}
 
+func (d dateTime) Run(ctx *Context) (err error) {
+	str, err := loadValues(d.fields, ctx)
+	if err != nil {
+		return errors.Wrap(err, "cannot apply EVNTTIME")
+	}
 	if !d.tryConvert(str, ctx) {
 		return errors.Errorf("EVNTTIME failed to convert date str=%s formats=%v",
 			str, d.formats)
@@ -93,7 +100,7 @@ var timeSpecToGolang = map[byte]string{
 	'Y': "06",
 	'W': "2006",
 	'Z': "15:04:05",
-	// 'A': ... number of days from the event time
+	// 'A': ... number of days from the event time (for DUR, not EVNTTIME)
 	// 'X': ... UNIX timestamp
 }
 
@@ -117,4 +124,98 @@ func dateTimeFormatToGolangLayout(input []parser.DateTimeItem) (layout string, e
 		}
 	}
 	return string(gen), nil
+}
+
+var timeSpecToDuration = map[byte]time.Duration{
+	// Only these 3 patterns seen in the wild:
+	// '%A%N%T%O'
+	// '%N%U%O'
+	// '%N:%U:%O'
+	'M': time.Hour * 24 * 30,
+	'G': time.Hour * 24 * 30,
+	'D': time.Hour * 24,
+	'F': time.Hour,
+	'H': time.Hour,
+	'I': time.Hour,
+	'N': time.Hour,
+	'T': time.Minute,
+	'U': time.Minute,
+	'J': time.Hour * 24,
+	'S': time.Second,
+	'O': time.Second,
+	'A': time.Hour * 24,
+}
+
+type duration struct {
+	target  string
+	fields  []string
+	formats [][]byte
+}
+
+func newDuration(ref parser.Duration) (dur duration, err error) {
+	dur = duration{
+		target: ref.Target,
+		fields: ref.Fields,
+	}
+	dur.formats = make([][]byte, len(ref.Formats))
+	for idx, fmt := range ref.Formats {
+		for _, item := range fmt {
+			if item.Spec() != parser.DateTimeConstant {
+				dur.formats[idx] = append(dur.formats[idx], item.Spec())
+			}
+		}
+	}
+	return dur, nil
+}
+
+type intScanner struct {
+	str string
+	pos int
+}
+
+func (i *intScanner) next() (value int64, ok bool) {
+	n := len(i.str)
+	for ; i.pos < n && i.str[i.pos] < '0' || i.str[i.pos] > '9'; i.pos++ {
+	}
+	if i.pos == n {
+		return 0, false
+	}
+	value = int64(i.str[i.pos] - '0')
+	for i.pos++; i.pos < n && i.str[i.pos] >= '0' && i.str[i.pos] <= '9'; i.pos++ {
+		value = value*10 + int64(i.str[i.pos]-'0')
+	}
+	return value, true
+}
+
+func (d duration) Run(ctx *Context) (err error) {
+	var scanner intScanner
+	scanner.str, err = loadValues(d.fields, ctx)
+	if err != nil {
+		return errors.Wrap(err, "cannot apply DUR")
+	}
+	var seconds int64
+	log.Printf("XXX DUR: <<%s>> for <<%s>>", scanner.str, d.formats[0])
+	for _, fmt := range d.formats {
+		seconds = 0
+		for _, chr := range fmt {
+			multiplier, found := timeSpecToDuration[chr]
+			if !found {
+				err = errors.Errorf("format specified %%%c not understood in DUR", chr)
+				continue
+			}
+			value, ok := scanner.next()
+			if !ok {
+				err = errors.Errorf("not enough fields for DUR")
+				continue
+			}
+			// Don't have subsecond precision
+			seconds += int64((multiplier * time.Duration(value)).Seconds())
+		}
+	}
+	log.Printf("XXX DUR: seconds=%d err=%v", seconds, err)
+	if err != nil {
+		return err
+	}
+	ctx.Fields.Put(d.target, strconv.FormatInt(seconds, 10))
+	return nil
 }

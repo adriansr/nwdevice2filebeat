@@ -45,8 +45,13 @@ func (DateTime) Children() []Operation {
 }
 
 func (v DateTime) Hashable() string {
+	return v.namesHashable("DateTime")
+}
+
+func (v DateTime) namesHashable(name string) string {
 	var sb strings.Builder
-	sb.WriteString("DateTime{Target:")
+	sb.WriteString(name)
+	sb.WriteString("{Target:")
 	sb.WriteString(v.Target)
 	sb.WriteString(",Fields:")
 	sb.WriteString(strings.Join(v.Fields, ","))
@@ -134,4 +139,15 @@ func parseDateTimeFormat(fmt string) (out []DateTimeItem, err error) {
 		out = append(out, Constant(ct))
 	}
 	return out, nil
+}
+
+// This uses more or less the same format as EVNTTIME but represents a duration.
+type Duration DateTime
+
+func (Duration) Children() []Operation {
+	return nil
+}
+
+func (v Duration) Hashable() string {
+	return DateTime(v).namesHashable("Duration")
 }

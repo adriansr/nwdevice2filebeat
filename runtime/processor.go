@@ -6,6 +6,7 @@ package runtime
 
 import (
 	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
@@ -43,13 +44,13 @@ func New(parser *parser.Parser) (p *Processor, err error) {
 	return p, err
 }
 
-func (p *Processor) Process(msg []byte) (Fields, error) {
+func (p *Processor) Process(msg []byte) (fields Fields, errs multierror.Errors) {
 	ctx := Context{
 		Message: msg,
 		Fields:  make(Fields),
 	}
 	if err := p.Root.Run(&ctx); err != nil {
-		return nil, err
+		return nil, append(errs, err)
 	}
-	return ctx.Fields, nil
+	return ctx.Fields, ctx.Errors
 }

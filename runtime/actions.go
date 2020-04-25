@@ -9,12 +9,14 @@ import (
 	"os"
 
 	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
 type Context struct {
 	Message []byte
 	Fields  Fields
+	Errors  multierror.Errors
 }
 
 type Node interface {
@@ -28,10 +30,9 @@ type Chain struct {
 func (c *Chain) Run(ctx *Context) error {
 	for _, sub := range c.Nodes {
 		if err := sub.Run(ctx); err != nil {
-			//return err
+			ctx.Errors = append(ctx.Errors, err)
 		}
 	}
-	// TODO
 	return nil
 }
 
@@ -79,7 +80,7 @@ type CopyField struct {
 func (c *CopyField) Run(ctx *Context) error {
 	value, err := ctx.Fields.Get(c.Src)
 	if err != nil {
-		return err
+		return errors.Errorf("fetching source field '%s' doesn't exists", c.Src)
 	}
 	ctx.Fields[c.Dst] = value
 	return nil
@@ -97,16 +98,17 @@ func (r RemoveFields) Run(ctx *Context) error {
 type MapSelect map[string]Node
 
 var ErrMessageIDNotFound = errors.New("messageid not found")
+var ErrMessageIDNotMapped = errors.New("no mapping for messageid")
 
 func (m MapSelect) Run(ctx *Context) error {
 	mID, err := ctx.Fields.Get("messageid")
 	if err != nil {
-		return err
+		return ErrMessageIDNotFound
 	}
 	if next, found := m[mID]; found {
 		return next.Run(ctx)
 	}
-	return ErrMessageIDNotFound
+	return ErrMessageIDNotMapped
 }
 
 type valueMapEntry interface {

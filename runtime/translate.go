@@ -93,8 +93,17 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 		return node, nil
 
 	case parser.DateTime:
-		// TODO
-		return DateTime{}, nil
+		dt := dateTime{
+			target: v.Target,
+			fields: v.Fields,
+		}
+		dt.formats = make([]string, len(v.Formats))
+		for idx, fmt := range v.Formats {
+			if dt.formats[idx], err = dateTimeFormatToGolangLayout(fmt); err != nil {
+				return nil, err
+			}
+		}
+		return dt, nil
 
 	case parser.ValueMapCall:
 		vm, ok := proc.valueMaps[v.MapName]

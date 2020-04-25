@@ -288,6 +288,11 @@ func (m *match) Run(ctx *Context) error {
 	} else {
 		ctx.Message = ctx.Message[pos:]
 	}
+	for _, act := range m.onSuccess {
+		if err := act.Run(ctx); err != nil {
+			ctx.Errors = append(ctx.Errors, err)
+		}
+	}
 	return nil
 }
 

@@ -71,15 +71,18 @@ func doRun(cmd *cobra.Command, args []string) {
 	var count int
 	for count = 1; scanner.Scan(); count++ {
 		line := scanner.Bytes()
-		fields, err := rt.Process(line)
-		if err != nil {
-			LogError("Error processing logs", "line", count, "reason", err, "message", string(line))
-			break
-		}
+		fields, errs := rt.Process(line)
 		log.Printf("Processed message <<%s>>", line)
 		log.Printf("Got %d fields:", len(fields))
 		for k, v := range fields {
 			log.Printf("  '%s': '%s'", k, v)
+		}
+		if len(errs) > 0 {
+			log.Printf("Got %d errors:", len(errs))
+			for idx, err := range errs {
+				log.Printf("  err[%d] = %v", idx, err)
+			}
+
 		}
 	}
 	took := time.Now().Sub(start)

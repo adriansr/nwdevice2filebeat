@@ -17,17 +17,18 @@ var knownFunctions = map[string]FunctionImpl{
 	"CALC":       calc,
 	"CNVTDOMAIN": notimpl,
 	"DIRCHK":     notimpl,
-	"DUR":        notimpl,
-	"EVNTTIME":   notimpl,
 	"RMQ":        notimpl,
 	"STRCAT":     strcat,
 	"URL":        notimpl,
 	"UTC":        notimpl,
 
-	// TODO: Prune this ones
-	"HDR":     noop,
-	"SYSVAL":  noop,
-	"PARMVAL": noop,
+	// These functions must already be pruned or translated, and observing
+	// them in the context of a call is an error.
+	//"DUR":      forbidden,
+	//"EVNTTIME": forbidden,
+	//"HDR":      forbidden,
+	//"SYSVAL":   forbidden,
+	//"PARMVAL":  forbidden,
 }
 
 type Argument interface {

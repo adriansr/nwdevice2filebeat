@@ -5,9 +5,11 @@
 package runtime
 
 import (
-	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
 var ErrFieldNotFound = errors.New("field not found")
@@ -31,7 +33,7 @@ func (f Fields) Put(name, value string) {
 	f[name] = value
 }
 
-func New(parser *parser.Parser) (p *Processor, err error) {
+func New(parser *parser.Parser, warnings *util.Warnings) (p *Processor, err error) {
 	p = &Processor{
 		valueMaps: make(map[string]*valueMap, len(parser.ValueMapsByName)),
 	}

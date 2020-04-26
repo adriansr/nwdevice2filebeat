@@ -5,8 +5,6 @@
 package runtime
 
 import (
-	"log"
-
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/pkg/errors"
 )
@@ -44,9 +42,9 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 			pattern:   pattern,
 			onSuccess: make([]Node, len(v.OnSuccess)),
 		}
-		log.Printf("match %s has %d ops:", v.ID, len(v.OnSuccess))
+		// TODO logging log.Printf("match %s has %d ops:", v.ID, len(v.OnSuccess))
 		for idx, op := range v.OnSuccess {
-			log.Printf("   [%d] = %s", idx, op.Hashable())
+			// TODO logging log.Printf("   [%d] = %s", idx, op.Hashable())
 			if match.onSuccess[idx], err = proc.translate(op, p); err != nil {
 				return nil, errors.Wrap(err, "error translating pattern's onsuccess")
 			}

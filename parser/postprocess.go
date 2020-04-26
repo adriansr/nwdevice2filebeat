@@ -10,9 +10,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
 type Action struct {
@@ -64,9 +65,9 @@ var transforms = PostprocessGroup{
 		{"remove no-ops in function lists", removeNoops},
 
 		{"translate HDR calls", translateHDR},
+
 		// Remove unnecessary $MSG and $HDR as first argument to calls
 		{"remove special fields from some calls", removeSpecialFields},
-		//{"log special field usage", checkSpecialFields},
 
 		// Convert EVNTTIME calls
 		{"convert EVNTTIME and DUR calls", convertEventTime},
@@ -287,20 +288,6 @@ func removeSpecialFields(parser *Parser) (err error) {
 	})
 	return err
 }
-func checkSpecialFields(parser *Parser) (err error) {
-	parser.Walk(func(node Operation) (WalkAction, Operation) {
-		switch call := node.(type) {
-		case Call:
-			for pos, arg := range call.Args {
-				if fld, ok := arg.(Field); ok && len(fld.Name()) > 0 && fld.Name()[0] == '$' {
-					log.Printf("INFO at %s: special field %s at position %d in call %s\n", call.Source(), fld.Name(), pos, call.String())
-				}
-			}
-		}
-		return WalkContinue, nil
-	})
-	return err
-}
 
 func convertValueMapReferences(parser *Parser) error {
 	var errs multierror.Errors
@@ -348,9 +335,6 @@ func stripRegex(parser *Parser) error {
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if call, ok := node.(Call); ok {
 			if _, found := parser.RegexsByName[call.Function]; found {
-				log.Printf("INFO - at %s: Stripping call to REGX %s (unsupported feature)",
-					call.Source(),
-					call.Function)
 				return WalkReplace, Noop{}
 			}
 		}
@@ -582,7 +566,7 @@ func splitDissect(p *Parser) (err error) {
 	return err
 }
 
-func injectSpaceBetweenConsecutiveCaptures(pattern Pattern, loc model.XMLPos) Pattern {
+func injectSpaceBetweenConsecutiveCaptures(pattern Pattern, loc util.XMLPos, warnings *util.Warnings) Pattern {
 	var changed bool
 	var fixes []int
 	var lastCapture Value
@@ -594,15 +578,15 @@ func injectSpaceBetweenConsecutiveCaptures(pattern Pattern, loc model.XMLPos) Pa
 				// a space in between.
 				// TODO: Revisit decision and check rsa2elk
 				fixes = append(fixes, idx)
-				log.Printf("INFO at %s: pattern has two consecutive captures: %s and %s (injected space)",
-					loc, lastCapture, v)
+				warnings.Addf(loc, "consecutive captures in pattern: %s and %s (injected space)",
+					lastCapture, v)
 			}
 			lastCapture = op
 		case Payload:
 			lastCapture = op
 		case Alternatives:
 			for altID, alt := range v {
-				if newP := injectSpaceBetweenConsecutiveCaptures(alt, loc); newP != nil {
+				if newP := injectSpaceBetweenConsecutiveCaptures(alt, loc, warnings); newP != nil {
 					v[altID] = newP
 					changed = true
 				}
@@ -631,7 +615,7 @@ func injectSpaceBetweenConsecutiveCaptures(pattern Pattern, loc model.XMLPos) Pa
 func fixDissectCaptures(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok {
-			if newP := injectSpaceBetweenConsecutiveCaptures(match.Pattern, match.Source()); newP != nil {
+			if newP := injectSpaceBetweenConsecutiveCaptures(match.Pattern, match.Source(), p.warnings); newP != nil {
 				match.Pattern = newP
 				return WalkReplace, match
 			}

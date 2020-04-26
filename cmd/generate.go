@@ -17,6 +17,7 @@ import (
 	"github.com/adriansr/nwdevice2filebeat/generator/javascript"
 	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
 var generateCmd = &cobra.Command{
@@ -42,17 +43,26 @@ func generateRun(cmd *cobra.Command, args []string) {
 	cfg.Dissect = true
 	cfg.StripPayload = true
 
-	dev, err := model.NewDevice(cfg.DevicePath)
+	warnings := util.NewWarnings(20)
+	dev, err := model.NewDevice(cfg.DevicePath, warnings)
 	if err != nil {
 		LogError("Failed to load device", "path", cfg.DevicePath, "reason", err)
 		return
 	}
-	log.Printf("Loaded XML %s", dev.String())
-	p, err := parser.New(dev, cfg)
+	if !warnings.Print("loading device XML") {
+		log.Printf("Loaded XML %s", dev.String())
+	}
+
+	warnings.Clear()
+	p, err := parser.New(dev, cfg, warnings)
 	if err != nil {
 		LogError("Failed to parse device", "path", cfg.DevicePath, "reason", err)
 		return
 	}
+
+	warnings.Print("parsing device")
+	warnings.Clear()
+
 	writer := ioutil.Discard
 	if outfile := cfg.OutputPath; outfile != "" {
 		outf, err := os.Create(outfile)

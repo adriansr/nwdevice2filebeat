@@ -9,14 +9,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/adriansr/nwdevice2filebeat/model"
+	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
 type Tree struct {
 	Root Operation
 }
 
-type SourceContext model.XMLPos
+type SourceContext util.XMLPos
 
 type WithSourceContext interface {
 	Source() SourceContext
@@ -27,8 +27,8 @@ type Operation interface {
 	Children() []Operation
 }
 
-func (b SourceContext) Source() model.XMLPos {
-	return model.XMLPos(b)
+func (b SourceContext) Source() util.XMLPos {
+	return util.XMLPos(b)
 }
 
 type Chain struct {

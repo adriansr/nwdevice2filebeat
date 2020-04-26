@@ -10,10 +10,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/runtime"
-	"github.com/spf13/cobra"
+	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
 var runCmd = &cobra.Command{
@@ -51,18 +53,27 @@ func doRun(cmd *cobra.Command, args []string) {
 	}
 	defer inputFile.Close()
 
-	dev, err := model.NewDevice(cfg.DevicePath)
+	warnings := util.NewWarnings(20)
+	dev, err := model.NewDevice(cfg.DevicePath, warnings)
 	if err != nil {
 		LogError("Failed to load device", "path", cfg.DevicePath, "reason", err)
 		return
 	}
-	log.Printf("Loaded XML %s", dev.String())
-	p, err := parser.New(dev, cfg)
+
+	if !warnings.Print("loading XML device") {
+		log.Printf("Loaded XML %s", dev.String())
+	}
+	warnings.Clear()
+
+	p, err := parser.New(dev, cfg, warnings)
 	if err != nil {
 		LogError("Failed to parse device", "path", cfg.DevicePath, "reason", err)
 		return
 	}
-	rt, err := runtime.New(&p)
+	warnings.Print("parsing device")
+	warnings.Clear()
+
+	rt, err := runtime.New(&p, warnings)
 	if err != nil {
 		LogError("Failed to load runtime", "reason", err)
 		return

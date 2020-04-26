@@ -34,7 +34,7 @@ type Device struct {
 }
 
 // New turns a new Device from the given directory path.
-func NewDevice(path string) (Device, error) {
+func NewDevice(path string, _ *util.Warnings) (Device, error) {
 	files, err := listFilesByExtensions(path)
 	if err != nil {
 		return Device{}, err
@@ -96,7 +96,7 @@ func (dev *Device) load() error {
 	decoder.CharsetReader = charset.NewReaderLabel
 
 	state := xmlStateProcInst
-	pos := XMLPos{
+	pos := util.XMLPos{
 		Path: dev.XMLPath,
 	}
 
@@ -148,19 +148,6 @@ func listFilesByExtensions(dir string) (filesByExt map[string][]string, err erro
 	})
 }
 
-type XMLPos struct {
-	Path string
-	Line uint64
-	Col  uint64
-}
-
-func (p XMLPos) String() string {
-	if len(p.Path) != 0 {
-		return fmt.Sprintf("%s:%d:%d", p.Path, p.Line, p.Col)
-	}
-	return "(unknown)"
-}
-
 type stateFn func(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error)
 
 func name(n string) xml.Name {
@@ -195,22 +182,22 @@ var xmlStates = map[xmlState]stateFn{
 
 type XMLElement interface {
 	XMLDecodingError() error
-	Pos() XMLPos
-	SetPos(XMLPos)
+	Pos() util.XMLPos
+	SetPos(util.XMLPos)
 	Apply(*Device) error
 }
 
 type XMLBaseElement struct {
-	location    XMLPos
+	location    util.XMLPos
 	UnknownAttr []xml.Attr `xml:",any,attr"`
 	UnknownXML  []byte     `xml:",innerxml"`
 }
 
-func (e *XMLBaseElement) Pos() XMLPos {
+func (e *XMLBaseElement) Pos() util.XMLPos {
 	return e.location
 }
 
-func (e *XMLBaseElement) SetPos(p XMLPos) {
+func (e *XMLBaseElement) SetPos(p util.XMLPos) {
 	e.location = p
 }
 
@@ -294,7 +281,7 @@ func (v *Version) String() string {
 }
 
 func (v *Version) Apply(dev *Device) error {
-	var unset XMLPos
+	var unset util.XMLPos
 	if dev.Version.Pos() != unset {
 		return errors.Errorf("VERSION already set from %s", dev.Version.Pos())
 	}
@@ -480,11 +467,9 @@ func stateProcInst(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState,
 		return nil, xmlStateErr, errors.Errorf("found unexpected XML end element while scanning for XML header: %s", v.Name)
 
 	case xml.CharData, xml.Comment, xml.Directive: // ignore
-		//log.Printf("ignore element %v", token)
 		return nil, xmlStateProcInst, nil
 
 	case xml.ProcInst:
-		//log.Printf("ProcInst target=%s data=%s", v.Target, v.Inst)
 		return nil, xmlStateDeviceMessages, nil
 
 	default:

@@ -6,12 +6,13 @@ package parser
 
 import (
 	"fmt"
-	"log"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/model"
-	"github.com/pkg/errors"
+	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
 type Parser struct {
@@ -25,34 +26,37 @@ type Parser struct {
 	ValueMapsByName map[string]*ValueMap
 	RegexsByName    map[string]*Regex
 	Root            Operation
+
+	warnings *util.Warnings
 }
 
-func New(dev model.Device, cfg config.Config) (p Parser, err error) {
+func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser, err error) {
+	p.warnings = warnings
 	p.Config = cfg
 	if len(dev.TagValMaps) > 0 {
 		return p, errors.Errorf("TAGVALMAP is not implemented (at %s)", dev.TagValMaps[0].Pos())
 	}
 
 	if len(dev.Regexs) > 0 {
-		log.Printf("WARN - at %s: Device uses unsupported REGX transform: will be ignored.", dev.Regexs[0].Pos())
+		p.warnings.Add(dev.Regexs[0].Pos(), "unsupported REGX transform: will be ignored.")
 	}
 	if len(dev.SumDatas) > 0 {
-		log.Printf("WARN - at %s: Device uses unsupported SUMDATA transform: will be ignored.", dev.SumDatas[0].Pos())
+		p.warnings.Add(dev.SumDatas[0].Pos(), "unsupported SUMDATA transform: will be ignored.")
 	}
 	if len(dev.VarTypes) > 0 {
-		log.Printf("WARN - at %s: Device uses unsupported VARTYPE transform: will be ignored.", dev.VarTypes[0].Pos())
+		p.warnings.Add(dev.VarTypes[0].Pos(), "unsupported VARTYPE transform: will be ignored.")
 	}
 
-	if p.ValueMaps, p.ValueMapsByName, err = processValueMaps(dev.ValueMaps); err != nil {
+	if p.ValueMaps, p.ValueMapsByName, err = p.processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
 	}
-	if p.Regexs, p.RegexsByName, err = processRegexs(dev.Regexs); err != nil {
+	if p.Regexs, p.RegexsByName, err = p.processRegexs(dev.Regexs); err != nil {
 		return p, err
 	}
-	if p.Headers, err = processHeaders(dev.Headers); err != nil {
+	if p.Headers, err = p.processHeaders(dev.Headers); err != nil {
 		return p, err
 	}
-	if p.Messages, err = processMessages(dev.Messages); err != nil {
+	if p.Messages, err = p.processMessages(dev.Messages); err != nil {
 		return p, err
 	}
 	if err = p.Apply(prechecks); err != nil {
@@ -148,7 +152,6 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 		Map: make(map[string]int, len(byID2)),
 	}
 	counter := 0
-	//for k, list := range byID2 {
 	for _, k := range keysInOrder {
 		list := byID2[k]
 		var elem Operation
@@ -166,11 +169,11 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 	return msgIdSelect, nil
 }
 
-func processValueMaps(input []*model.ValueMap) (output []ValueMap, byName map[string]*ValueMap, err error) {
+func (p *Parser) processValueMaps(input []*model.ValueMap) (output []ValueMap, byName map[string]*ValueMap, err error) {
 	byName = make(map[string]*ValueMap, len(input))
 	output = make([]ValueMap, len(input))
 	for idx, xml := range input {
-		vm, err := newValueMap(xml)
+		vm, err := p.newValueMap(xml)
 		if err != nil {
 			return output, byName, errors.Wrapf(err, "error parsing VALUEMAP at %s", xml.Pos())
 		}
@@ -183,7 +186,7 @@ func processValueMaps(input []*model.ValueMap) (output []ValueMap, byName map[st
 	return output, byName, nil
 }
 
-func processRegexs(input []*model.RegX) (output []Regex, byName map[string]*Regex, err error) {
+func (p *Parser) processRegexs(input []*model.RegX) (output []Regex, byName map[string]*Regex, err error) {
 	byName = make(map[string]*Regex, len(input))
 	output = make([]Regex, len(input))
 	for idx, xml := range input {
@@ -200,7 +203,7 @@ func processRegexs(input []*model.RegX) (output []Regex, byName map[string]*Rege
 	return output, byName, nil
 }
 
-func processHeaders(input []*model.Header) (output []header, err error) {
+func (p *Parser) processHeaders(input []*model.Header) (output []header, err error) {
 	output = make([]header, len(input))
 	for idx, xml := range input {
 		vm, err := newHeader(xml)
@@ -212,7 +215,7 @@ func processHeaders(input []*model.Header) (output []header, err error) {
 	return output, nil
 }
 
-func processMessages(input []*model.Message) (output []message, err error) {
+func (p *Parser) processMessages(input []*model.Message) (output []message, err error) {
 	output = make([]message, len(input))
 	for idx, xml := range input {
 		vm, err := newMessage(xml)
@@ -230,7 +233,7 @@ var valueMapNullValues = map[string]bool{
 	"$NULL": true,
 }
 
-func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
+func (p *Parser) newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 	vm.SourceContext = SourceContext(xml.Pos())
 	if !valueMapNullValues[xml.Default] {
 		v, err := newValue(xml.Default, false)
@@ -246,12 +249,9 @@ func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 	for _, pair := range kvpairs {
 		kv := strings.Split(pair, "=")
 		if len(kv) != 2 {
-			// TODO: Warnings
-			//
 			// Ignoring this as only happens once (barracudasf).
-			log.Printf("WARN: parsing HEADER at %s: bad entry in keyvaluepair: '%s'", xml.Pos(), pair)
+			p.warnings.Addf(xml.Pos(), "bad entry in VALUEMAP keyvaluepair: '%s'", pair)
 			continue
-			//return vm, errors.New("failed parsing keyvaluepairs")
 		}
 		value, err := newValue(kv[1], true)
 		if err != nil {
@@ -260,12 +260,12 @@ func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 		if prevIdx, found := vm.Mappings[kv[0]]; found {
 			prev := vm.Nodes[prevIdx]
 			if prev == value {
-				log.Printf("WARN: parsing VALUEMAP at %s: duplicated keyvaluepair entry: '%s'", xml.Pos(), pair)
+				p.warnings.Addf(xml.Pos(), "duplicate entry in VALUEMAP: '%s'", pair)
 				continue
 			}
-			// TODO:
-			// What to do here. It happens only once (ibmracf)
-			log.Printf("WARN: parsing VALUEMAP at %s: found duplicated key '%s' with differing value old:%s new:%s", xml.Pos(), kv[0], prev, value)
+			// It happens only once (ibmracf). Overwrite duplicates.
+			p.warnings.Addf(xml.Pos(), "duplicated VALUEMAP entry '%s' with differing value old:'%s' new:'%s'",
+				kv[0], prev, value)
 			vm.Nodes[prevIdx] = value
 		} else {
 			vm.Nodes = append(vm.Nodes, value)
@@ -276,7 +276,7 @@ func newValueMap(xml *model.ValueMap) (vm ValueMap, err error) {
 }
 
 type header struct {
-	pos       model.XMLPos
+	pos       util.XMLPos
 	id2       string
 	messageID Operation
 	functions []Operation
@@ -322,7 +322,7 @@ func newHeader(xml *model.Header) (h header, err error) {
 }
 
 type message struct {
-	pos           model.XMLPos
+	pos           util.XMLPos
 	id1           string
 	id2           string
 	eventcategory string
@@ -336,7 +336,7 @@ func (m message) String() string {
 }
 
 func newMessage(xml *model.Message) (m message, err error) {
-	// This appears in all the messages.
+	// These appear in all the messages.
 	if xml.ID1 == "" {
 		return m, errors.Errorf("empty ID1 attribute")
 	}
@@ -346,9 +346,7 @@ func newMessage(xml *model.Message) (m message, err error) {
 	if xml.Content == "" {
 		return m, errors.New("empty content attribute")
 	}
-	//if xml.Functions == "" {
-	//	return m, errors.Errorf("no functions in MESSAGE at %s", xml.Pos())
-	//}
+
 	m = message{
 		pos:           xml.Pos(),
 		id1:           xml.ID1,
@@ -362,7 +360,6 @@ func newMessage(xml *model.Message) (m message, err error) {
 	if m.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
 		return m, errors.Wrap(err, "error parsing functions")
 	}
-	//log.Printf("XXX at %s: got %+v", xml.Pos(), m)
 	return m, err
 }
 

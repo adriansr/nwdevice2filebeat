@@ -144,6 +144,7 @@ var timeSpecToDuration = map[byte]time.Duration{
 	'S': time.Second,
 	'O': time.Second,
 	'A': time.Hour * 24,
+	// Z
 }
 
 type duration struct {
@@ -161,9 +162,17 @@ func newDuration(ref parser.Duration) (dur duration, err error) {
 	for idx, fmt := range ref.Formats {
 		for _, item := range fmt {
 			if item.Spec() != parser.DateTimeConstant {
-				dur.formats[idx] = append(dur.formats[idx], item.Spec())
+				if item.Spec() != 'Z' {
+					dur.formats[idx] = append(dur.formats[idx], item.Spec())
+				} else {
+					// Treat 'Z' as 'HTS' to simplify parsing.
+					dur.formats[idx] = append(dur.formats[idx], []byte("HTS")...)
+				}
 			}
 		}
+	}
+	if len(dur.formats) == 0 {
+		return dur, errors.Errorf("at %s: no formats specified for DUR", ref.Source())
 	}
 	return dur, nil
 }
@@ -194,7 +203,6 @@ func (d duration) Run(ctx *Context) (err error) {
 		return errors.Wrap(err, "cannot apply DUR")
 	}
 	var seconds int64
-	log.Printf("XXX DUR: <<%s>> for <<%s>>", scanner.str, d.formats[0])
 	for _, fmt := range d.formats {
 		seconds = 0
 		for _, chr := range fmt {
@@ -212,7 +220,6 @@ func (d duration) Run(ctx *Context) (err error) {
 			seconds += int64((multiplier * time.Duration(value)).Seconds())
 		}
 	}
-	log.Printf("XXX DUR: seconds=%d err=%v", seconds, err)
 	if err != nil {
 		return err
 	}

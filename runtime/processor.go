@@ -5,6 +5,8 @@
 package runtime
 
 import (
+	"strings"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -13,6 +15,17 @@ import (
 )
 
 var ErrFieldNotFound = errors.New("field not found")
+
+// This is a duration processor that will convert a field duration in the
+// HH:mm:ss format into a duration in seconds.
+// This would be the job of a DUR("%Z",duration) action in the log parser
+// but a lot of cases are observed where duration is left unconverted in
+// this format, which leads me to think that the conversion is automatic.
+var convertDuration = duration{
+	target:  "duration",
+	fields:  []string{"duration"},
+	formats: [][]byte{[]byte("HTS")},
+}
 
 type Processor struct {
 	Root      Node
@@ -63,5 +76,13 @@ func (p *Processor) Process(msg []byte) (fields Fields, errs multierror.Errors) 
 	if err := p.Root.Run(&ctx); err != nil {
 		return nil, append(errs, err)
 	}
+	p.convert(&ctx)
 	return ctx.Fields, ctx.Errors
+}
+
+func (p *Processor) convert(ctx *Context) {
+	if dur, found := ctx.Fields["duration"]; found && strings.IndexByte(dur, ':') != -1 {
+		// Duration is not numeric, try to convert it in HH:mm:ss format.
+		convertDuration.Run(ctx)
+	}
 }

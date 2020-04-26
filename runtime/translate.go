@@ -67,7 +67,7 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 				case "$MSG":
 					return CopyMsg(v.Target), nil
 				default:
-					return nil, errors.Errorf("Don't know how to SetField from '%s'", val.Name)
+					return nil, errors.Errorf("Don't know how to SetField from '%s'", val.Name())
 				}
 			}
 			return &CopyField{

@@ -15,8 +15,8 @@ import (
 var ErrFieldNotFound = errors.New("field not found")
 
 type Processor struct {
-	Root Node
-
+	Root      Node
+	logger    util.VerbosityLogger
 	valueMaps map[string]*valueMap
 }
 
@@ -33,9 +33,16 @@ func (f Fields) Put(name, value string) {
 	f[name] = value
 }
 
-func New(parser *parser.Parser, warnings *util.Warnings) (p *Processor, err error) {
+func New(parser *parser.Parser, warnings *util.Warnings, logger util.Logger) (p *Processor, err error) {
+	if logger == nil {
+		logger = util.DontLog{}
+	}
 	p = &Processor{
 		valueMaps: make(map[string]*valueMap, len(parser.ValueMapsByName)),
+		logger: util.VerbosityLogger{
+			Logger:   logger,
+			MaxLevel: parser.Config.Verbosity,
+		},
 	}
 	for name, vm := range parser.ValueMapsByName {
 		if p.valueMaps[name], err = newValueMap(vm, parser); err != nil {
@@ -48,8 +55,10 @@ func New(parser *parser.Parser, warnings *util.Warnings) (p *Processor, err erro
 
 func (p *Processor) Process(msg []byte) (fields Fields, errs multierror.Errors) {
 	ctx := Context{
-		Message: msg,
-		Fields:  make(Fields),
+		Message:  msg,
+		Fields:   make(Fields),
+		Warnings: util.NewWarnings(20),
+		Logger:   p.logger,
 	}
 	if err := p.Root.Run(&ctx); err != nil {
 		return nil, append(errs, err)

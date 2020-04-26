@@ -20,8 +20,8 @@ type Warnings struct {
 	limit   int
 }
 
-func NewWarnings(limit int) *Warnings {
-	return &Warnings{
+func NewWarnings(limit int) Warnings {
+	return Warnings{
 		limit: limit,
 	}
 }

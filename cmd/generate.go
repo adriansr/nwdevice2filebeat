@@ -44,7 +44,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 	cfg.StripPayload = true
 
 	warnings := util.NewWarnings(20)
-	dev, err := model.NewDevice(cfg.DevicePath, warnings)
+	dev, err := model.NewDevice(cfg.DevicePath, &warnings)
 	if err != nil {
 		LogError("Failed to load device", "path", cfg.DevicePath, "reason", err)
 		return
@@ -54,7 +54,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 	}
 
 	warnings.Clear()
-	p, err := parser.New(dev, cfg, warnings)
+	p, err := parser.New(dev, cfg, &warnings)
 	if err != nil {
 		LogError("Failed to parse device", "path", cfg.DevicePath, "reason", err)
 		return
@@ -134,6 +134,9 @@ func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 		if cfg.Timezone, err = loadLocation(tzName); err != nil {
 			return cfg, errors.Wrapf(err, "unable to parse timezone: '%s'", tzName)
 		}
+	}
+	if verbosity, err := cmd.PersistentFlags().GetCount("verbose"); err == nil {
+		cfg.Verbosity = util.VerbosityLevel(verbosity)
 	}
 	return cfg, nil
 }

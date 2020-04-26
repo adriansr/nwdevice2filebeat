@@ -5,18 +5,18 @@
 package runtime
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/adriansr/nwdevice2filebeat/util"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
 type Context struct {
-	Message []byte
-	Fields  Fields
-	Errors  multierror.Errors
+	Message  []byte
+	Fields   Fields
+	Errors   multierror.Errors
+	Warnings util.Warnings
+	Logger   util.VerbosityLogger
 }
 
 type Node interface {
@@ -133,7 +133,7 @@ type fld string
 func (f fld) Get(ctx *Context) string {
 	value, err := ctx.Fields.Get(string(f))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Get of unset field: %s\n", string(f))
+		//TODO fmt.Fprintf(os.Stderr, "Get of unset field: %s\n", string(f))
 		return ""
 	}
 	return value

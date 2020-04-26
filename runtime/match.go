@@ -6,11 +6,10 @@ package runtime
 
 import (
 	"bytes"
-	"fmt"
-	"os"
 	"strings"
 
 	"github.com/adriansr/nwdevice2filebeat/parser"
+	"github.com/adriansr/nwdevice2filebeat/util"
 	"github.com/pkg/errors"
 )
 
@@ -241,8 +240,8 @@ var ErrNoMatch = errors.New("pattern didn't match")
 var ErrMultiplePayload = errors.New("multiple payloads captured")
 
 func (m *match) Run(ctx *Context) error {
-	/*THIS*/ fmt.Fprintf(os.Stderr, "-> run \"%s\"\n", m.String())
-	/*THIS*/ fmt.Fprintf(os.Stderr, " > msg ='%s'\n", ctx.Message)
+	ctx.Logger.Log(util.LogTrace, "-> run \"%s\"\n", m.String())
+	ctx.Logger.Log(util.LogTrace, " > msg ='%s'\n", ctx.Message)
 	fullCapture := captures{
 		payload: -1,
 	}
@@ -251,12 +250,11 @@ func (m *match) Run(ctx *Context) error {
 		var nextPos int
 		for _, alt := range chunk {
 			var partial captures
-			/*THIS*/ fmt.Fprintf(os.Stderr, " ~> try: <<%s>>\n", ctx.Message[pos:])
+			ctx.Logger.Log(util.LogTrace, " ~> try: <<%s>>\n", ctx.Message[pos:])
 			if nextPos, partial = matchPattern(ctx.Message, pos, alt); nextPos != -1 {
-				/*THIS*/ fmt.Fprintf(os.Stderr, " <~ matched <<%s>> payload: %d nexPos=%d\n", alt.String(), partial.payload, nextPos)
+				ctx.Logger.Log(util.LogTrace, " <~ matched <<%s>> payload: %d nexPos=%d\n", alt.String(), partial.payload, nextPos)
 				if partial.payload >= 0 {
 					if fullCapture.payload != -1 {
-						/*THIS*/ fmt.Fprintf(os.Stderr, " ! multiple payload!\n")
 						return ErrMultiplePayload
 					}
 					fullCapture.payload = partial.payload
@@ -264,11 +262,11 @@ func (m *match) Run(ctx *Context) error {
 				fullCapture.fields = append(fullCapture.fields, partial.fields...)
 				break
 			} else {
-				/*THIS*/ fmt.Fprintf(os.Stderr, " <~ didn't match <<%s>> payload: %d\n", alt.String(), partial.payload)
+				ctx.Logger.Log(util.LogTrace, " <~ didn't match <<%s>> payload: %d\n", alt.String(), partial.payload)
 			}
 		}
 		if nextPos == -1 {
-			/*THIS*/ fmt.Fprintf(os.Stderr, "<- not matched\n")
+			ctx.Logger.Log(util.LogTrace, "<- not matched\n")
 			return ErrNoMatch
 		}
 		pos = nextPos
@@ -276,11 +274,11 @@ func (m *match) Run(ctx *Context) error {
 	if len(fullCapture.fields) > 0 {
 		for _, capture := range fullCapture.fields {
 			key, value := string(capture.field), string(ctx.Message[capture.start:capture.end])
-			/*THIS*/ fmt.Fprintf(os.Stderr, " + captured '%s'='%s'\n", key, value)
+			ctx.Logger.Log(util.LogTrace, " + captured '%s'='%s'\n", key, value)
 			ctx.Fields.Put(key, value)
 		}
 	} else {
-		/*THIS*/ fmt.Fprintf(os.Stderr, " ? captured zero fields\n")
+		ctx.Logger.Log(util.LogTrace, " ? captured zero fields\n")
 	}
 	// Not sure about references to $MSG in function calls. Should it wait to
 	// update ctx.Message after functions applied?
@@ -291,7 +289,7 @@ func (m *match) Run(ctx *Context) error {
 	}
 	if fullCapture.payload >= 0 {
 		ctx.Message = ctx.Message[fullCapture.payload:]
-		/*THIS*/ fmt.Fprintf(os.Stderr, " + payload ='%s'\n", ctx.Message)
+		ctx.Logger.Log(util.LogTrace, " + payload ='%s'\n", ctx.Message)
 	} else {
 		ctx.Message = ctx.Message[pos:]
 	}

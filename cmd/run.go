@@ -31,6 +31,7 @@ func init() {
 	runCmd.PersistentFlags().String("tz", "", "Timezone")
 	runCmd.PersistentFlags().StringSliceP("optimize", "O", nil, "Optimizations")
 	runCmd.PersistentFlags().StringSliceP("fix", "F", nil, "Fixes")
+	runCmd.PersistentFlags().CountP("verbose", "v", "Verbosity level, can be repeated.")
 	runCmd.MarkPersistentFlagRequired("device")
 	runCmd.MarkPersistentFlagRequired("logs")
 }
@@ -54,7 +55,7 @@ func doRun(cmd *cobra.Command, args []string) {
 	defer inputFile.Close()
 
 	warnings := util.NewWarnings(20)
-	dev, err := model.NewDevice(cfg.DevicePath, warnings)
+	dev, err := model.NewDevice(cfg.DevicePath, &warnings)
 	if err != nil {
 		LogError("Failed to load device", "path", cfg.DevicePath, "reason", err)
 		return
@@ -65,7 +66,7 @@ func doRun(cmd *cobra.Command, args []string) {
 	}
 	warnings.Clear()
 
-	p, err := parser.New(dev, cfg, warnings)
+	p, err := parser.New(dev, cfg, &warnings)
 	if err != nil {
 		LogError("Failed to parse device", "path", cfg.DevicePath, "reason", err)
 		return
@@ -73,7 +74,8 @@ func doRun(cmd *cobra.Command, args []string) {
 	warnings.Print("parsing device")
 	warnings.Clear()
 
-	rt, err := runtime.New(&p, warnings)
+	var logger util.StdLog
+	rt, err := runtime.New(&p, &warnings, logger)
 	if err != nil {
 		LogError("Failed to load runtime", "reason", err)
 		return

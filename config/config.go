@@ -4,7 +4,11 @@
 
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/adriansr/nwdevice2filebeat/util"
+)
 
 type Config struct {
 	DevicePath string
@@ -12,7 +16,8 @@ type Config struct {
 	Opt        Optimizations
 	Fixes      Fixes
 	// For datetime handling
-	Timezone *time.Location
+	Timezone  *time.Location
+	Verbosity util.VerbosityLevel
 
 	// These are set depending on what the output supports
 	Dissect      bool

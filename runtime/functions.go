@@ -6,6 +6,7 @@ package runtime
 
 import (
 	"bytes"
+	"net"
 	"strconv"
 	"strings"
 
@@ -13,12 +14,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type FunctionImpl func([]string) (string, error)
+type FunctionImpl func([]string, *Context) (string, error)
 
 var knownFunctions = map[string]FunctionImpl{
 	"CALC":       calc,
 	"CNVTDOMAIN": notimpl,
-	"DIRCHK":     notimpl,
+	"DIRCHK":     networkDirection,
 	"RMQ":        removeQuotes,
 	"STRCAT":     strcat,
 	"URL":        notimpl,
@@ -52,7 +53,7 @@ func (f Function) Run(ctx *Context) (err error) {
 			return errors.Wrapf(err, "fetching argument %v for %s=%s call", arg, f.Target, f.Name)
 		}
 	}
-	value, err := f.Handler(args)
+	value, err := f.Handler(args, ctx)
 	if err != nil {
 		return errors.Wrapf(err, "running %s='%s' on args:%v", f.Target, f.Name, args)
 	}
@@ -98,7 +99,7 @@ func newFunction(name string, target string, args []parser.Value) (Node, error) 
 
 var ErrNotImplemented = errors.New("function not implemented")
 
-func calc(args []string) (string, error) {
+func calc(args []string, _ *Context) (string, error) {
 	// This is already checked to be 3 arguments.
 	a, err := strconv.ParseInt(args[0], 10, 64)
 	if err != nil {
@@ -120,7 +121,7 @@ func calc(args []string) (string, error) {
 	return strconv.FormatInt(r, 10), nil
 }
 
-func strcat(args []string) (string, error) {
+func strcat(args []string, _ *Context) (string, error) {
 	var n int
 	for _, arg := range args {
 		n += len(arg)
@@ -132,16 +133,21 @@ func strcat(args []string) (string, error) {
 	return string(result), nil
 }
 
-func notimpl([]string) (string, error) {
+func notimpl([]string, *Context) (string, error) {
 	return "", ErrNotImplemented
 }
 
 var quoteChars = []byte("\"'`")
 
-func removeQuotes(args []string) (string, error) {
+var (
+	errOneArgument     = errors.New("function requires exactly one argument")
+	errDirChkArguments = errors.New("only single-argument form is supported")
+)
+
+func removeQuotes(args []string, _ *Context) (string, error) {
 	// RMQ always has one argument.
 	if len(args) != 1 {
-		return "", errors.New("RMQ function requires exactly one argument")
+		return "", errOneArgument
 	}
 	str := strings.TrimSpace(args[0])
 	n := len(str)
@@ -152,4 +158,33 @@ func removeQuotes(args []string) (string, error) {
 		}
 	}
 	return str, nil
+}
+
+const (
+	dirChkInside  = "1"
+	dirChkOutside = "0"
+)
+
+func networkDirection(args []string, ctx *Context) (string, error) {
+	// The different forms of this function are:
+	// DIRCHK(saddr) => '1' if addr is Inside '0' if Outside.
+	// DIRCHK($IN/$OUT,saddr,daddr)
+	// DIRCHK($IN/$OUT,saddr,daddr,sport,dport)
+	//
+	// Don't know what the multiargument ones mean exactly and what is a proper
+	// result. These are only used in Netscreen log parser.
+	if len(args) != 1 {
+		return dirChkOutside, errDirChkArguments
+	}
+	ip := net.ParseIP(args[0])
+	if ip == nil {
+		return dirChkOutside, errors.Errorf("failed to parse '%s' as IP for network direction check.", args[0])
+	}
+	// TODO: Implement this better than O(n)
+	for _, net := range ctx.Config.Runtime.LocalNetworks {
+		if net.Contains(ip) {
+			return dirChkOutside, nil
+		}
+	}
+	return dirChkInside, nil
 }

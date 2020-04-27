@@ -131,7 +131,7 @@ func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 		}
 	}
 	if tzName, err := cmd.PersistentFlags().GetString("tz"); err == nil {
-		if cfg.Timezone, err = loadLocation(tzName); err != nil {
+		if cfg.Runtime.Timezone, err = loadLocation(tzName); err != nil {
 			return cfg, errors.Wrapf(err, "unable to parse timezone: '%s'", tzName)
 		}
 	}

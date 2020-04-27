@@ -9,14 +9,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result Node, err error) {
+func (proc *Processor) translate(op parser.Operation) (result Node, err error) {
 	switch v := op.(type) {
 	case parser.Chain:
 		chain := Chain{
 			Nodes: make([]Node, len(v.Nodes)),
 		}
 		for idx, op := range v.Children() {
-			if chain.Nodes[idx], err = proc.translate(op, p); err != nil {
+			if chain.Nodes[idx], err = proc.translate(op); err != nil {
 				return nil, err
 			}
 		}
@@ -27,7 +27,7 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 			Nodes: make([]Node, len(v.Nodes)),
 		}
 		for idx, op := range v.Children() {
-			if sel.Nodes[idx], err = proc.translate(op, p); err != nil {
+			if sel.Nodes[idx], err = proc.translate(op); err != nil {
 				return nil, err
 			}
 		}
@@ -45,7 +45,7 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 		// TODO logging log.Printf("match %s has %d ops:", v.ID, len(v.OnSuccess))
 		for idx, op := range v.OnSuccess {
 			// TODO logging log.Printf("   [%d] = %s", idx, op.Hashable())
-			if match.onSuccess[idx], err = proc.translate(op, p); err != nil {
+			if match.onSuccess[idx], err = proc.translate(op); err != nil {
 				return nil, errors.Wrap(err, "error translating pattern's onsuccess")
 			}
 		}
@@ -85,14 +85,14 @@ func (proc *Processor) translate(op parser.Operation, p *parser.Parser) (result 
 	case parser.MsgIdSelect:
 		node := MapSelect{}
 		for k, idx := range v.Map {
-			if node[k], err = proc.translate(v.Nodes[idx], p); err != nil {
+			if node[k], err = proc.translate(v.Nodes[idx]); err != nil {
 				return nil, err
 			}
 		}
 		return node, nil
 
 	case parser.DateTime:
-		return newDateTime(v, p.Config.Timezone)
+		return newDateTime(v, proc.cfg.Runtime.Timezone)
 
 	case parser.Duration:
 		return newDuration(v)

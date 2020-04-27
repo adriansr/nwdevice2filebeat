@@ -5,6 +5,7 @@
 package runtime
 
 import (
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/util"
 	"github.com/joeshaw/multierror"
@@ -17,6 +18,7 @@ type Context struct {
 	Errors   multierror.Errors
 	Warnings util.Warnings
 	Logger   util.VerbosityLogger
+	Config   *config.Config
 }
 
 type Node interface {

@@ -7,6 +7,7 @@ package runtime
 import (
 	"strings"
 
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -31,6 +32,7 @@ type Processor struct {
 	Root      Node
 	logger    util.VerbosityLogger
 	valueMaps map[string]*valueMap
+	cfg       *config.Config
 }
 
 type Fields map[string]string
@@ -56,13 +58,14 @@ func New(parser *parser.Parser, warnings *util.Warnings, logger util.Logger) (p 
 			Logger:   logger,
 			MaxLevel: parser.Config.Verbosity,
 		},
+		cfg: &parser.Config,
 	}
 	for name, vm := range parser.ValueMapsByName {
 		if p.valueMaps[name], err = newValueMap(vm, parser); err != nil {
 			return nil, err
 		}
 	}
-	p.Root, err = p.translate(parser.Root, parser)
+	p.Root, err = p.translate(parser.Root)
 	return p, err
 }
 
@@ -72,6 +75,7 @@ func (p *Processor) Process(msg []byte) (fields Fields, errs multierror.Errors) 
 		Fields:   make(Fields),
 		Warnings: util.NewWarnings(20),
 		Logger:   p.logger,
+		Config:   p.cfg,
 	}
 	if err := p.Root.Run(&ctx); err != nil {
 		return nil, append(errs, err)

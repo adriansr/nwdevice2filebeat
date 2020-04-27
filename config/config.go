@@ -5,6 +5,7 @@
 package config
 
 import (
+	"net"
 	"time"
 
 	"github.com/adriansr/nwdevice2filebeat/util"
@@ -13,15 +14,16 @@ import (
 type Config struct {
 	DevicePath string
 	OutputPath string
-	Opt        Optimizations
-	Fixes      Fixes
-	// For datetime handling
-	Timezone  *time.Location
+
 	Verbosity util.VerbosityLevel
 
 	// These are set depending on what the output supports
 	Dissect      bool
 	StripPayload bool
+
+	Fixes   Fixes
+	Opt     Optimizations
+	Runtime Runtime
 }
 
 type Optimizations struct {
@@ -41,4 +43,12 @@ type Fixes struct {
 	// StripLeadingSpace strips space at the start of MESSAGES, as it seems
 	// to be a common error to add an extra space first.
 	StripLeadingSpace bool
+}
+
+type Runtime struct {
+	// For datetime handling (EVNTTIME function).
+	Timezone *time.Location
+
+	// For network direction calculation (DIRCHK function).
+	LocalNetworks []net.IPNet
 }

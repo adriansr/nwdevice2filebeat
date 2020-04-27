@@ -22,7 +22,6 @@ var knownFunctions = map[string]FunctionImpl{
 	"DIRCHK":     networkDirection,
 	"RMQ":        removeQuotes,
 	"STRCAT":     strcat,
-	"URL":        notimpl,
 
 	// These functions must already be pruned or translated, and observing
 	// them in the context of a function call is an error.
@@ -32,6 +31,7 @@ var knownFunctions = map[string]FunctionImpl{
 	//"SYSVAL":   forbidden,
 	//"PARMVAL":  forbidden,
 	//"UTC":      forbidden,
+	//"URL":        notimpl,
 
 }
 

@@ -281,9 +281,6 @@ func (c Call) Hashable() string {
 	return sb.String()
 }
 
-// TODO: Sometimes keys are numeric (and hex!) should it support numeric keys
-//       in different base? As in 33 for 0x21
-// TODO: Values are either quoted (single) or refs to fields (*dport)
 type ValueMap struct {
 	SourceContext
 	Nodes    []Operation
@@ -378,5 +375,44 @@ func (r RemoveFields) Hashable() string {
 }
 
 func (r RemoveFields) Children() []Operation {
+	return nil
+}
+
+type URLComponent uint8
+
+const (
+	URLComponentDomain URLComponent = iota
+	URLComponentExt
+	URLComponentFqdn
+	URLComponentPage
+	URLComponentPath
+	URLComponentPort
+	URLComponentQuery
+	URLComponentRoot
+)
+
+var VarNameToURLComponent = map[string]URLComponent{
+	"$DOMAIN": URLComponentDomain,
+	"$EXT":    URLComponentExt,
+	"$FQDN":   URLComponentFqdn,
+	"$PAGE":   URLComponentPage,
+	"$PATH":   URLComponentPath,
+	"$PORT":   URLComponentPort,
+	"$QUERY":  URLComponentQuery,
+	"$ROOT":   URLComponentRoot,
+}
+
+type URLExtract struct {
+	Target    string
+	Source    string
+	Component URLComponent
+}
+
+func (u URLExtract) Hashable() string {
+	return fmt.Sprintf("URL{tgt=%s,src=%s,cp=%d}",
+		u.Target, u.Source, u.Component)
+}
+
+func (u URLExtract) Children() []Operation {
 	return nil
 }

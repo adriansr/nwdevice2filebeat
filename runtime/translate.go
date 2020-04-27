@@ -114,6 +114,10 @@ func (proc *Processor) translate(op parser.Operation) (result Node, err error) {
 			key:      key,
 			target:   v.Target,
 		}, nil
+
+	case parser.URLExtract:
+		return urlExtract(v), nil
+
 	default:
 		return nil, errors.Errorf("unknown type to translate: %T", v)
 	}

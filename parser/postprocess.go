@@ -59,12 +59,10 @@ var transforms = PostprocessGroup{
 	Actions: []Action{
 		// Replaces a Call() to a MalueMap with a ValueMapCall.
 		{"translate VALUEMAP references", convertValueMapReferences},
-		{"translate PARMVAL calls", translateParmval},
+		{"translate calls", translateCalls},
 		{"strip REGX calls", stripRegex},
 		{"strip SYSVAL calls", pruneSysval},
 		{"remove no-ops in function lists", removeNoops},
-
-		{"translate HDR calls", translateHDR},
 
 		// Remove unnecessary $MSG and $HDR as first argument to calls
 		{"remove special fields from some calls", removeSpecialFields},
@@ -237,28 +235,6 @@ func checkFunctionsArity(parser *Parser) (err error) {
 	return errs.Err()
 }
 
-func translateHDR(parser *Parser) (err error) {
-	parser.Walk(func(node Operation) (WalkAction, Operation) {
-		switch call := node.(type) {
-		case Call:
-			switch call.Function {
-			case "HDR":
-				if len(call.Args) != 1 {
-					err = errors.Errorf("at %s: HDR/SYSVAL call has more than one argument: %v", call.Source(), call.Hashable())
-					return WalkCancel, nil
-				}
-				return WalkReplace, SetField{
-					SourceContext: call.SourceContext,
-					Target:        call.Target,
-					Value:         []Operation{call.Args[0]},
-				}
-			}
-		}
-		return WalkContinue, nil
-	})
-	return err
-}
-
 func pruneSysval(parser *Parser) (err error) {
 	parser.WalkPostOrder(func(node Operation) (WalkAction, Operation) {
 		if match, ok := node.(Match); ok {
@@ -312,19 +288,60 @@ func convertValueMapReferences(parser *Parser) error {
 	return errs.Err()
 }
 
-func translateParmval(parser *Parser) (err error) {
+func translateCalls(parser *Parser) (err error) {
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
-		if call, ok := node.(Call); ok && call.Function == "PARMVAL" {
-			if n := len(call.Args); n != 1 {
-				err = errors.Errorf("at %s: expected 1 argument in PARMVAL call, got %d", call.Source(), n)
-				return WalkCancel, nil
+		if call, ok := node.(Call); ok {
+			switch call.Function {
+			case "PARMVAL":
+				if n := len(call.Args); n != 1 {
+					err = errors.Errorf("at %s: expected 1 argument in PARMVAL call, got %d", call.Source(), n)
+					return WalkCancel, nil
+				}
+				repl := SetField{
+					SourceContext: call.SourceContext,
+					Target:        call.Target,
+					Value:         []Operation{call.Args[0]},
+				}
+				return WalkReplace, repl
+
+			case "HDR":
+				if len(call.Args) != 1 {
+					err = errors.Errorf("at %s: HDR call has more than one argument: %v", call.Source(), call.Hashable())
+					return WalkCancel, nil
+				}
+				return WalkReplace, SetField{
+					SourceContext: call.SourceContext,
+					Target:        call.Target,
+					Value:         []Operation{call.Args[0]},
+				}
+
+			case "URL":
+				if len(call.Args) != 2 {
+					err = errors.Errorf("at %s: URL call has more than 2 arguments: %v", call.Source(), call.Hashable())
+					return WalkCancel, nil
+				}
+				// Extract field names from arguments
+				var param [2]string
+				for idx, op := range call.Args {
+					fld, found := op.(Field)
+					if !found {
+						err = errors.Errorf("at %s: URL call argument %d is not a field: %v", call.Source(), idx+1, call.Hashable())
+						return WalkCancel, nil
+					}
+					param[idx] = fld.Name()
+				}
+				// Arg 1 is URL component identifier.
+				cp, found := VarNameToURLComponent[param[0]]
+				if !found {
+					err = errors.Errorf("at %s: URL call argument %s is not understood: %v", call.Source(), param[0], call.Hashable())
+					return WalkCancel, nil
+				}
+				return WalkReplace, URLExtract{
+					Target:    call.Target,
+					Source:    param[1],
+					Component: cp,
+				}
 			}
-			repl := SetField{
-				SourceContext: call.SourceContext,
-				Target:        call.Target,
-				Value:         []Operation{call.Args[0]},
-			}
-			return WalkReplace, repl
 		}
 		return WalkContinue, nil
 	})
@@ -1235,7 +1252,7 @@ func stripLeadingSpace(parser *Parser) error {
 		return nil
 	}
 	count := 0
-	for _, msg := range parser.Messages {
+	for idx, msg := range parser.Messages {
 		if n := len(msg.content); n < 1 {
 			continue
 		}
@@ -1243,10 +1260,11 @@ func stripLeadingSpace(parser *Parser) error {
 			if trimmed := strings.TrimLeft(ct.Value(), " "); trimmed != ct.Value() {
 				count++
 				if len(trimmed) > 0 {
-					msg.content[0] = Constant(trimmed)
+					parser.Messages[idx].content[0] = Constant(trimmed)
 				} else {
-					msg.content = msg.content[1:]
+					parser.Messages[idx].content = msg.content[1:]
 				}
+
 			}
 		}
 	}

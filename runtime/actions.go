@@ -5,11 +5,12 @@
 package runtime
 
 import (
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
 	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/util"
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 )
 
 type Context struct {

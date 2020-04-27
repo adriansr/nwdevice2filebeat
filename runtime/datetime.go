@@ -33,7 +33,7 @@ func newDateTime(ref parser.DateTime, loc *time.Location) (dt dateTime, err erro
 			return dt, err
 		}
 	}
-	if loc == nil {
+	if ref.IsUTC || loc == nil {
 		dt.parser = time.Parse
 	} else {
 		dt.parser = func(format, value string) (time.Time, error) {

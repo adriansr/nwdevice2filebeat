@@ -5,7 +5,9 @@
 package runtime
 
 import (
+	"bytes"
 	"strconv"
+	"strings"
 
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/pkg/errors"
@@ -17,18 +19,19 @@ var knownFunctions = map[string]FunctionImpl{
 	"CALC":       calc,
 	"CNVTDOMAIN": notimpl,
 	"DIRCHK":     notimpl,
-	"RMQ":        notimpl,
+	"RMQ":        removeQuotes,
 	"STRCAT":     strcat,
 	"URL":        notimpl,
-	"UTC":        notimpl,
 
 	// These functions must already be pruned or translated, and observing
-	// them in the context of a call is an error.
+	// them in the context of a function call is an error.
 	//"DUR":      forbidden,
 	//"EVNTTIME": forbidden,
 	//"HDR":      forbidden,
 	//"SYSVAL":   forbidden,
 	//"PARMVAL":  forbidden,
+	//"UTC":      forbidden,
+
 }
 
 type Argument interface {
@@ -133,6 +136,20 @@ func notimpl([]string) (string, error) {
 	return "", ErrNotImplemented
 }
 
-func noop([]string) (string, error) {
-	return "", nil
+var quoteChars = []byte("\"'`")
+
+func removeQuotes(args []string) (string, error) {
+	// RMQ always has one argument.
+	if len(args) != 1 {
+		return "", errors.New("RMQ function requires exactly one argument")
+	}
+	str := strings.TrimSpace(args[0])
+	n := len(str)
+	if n > 1 {
+		q := str[0]
+		if bytes.IndexByte(quoteChars, q) >= 0 && str[n-1] == q {
+			return str[1 : n-1], nil
+		}
+	}
+	return str, nil
 }

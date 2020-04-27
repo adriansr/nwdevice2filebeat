@@ -410,8 +410,12 @@ func convertEventTime(p *Parser) (err error) {
 			}
 
 			var result Operation = repl
-			if call.Function == "DUR" {
+			switch call.Function {
+			case "DUR":
 				result = Duration(repl)
+			case "UTC":
+				// UTC call is the same as EVNTTIME but without timezone conversion.
+				repl.IsUTC = true
 			}
 			return WalkReplace, result
 		}

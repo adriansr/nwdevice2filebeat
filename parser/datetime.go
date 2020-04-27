@@ -5,6 +5,7 @@
 package parser
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -15,7 +16,7 @@ type DateTimeItem interface {
 	Value() string
 }
 
-// Caracter after % in an EVNTTIME pattern.
+// Character after % in an EVNTTIME pattern.
 type DateTimeSpec byte
 
 const DateTimeConstant byte = '%'
@@ -38,6 +39,8 @@ type DateTime struct {
 	Fields []string
 	// Content is either DateTimeSpec or Constant
 	Formats [][]DateTimeItem
+	// IsUTC determines if this comes from a EVNTTIME or UTC call.
+	IsUTC bool
 }
 
 func (DateTime) Children() []Operation {
@@ -45,17 +48,17 @@ func (DateTime) Children() []Operation {
 }
 
 func (v DateTime) Hashable() string {
-	return v.namesHashable("DateTime")
+	return v.namesHashable("DateTime", "utc:", strconv.FormatBool(v.IsUTC))
 }
 
-func (v DateTime) namesHashable(name string) string {
+func (v DateTime) namesHashable(name string, extra ...string) string {
 	var sb strings.Builder
 	sb.WriteString(name)
 	sb.WriteString("{Target:")
 	sb.WriteString(v.Target)
-	sb.WriteString(",Fields:")
+	sb.WriteString(",Fields:[")
 	sb.WriteString(strings.Join(v.Fields, ","))
-	sb.WriteString(",Formats:[")
+	sb.WriteString("],Formats:[")
 	for _, ff := range v.Formats {
 		sb.WriteString("[")
 		for _, f := range ff {
@@ -65,7 +68,11 @@ func (v DateTime) namesHashable(name string) string {
 		}
 		sb.WriteString("],")
 	}
-	sb.WriteString("]}")
+	sb.WriteByte(']')
+	for _, str := range extra {
+		sb.WriteString(str)
+	}
+	sb.WriteByte('}')
 	return sb.String()
 }
 

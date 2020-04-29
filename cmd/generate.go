@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
-	"github.com/adriansr/nwdevice2filebeat/generator/javascript"
 	"github.com/adriansr/nwdevice2filebeat/model"
+	"github.com/adriansr/nwdevice2filebeat/output/javascript"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/util"
 )

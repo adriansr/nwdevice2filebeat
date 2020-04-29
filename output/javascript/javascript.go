@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/adriansr/nwdevice2filebeat/generator"
+	"github.com/adriansr/nwdevice2filebeat/output"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
@@ -37,12 +37,12 @@ func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
 	if err := p.Apply(preprocessors); err != nil {
 		return 0, err
 	}
-	cw := generator.NewCodeWriter(dest, "\t")
+	cw := output.NewCodeWriter(dest, "\t")
 	generate(p.Root, cw)
 	return cw.Finalize()
 }
 
-func generate(op parser.Operation, out *generator.CodeWriter) {
+func generate(op parser.Operation, out *output.CodeWriter) {
 	switch v := op.(type) {
 	case File:
 		for _, node := range v.Nodes {
@@ -251,7 +251,7 @@ func generate(op parser.Operation, out *generator.CodeWriter) {
 	}
 }
 
-func writeMapping(m map[string]int, nodes []parser.Operation, out *generator.CodeWriter) {
+func writeMapping(m map[string]int, nodes []parser.Operation, out *output.CodeWriter) {
 	out.Write("{").Newline().Indent()
 	keys := make([]string, len(m))
 	pos := 0
@@ -270,7 +270,7 @@ func writeMapping(m map[string]int, nodes []parser.Operation, out *generator.Cod
 	out.Unindent().Write("}")
 }
 
-func writeMapString(m map[string]string, out *generator.CodeWriter) {
+func writeMapString(m map[string]string, out *output.CodeWriter) {
 	out.Write("{").Newline().Indent()
 	keys := make([]string, len(m))
 	pos := 0

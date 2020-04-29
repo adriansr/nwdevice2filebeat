@@ -34,7 +34,8 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 	p.warnings = warnings
 	p.Config = cfg
 	if len(dev.TagValMaps) > 0 {
-		return p, errors.Errorf("TAGVALMAP is not implemented (at %s)", dev.TagValMaps[0].Pos())
+		//return p, errors.Errorf("TAGVALMAP is not implemented (at %s)", dev.TagValMaps[0].Pos())
+		warnings.Add(dev.TagValMaps[0].Pos(), "TAGVALMAP is not implemented")
 	}
 
 	if len(dev.Regexs) > 0 {

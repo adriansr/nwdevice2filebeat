@@ -194,43 +194,10 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Write("})")
 
 	case parser.DateTime:
-		if len(v.Formats) == 1 {
-			out.Write("date_time({").Newline().Indent().
-				Write("dest: ").JS(v.Target).Write(",").Newline().
-				Write("args: ").JS(v.Fields).Write(",").Newline().
-				Write("fmt: [")
-			for idx, fmt := range v.Formats[0] {
-				if idx > 0 {
-					out.Write(",")
-				}
-				if spec := fmt.Spec(); spec != parser.DateTimeConstant {
-					out.Writef("d%c", spec)
-				} else {
-					out.Write("dc(").JS(fmt.Value()).Write(")")
-				}
-			}
-			out.Write("],").Newline().Unindent().Write("})")
-		} else {
-			out.Write("date_times({").Newline().Indent().
-				Write("dest: ").JS(v.Target).Write(",").Newline().
-				Write("args: ").JS(v.Fields).Write(",").Newline().
-				Write("fmts: [").Newline().Indent()
-			for fmtIdx := range v.Formats {
-				out.Write("[")
-				for idx, fmt := range v.Formats[fmtIdx] {
-					if idx > 0 {
-						out.Write(",")
-					}
-					if spec := fmt.Spec(); spec != parser.DateTimeConstant {
-						out.Writef("d%c", spec)
-					} else {
-						out.Write("dc(").JS(fmt.Value()).Write(")")
-					}
-				}
-				out.Write("],").Newline()
-			}
-			out.Unindent().Write("],").Newline().Unindent().Write("})")
-		}
+		writeDateTimeLike(v, "date_time", "d", out)
+
+	case parser.Duration:
+		writeDateTimeLike(parser.DateTime(v), "duration", "u", out)
 
 	case parser.RemoveFields:
 		out.Write("remove(").JS(v).Write(")")
@@ -240,11 +207,17 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		writeMapString(v, out)
 		out.Write(")")
 
+	case parser.URLExtract:
+		if fn, found := urlComponentToJSFn[v.Component]; found {
+			out.Write(fn).Write("(").JS(v.Target).Write(",").
+				JS(v.Source).Write(")")
+		} else {
+			out.Err(errors.Errorf("unknown URL component to extract: %v", v.Component))
+		}
 	case parser.Noop:
 		// Removing nodes from the tree is complicated.
 		out.Write("nop")
 		out.Err(errors.New("WARN: Found a Noop in the tree."))
-
 	default:
 		out.Writef("/* TODO: here goes a %T */", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))
@@ -283,4 +256,55 @@ func writeMapString(m map[string]string, out *output.CodeWriter) {
 		out.JS(key).Write(": ").JS(m[key]).Write(",").Newline()
 	}
 	out.Unindent().Write("}")
+}
+
+func writeDateTimeLike(dt parser.DateTime, name, fnPrefix string, out *output.CodeWriter) {
+	if len(dt.Formats) == 1 {
+		out.Write(name).Write("({").Newline().Indent().
+			Write("dest: ").JS(dt.Target).Write(",").Newline().
+			Write("args: ").JS(dt.Fields).Write(",").Newline().
+			Write("fmt: [")
+		for idx, fmt := range dt.Formats[0] {
+			if idx > 0 {
+				out.Write(",")
+			}
+			if spec := fmt.Spec(); spec != parser.DateTimeConstant {
+				out.Writef("%s%c", fnPrefix, spec)
+			} else {
+				out.Write("dc(").JS(fmt.Value()).Write(")")
+			}
+		}
+		out.Write("],").Newline().Unindent().Write("})")
+	} else {
+		out.Write(name).Write("s({").Newline().Indent().
+			Write("dest: ").JS(dt.Target).Write(",").Newline().
+			Write("args: ").JS(dt.Fields).Write(",").Newline().
+			Write("fmts: [").Newline().Indent()
+		for fmtIdx := range dt.Formats {
+			out.Write("[")
+			for idx, fmt := range dt.Formats[fmtIdx] {
+				if idx > 0 {
+					out.Write(",")
+				}
+				if spec := fmt.Spec(); spec != parser.DateTimeConstant {
+					out.Writef("d%c", spec)
+				} else {
+					out.Write("dc(").JS(fmt.Value()).Write(")")
+				}
+			}
+			out.Write("],").Newline()
+		}
+		out.Unindent().Write("],").Newline().Unindent().Write("})")
+	}
+}
+
+var urlComponentToJSFn = map[parser.URLComponent]string{
+	parser.URLComponentDomain: "domain",
+	parser.URLComponentExt:    "ext",
+	parser.URLComponentFqdn:   "fqdn",
+	parser.URLComponentPage:   "page",
+	parser.URLComponentPath:   "path",
+	parser.URLComponentPort:   "port",
+	parser.URLComponentQuery:  "query",
+	parser.URLComponentRoot:   "root",
 }

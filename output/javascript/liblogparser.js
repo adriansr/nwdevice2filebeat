@@ -85,12 +85,12 @@ function msgid_select(mapping) {
     return function(evt) {
         var msgid = evt.Get(FIELDS_PREFIX + "messageid");
         if (msgid == null) {
-            console.warn("msgid_select: no messageid captured!")
+            //console.warn("msgid_select: no messageid captured!")
             return;
         }
         var next = mapping[msgid];
         if (next === undefined) {
-            console.warn("msgid_select: no mapping for messageid:" + msgid);
+            //console.warn("msgid_select: no mapping for messageid:" + msgid);
             return;
         }
         //console.info("msgid_select: matched key=" + msgid);
@@ -308,6 +308,16 @@ function date_time(opts) {
     }
 }
 
+function duration(opts) {
+    // TODO: Duration
+    return nop;
+}
+
+function durations(opts) {
+    // TODO: Durations
+    return nop;
+}
+
 function remove(fields) {
     return function(evt) {
         for (var i=0; i<fields.length; i++) {
@@ -455,3 +465,57 @@ function dateMonthName(long) {
         return pos + 3 + (long? idx[1] : 0);
     }
 }
+
+function domain(dst, src) {
+    return nop;
+}
+
+function ext(dst, src) {
+    return nop;
+}
+
+function fqdn(dst, src) {
+    return nop;
+}
+
+function page(dst, src) {
+    return nop;
+}
+
+function path(dst, src) {
+    return nop;
+}
+
+function port(dst, src) {
+    return nop;
+}
+
+function query(dst, src) {
+    return nop;
+}
+
+function root(dst, src) {
+    return nop;
+}
+
+var uR = nop;
+var uB = nop;
+var uM = nop;
+var uG = nop;
+var uD = nop;
+var uF = nop;
+var uH = nop;
+var uI = nop;
+var uN = nop;
+var uT = nop;
+var uU = nop;
+var uJ = nop;
+var uP = nop;
+var uQ = nop;
+var uS = nop;
+var uO = nop;
+var uY = nop;
+var uW = nop;
+var uZ = nop;
+var uA = nop;
+var uX = nop;

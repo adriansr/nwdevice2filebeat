@@ -184,6 +184,9 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 	case SetField:
 		out.Write("setf(").JS(v[0]).Write(",").JS(v[1]).Write(")")
 
+	case SetConstant:
+		out.Write("setc(").JS(v[0]).Write(",").JS(v[1]).Write(")")
+
 	case parser.ValueMapCall:
 		out.Write("lookup({").Newline().Indent().
 			Write("dest: ").JS(v.Target).Write(",").Newline().

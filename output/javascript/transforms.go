@@ -14,6 +14,8 @@ import (
 	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
+const promoteSetConstant = false
+
 var preprocessors = parser.PostprocessGroup{
 	Title: "javascript transforms",
 	Actions: []parser.Action{
@@ -32,12 +34,22 @@ var preprocessors = parser.PostprocessGroup{
 			Run:  promoteConstantSetField,
 		},
 		{
-			Name: "promote field copy operations",
-			Run:  promoteCopyField,
+			// Needs to run before adjustFieldNames so that SetField targets
+			// don't have the prefix added to them.
+			Name: "promote constant assignments",
+			Run:  promoteConstantSetField,
 		},
 		{
-			Name: "fuck",
-			Run:  fuckingShit,
+			Name: "translate field constant assignment operations",
+			Run:  translateConstantField,
+		},
+		{
+			Name: "translate field copy operations",
+			Run:  translateCopyField,
+		},
+		{
+			Name: "forbid SetField",
+			Run:  failIfSetFieldFound,
 		},
 		{
 			Name: "adjust field names",
@@ -429,6 +441,15 @@ func promoteConstantSetFieldList(list []parser.Operation) (newList []parser.Oper
 }
 
 func promoteConstantSetField(p *parser.Parser) (err error) {
+	// WARNING: This is dangerous because it messes with the order in which
+	//          functions are executed inside a on_success chain. Should be
+	//          updated to only extract fields whose value is not accessed
+	//          before being set (They could be the result of a capture, copied
+	//          to another field and then set to a different value).
+	if !promoteSetConstant {
+		return nil
+	}
+
 	// This usually leads to a smaller JS even though now we cannot deduplicate
 	// constant fields set as hardly two messages will set the exact same fields.
 	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
@@ -480,6 +501,16 @@ func (s SetField) Children() []parser.Operation {
 	return nil
 }
 
+type SetConstant [2]string
+
+func (s SetConstant) Hashable() string {
+	return fmt.Sprintf("SetC{dst=%s,src=%s}", s[0], s[1])
+}
+
+func (s SetConstant) Children() []parser.Operation {
+	return nil
+}
+
 func promoteCopyFieldInList(list []parser.Operation) (changed bool) {
 	for idx, op := range list {
 		if set, isSet := op.(parser.SetField); isSet {
@@ -495,16 +526,31 @@ func promoteCopyFieldInList(list []parser.Operation) (changed bool) {
 	return changed
 }
 
-func promoteCopyField(p *parser.Parser) error {
+func promoteConstantFieldInList(list []parser.Operation) (changed bool) {
+	for idx, op := range list {
+		if set, isSet := op.(parser.SetField); isSet {
+			if ct, isCt := set.Value[0].(parser.Constant); isCt {
+				list[idx] = SetConstant{
+					set.Target,
+					ct.Value(),
+				}
+				changed = true
+			}
+		}
+	}
+	return changed
+}
+
+func doTranslateSetField(p *parser.Parser, translator func([]parser.Operation) bool) error {
 	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
 		switch v := node.(type) {
 		case parser.Match:
-			if promoteCopyFieldInList(v.OnSuccess) {
+			if translator(v.OnSuccess) {
 				return parser.WalkReplace, v
 			}
 		case parser.AllMatch:
-			changed := promoteCopyFieldInList(v.OnSuccess())
-			changed = promoteCopyFieldInList(v.OnFailure()) || changed
+			changed := translator(v.OnSuccess())
+			changed = translator(v.OnFailure()) || changed
 			if changed {
 				return parser.WalkReplace, v
 			}
@@ -514,7 +560,15 @@ func promoteCopyField(p *parser.Parser) error {
 	return nil
 }
 
-func fuckingShit(p *parser.Parser) (err error) {
+func translateCopyField(p *parser.Parser) error {
+	return doTranslateSetField(p, promoteCopyFieldInList)
+}
+
+func translateConstantField(p *parser.Parser) error {
+	return doTranslateSetField(p, promoteConstantFieldInList)
+}
+
+func failIfSetFieldFound(p *parser.Parser) (err error) {
 	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
 		switch v := node.(type) {
 		case parser.SetField:

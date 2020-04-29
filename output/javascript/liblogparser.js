@@ -243,6 +243,12 @@ function setf(dst, src) {
     }
 }
 
+function setc(dst, value) {
+    return function(evt) {
+        evt.Put(FIELDS_PREFIX + dst, value);
+    }
+}
+
 function set_field(opts) {
     return function(evt) {
         var val = opts.value(evt);

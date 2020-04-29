@@ -131,6 +131,8 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 				Value:         []Operation{Constant(msg.eventcategory)},
 			})
 		}
+		// This causes every message to be unique. Outputs must remember to
+		// extract this value to deduplicate properly.
 		if msg.id1 != "" {
 			match.OnSuccess = append(match.OnSuccess, SetField{
 				SourceContext: match.SourceContext,

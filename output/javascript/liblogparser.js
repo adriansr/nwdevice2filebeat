@@ -39,7 +39,7 @@ function linear_select(subprocessors) {
     }
 }
 
-function match(src, pattern, on_succcess) {
+function match(src, pattern, on_success) {
     //console.debug("create tokenizer: " + options.dissect.tokenizer);
     var dissect = new processor.Dissect({
         field: src,

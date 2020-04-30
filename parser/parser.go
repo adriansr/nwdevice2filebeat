@@ -91,7 +91,7 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 		hNodes = append(hNodes, match)
 	}
 
-	msgNode, err := makeMessagesNode(p.Messages)
+	msgNode, err := p.makeMessagesNode(p.Messages)
 	if err != nil {
 		return p, err
 	}
@@ -113,7 +113,7 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 	return p, nil
 }
 
-func makeMessagesNode(msgs []message) (Operation, error) {
+func (p *Parser) makeMessagesNode(msgs []message) (Operation, error) {
 	var keysInOrder []string
 	byID2 := make(map[string][]Operation)
 	for idx, msg := range msgs {
@@ -133,7 +133,7 @@ func makeMessagesNode(msgs []message) (Operation, error) {
 		}
 		// This causes every message to be unique. Outputs must remember to
 		// extract this value to deduplicate properly.
-		if msg.id1 != "" {
+		if !p.Config.Opt.StripMessageID1 && msg.id1 != "" {
 			match.OnSuccess = append(match.OnSuccess, SetField{
 				SourceContext: match.SourceContext,
 				Target:        "msg_id1",

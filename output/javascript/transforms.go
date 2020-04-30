@@ -28,6 +28,10 @@ var preprocessors = parser.PostprocessGroup{
 			Run:  adjustOverlappingPayload,
 		},
 		{
+			Name: "extract msg_id1",
+			Run:  extractMsgID1,
+		},
+		{
 			// Needs to run before adjustFieldNames so that SetField targets
 			// don't have the prefix added to them.
 			Name: "promote constant assignments",
@@ -128,8 +132,9 @@ func (p RawJS) Children() []parser.Operation {
 
 func adjustTree(p *parser.Parser) (err error) {
 	var file File
-	file.Nodes = append(file.Nodes, RawJS(header))
-	file.Nodes = append(file.Nodes, MainProcessor{inner: []parser.Operation{p.Root}})
+	file.Nodes = append(file.Nodes,
+		RawJS(header),
+		MainProcessor{inner: []parser.Operation{p.Root}})
 	for _, vm := range p.ValueMaps {
 		file.Nodes = append(file.Nodes, vm)
 	}
@@ -261,15 +266,15 @@ type VariableReference struct {
 
 type Variable struct {
 	Name  string
-	Value parser.Operation
+	Value [1]parser.Operation
 }
 
 func (p Variable) Hashable() string {
-	return ""
+	return "Variable{" + p.Name + "}"
 }
 
 func (v Variable) Children() []parser.Operation {
-	return nil
+	return v.Value[:]
 }
 
 func (v VariableReference) Children() []parser.Operation {
@@ -277,7 +282,7 @@ func (v VariableReference) Children() []parser.Operation {
 }
 
 func (p VariableReference) Hashable() string {
-	return ""
+	return "VarRef{" + p.Name + "}"
 }
 
 type nameGenerator struct {
@@ -308,22 +313,29 @@ func extractVariables(p *parser.Parser) (err error) {
 		case parser.Chain:
 			name = gen.New("chain")
 		case parser.Match:
-			prefix := "msg"
-			if v.Input == "message" {
-				prefix = "hdr"
+			switch v.Input {
+			case "message":
+				name = gen.New("hdr")
+			case "payload":
+				if !p.Config.Opt.StripMessageID1 {
+					name = gen.New("msg")
+				}
+			default:
+				name = gen.New("part")
 			}
-			name = gen.New(prefix)
 		case parser.LinearSelect:
 			name = gen.New("select")
 		case parser.AllMatch:
 			name = gen.New("all")
+		case MsgID1Wrapper:
+			name = gen.New("msg")
 		}
 		if name == "" {
 			return parser.WalkContinue, nil
 		}
 		vars = append(vars, Variable{
 			Name:  name,
-			Value: node,
+			Value: [1]parser.Operation{node},
 		})
 		return parser.WalkReplace, VariableReference{Name: name}
 	})
@@ -333,50 +345,78 @@ func extractVariables(p *parser.Parser) (err error) {
 
 func removeDuplicateNodes(p *parser.Parser) (err error) {
 	if !p.Config.Opt.DetectDuplicates {
-		return nil
+		return
 	}
+	var gen nameGenerator
+	for pass := 1; ; pass++ {
+		log.Printf("Removing duplicates pass %d", pass)
+		in, out, err := doRemoveDuplicateNodes(p, &gen)
+		if err != nil {
+			return err
+		}
+		if in == out {
+			log.Printf("Deduplication done. %d unique nodes left.", out)
+			break
+		}
+		log.Printf("Duplicated from %d -> %d nodes", in, out)
+	}
+	return nil
+}
+
+func canBeDeduplicated(node parser.Operation) bool {
+	switch node.(type) {
+	case Variable, VariableReference, MainProcessor, RawJS, File:
+		return false
+	}
+	return true
+}
+
+func doRemoveDuplicateNodes(p *parser.Parser, gen *nameGenerator) (inCount, outCount int, err error) {
 	file, ok := p.Root.(File)
 	if !ok {
-		return errors.New("operations tree is not a File")
+		return 0, 0, errors.New("operations tree is not a File")
 	}
 	var vars []parser.Operation
+
+	defer func() {
+		p.Root = file.WithVars(vars)
+	}()
 
 	total := 0
 	seen := make(map[string][]parser.Operation)
 	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
-		hash := node.Hashable()
-		if hash != "" {
+		if canBeDeduplicated(node) {
 			total++
+			hash := node.Hashable()
+			if hash == "" {
+				err = errors.Errorf("found null hashable of type %T", node)
+			}
 			seen[hash] = append(seen[hash], node)
 		}
 		return parser.WalkContinue, nil
 	})
-	dupes := total - len(seen)
-	if dupes == 0 {
-		return err
+	if len(seen) == total {
+		return total, total, err
 	}
-	log.Printf("INFO duplicates: %d", dupes)
 	for k, v := range seen {
 		if len(v) < 2 {
 			delete(seen, k)
 		} else {
+			//log.Printf(" Will deduplicate (%d) : %s", len(v), k)
 			seen[k] = nil
 		}
 	}
-	counter := 0
-	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
-		hash := node.Hashable()
-		if hash != "" {
+	p.WalkPostOrder(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		if canBeDeduplicated(node) {
+			hash := node.Hashable()
 			if ref, ok := seen[hash]; ok {
 				var repl parser.Operation
 				if ref == nil {
-					name := fmt.Sprintf("dup%d", counter)
-					counter++
+					name := gen.New("dup")
 					vars = append(vars, Variable{
 						Name:  name,
-						Value: node,
+						Value: [1]parser.Operation{node},
 					})
-					//log.Printf("XXX duplicates var %s = %s", name, hash)
 					repl = VariableReference{Name: name}
 					seen[hash] = []parser.Operation{repl}
 				} else {
@@ -387,8 +427,20 @@ func removeDuplicateNodes(p *parser.Parser) (err error) {
 		}
 		return parser.WalkContinue, nil
 	})
-	p.Root = file.WithVars(vars)
-	return nil
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		if canBeDeduplicated(node) {
+			outCount++
+			hash := node.Hashable()
+			if _, seen := seen[hash]; seen {
+				// This detects nodes whose memory layout prevents child nodes
+				// from being replaced.
+				log.Printf("WARN: Should've been removed: %s", hash)
+			}
+		}
+		return parser.WalkContinue, nil
+	})
+
+	return total, outCount, nil
 }
 
 func fixNonCapturingDissects(p *parser.Parser) error {
@@ -574,6 +626,59 @@ func failIfSetFieldFound(p *parser.Parser) (err error) {
 		case parser.SetField:
 			err = errors.Errorf("parser.SetField found where it shouldn't: %s", v.Hashable())
 			return parser.WalkCancel, nil
+		}
+		return parser.WalkContinue, nil
+	})
+	return err
+}
+
+type MsgID1Wrapper struct {
+	msgID1  string
+	wrapped []parser.Operation
+}
+
+func (m MsgID1Wrapper) Hashable() string {
+	return fmt.Sprintf("ID1{%s, %s}", m.msgID1, m.wrapped[0].Hashable())
+}
+
+func (m MsgID1Wrapper) Children() []parser.Operation {
+	return m.wrapped
+}
+
+func findMsgID1(actions []parser.Operation) (found bool, msgID1 string, newList []parser.Operation) {
+	for idx, act := range actions {
+		if setOp, ok := act.(parser.SetField); ok && setOp.Target == "msg_id1" {
+			if ct, ok := setOp.Value[0].(parser.Constant); ok {
+				return true, ct.Value(), append(append([]parser.Operation{}, actions[:idx]...), actions[idx+1:]...)
+			}
+		}
+	}
+	return
+}
+
+func extractMsgID1(p *parser.Parser) (err error) {
+	if false {
+		return nil
+	}
+	p.Walk(func(node parser.Operation) (action parser.WalkAction, operation parser.Operation) {
+		switch v := node.(type) {
+		case parser.AllMatch:
+			if found, id1, list := findMsgID1(v.OnSuccess()); found {
+				cp := v.WithOnSuccess(list)
+				return parser.WalkReplace, MsgID1Wrapper{
+					msgID1:  id1,
+					wrapped: []parser.Operation{cp},
+				}
+			}
+		case parser.Match:
+			if found, id1, list := findMsgID1(v.OnSuccess); found {
+				cp := v
+				cp.OnSuccess = list
+				return parser.WalkReplace, MsgID1Wrapper{
+					msgID1:  id1,
+					wrapped: []parser.Operation{cp},
+				}
+			}
 		}
 		return parser.WalkContinue, nil
 	})

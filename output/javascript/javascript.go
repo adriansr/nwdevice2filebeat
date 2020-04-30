@@ -55,7 +55,7 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 	case Variable:
 		out.Newline()
 		out.Write("var ").Write(v.Name).Write(" = ")
-		generate(v.Value, out)
+		generate(v.Value[0], out)
 		out.Write(";").Newline()
 
 	case VariableReference:
@@ -117,22 +117,17 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Write(")")
 
 	case parser.Match:
-		out.Write("match({").Newline().
-			Indent().Write("id: ").JS(v.ID).Write(",").Newline().
-			Write("dissect: {").Newline().
-			Indent().Write("tokenizer: ").JS(v.Pattern.Tokenizer()).Write(",").Newline().
-			Write("field: ").JS(v.Input).Write(",").Newline().
-			Unindent().Write("},").Newline()
+		out.Write("match(").JS(v.Input).Write(", ").JS(v.Pattern.Tokenizer())
 		if len(v.OnSuccess) > 0 {
-			out.Write("on_success: processor_chain([").
+			out.Write(", processor_chain([").
 				Indent().Newline()
 			for _, act := range v.OnSuccess {
 				generate(act, out)
 				out.Write(",").Newline()
 			}
-			out.Unindent().Write("]),").Newline()
+			out.Unindent().Write("])")
 		}
-		out.Unindent().Write("})")
+		out.Write(")")
 
 	case parser.AllMatch:
 		out.Write("all_match({").Newline().Indent().
@@ -221,6 +216,12 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		// Removing nodes from the tree is complicated.
 		out.Write("nop")
 		out.Err(errors.New("WARN: Found a Noop in the tree."))
+
+	case MsgID1Wrapper:
+		out.Write("msg(").JS(v.msgID1).Write(", ")
+		generate(v.wrapped[0], out)
+		out.Write(")")
+
 	default:
 		out.Writef("/* TODO: here goes a %T */", v)
 		out.Err(errors.Errorf("unknown type to serialize %T", v))

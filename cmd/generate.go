@@ -118,6 +118,8 @@ func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
 				cfg.Opt.GlobalEntities = true
 			case "deduplicate":
 				cfg.Opt.DetectDuplicates = true
+			case "stripid1":
+				cfg.Opt.StripMessageID1 = true
 			}
 		}
 	}

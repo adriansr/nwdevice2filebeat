@@ -39,14 +39,17 @@ function linear_select(subprocessors) {
     }
 }
 
-function match(options) {
-    options.dissect["target_prefix"] = FIELDS_OBJECT;
-    options.dissect["ignore_failure"] = true;
-    options.dissect["overwrite_keys"] = true;
+function match(src, pattern, on_succcess) {
     //console.debug("create tokenizer: " + options.dissect.tokenizer);
-    var dissect = new processor.Dissect(options.dissect);
+    var dissect = new processor.Dissect({
+        field: src,
+        tokenizer: pattern,
+        target_prefix: FIELDS_OBJECT,
+        ignore_failure: true,
+        overwrite_keys: true,
+    });
     return function(evt) {
-        var src = evt.Get(options.dissect.field);
+        //var src = evt.Get(options.dissect.field);
         dissect.Run(evt);
         var failed = evt.Get(FLAG_FIELD) != null;
         /*if (failed) {
@@ -56,8 +59,8 @@ function match(options) {
         }
         console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
         console.debug("       input: <<" + src + ">>");*/
-        if (options.on_success != null && !failed) {
-            options.on_success(evt);
+        if (on_success != null && !failed) {
+            on_success(evt);
         }
     }
 }
@@ -98,6 +101,14 @@ function msgid_select(mapping) {
     }
 }
 
+function msg(msg_id, match) {
+    return function(evt) {
+        match(evt);
+        if (evt.Get(FLAG_FIELD) == null) {
+            evt.Put(FIELDS_PREFIX + "msg_id1", msg_id);
+        }
+    }
+}
 var start;
 function save_flags(evt) {
     start = Date.now();

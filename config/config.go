@@ -37,6 +37,12 @@ type Optimizations struct {
 	// Makes the generated JS more compact and saves memory, but impacts
 	// readability.
 	DetectDuplicates bool
+
+	// This removes the id1 from messages. This ID uniquely identifies every
+	// MESSAGE parser and its presence, while it helps to understand which
+	// particular message matched, at the same time makes every message parser
+	// unique and increases the output size.
+	StripMessageID1 bool
 }
 
 type Fixes struct {

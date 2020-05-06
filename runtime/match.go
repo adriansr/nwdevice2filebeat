@@ -150,7 +150,7 @@ func newPatternInner(input parser.Pattern, depth int) (output [][]pattern, err e
 			entry.value = adjustConstant([]byte(v.Value()))
 			current = append(current, entry)
 		case parser.Field:
-			entry.value = []byte(v.Name())
+			entry.value = []byte(v.Name)
 			entry.isCapture = true
 			current = append(current, entry)
 		case parser.Payload:

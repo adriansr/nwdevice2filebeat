@@ -7,6 +7,7 @@ package parser
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -42,30 +43,31 @@ func (c Constant) Value() string {
 	return string(c)
 }
 
-type Field string
-
-func (c Field) String() string {
-	return "Field(" + string(c) + ")"
+type Field struct {
+	Name   string
+	Greedy bool
 }
 
-func (c Field) Name() string {
-	return string(c)
+func (f Field) String() string {
+	return "Field(" + f.Name + "," + strconv.FormatBool(f.Greedy) + ")"
 }
 
 func (f Field) Token() string {
-	if len(f) == 0 {
+	if len(f.Name) == 0 {
 		return "%{}"
 	}
-	//return "%{" + string(f) + "->}"
-	return "%{" + string(f) + "}"
+	if f.Greedy {
+		return "%{" + f.Name + "->}"
+	}
+	return "%{" + f.Name + "}"
 }
 
-func (c Field) Children() []Operation {
+func (Field) Children() []Operation {
 	return nil
 }
 
-func (c Field) Hashable() string {
-	return c.String()
+func (f Field) Hashable() string {
+	return f.String()
 }
 
 type Alternatives []Pattern
@@ -258,7 +260,7 @@ func (c Payload) Hashable() string {
 }
 
 func (c Payload) FieldName() string {
-	return string(c)
+	return c.Name
 }
 
 func (c Payload) Children() []Operation {
@@ -266,10 +268,10 @@ func (c Payload) Children() []Operation {
 }
 
 func (p Payload) Token() string {
-	if len(p) == 0 {
+	if len(p.Name) == 0 {
 		return "%{payload}"
 	}
-	return "%{" + string(p) + "}"
+	return "%{" + p.Name + "}"
 }
 
 func newValue(s string, unquotedMeansField bool) (Value, error) {
@@ -289,13 +291,13 @@ func newValue(s string, unquotedMeansField bool) (Value, error) {
 			return nil, errors.Errorf("field name in reference:<<%s>> does not match regex:<<%s>>", name, fieldNameRegex)
 		}
 		// TODO: This was FieldRef, but the distinction doesn't seem necessary.
-		return Field(name), nil
+		return Field{Name: name}, nil
 	default:
 		if unquotedMeansField {
 			if !fieldNameRegex.MatchString(s) {
 				return nil, errors.Errorf("field name:<<%s>> does not match regex:<<%s>>", s, fieldNameRegex)
 			}
-			return Field(s), nil
+			return Field{Name: s}, nil
 		} else {
 			return Constant(s), nil
 		}

@@ -89,7 +89,7 @@ func newFunction(name string, target string, args []parser.Value) (Node, error) 
 		case parser.Constant:
 			f.Args[idx] = constant(v.Value())
 		case parser.Field:
-			f.Args[idx] = field(v.Name())
+			f.Args[idx] = field(v.Name)
 		default:
 			return nil, errors.Errorf("unknown value in function call argument: %T", v)
 		}

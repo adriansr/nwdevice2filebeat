@@ -59,20 +59,20 @@ func (proc *Processor) translate(op parser.Operation) (result Node, err error) {
 				Value: val.Value(),
 			}, nil
 		case parser.Field:
-			if len(val.Name()) == 0 {
+			if len(val.Name) == 0 {
 				return nil, errors.New("empty field name in SetField")
 			}
-			if val.Name()[0] == '$' {
-				switch val.Name() {
+			if val.Name[0] == '$' {
+				switch val.Name {
 				case "$MSG":
 					return CopyMsg(v.Target), nil
 				default:
-					return nil, errors.Errorf("Don't know how to SetField from '%s'", val.Name())
+					return nil, errors.Errorf("Don't know how to SetField from '%s'", val.Name)
 				}
 			}
 			return &CopyField{
 				Dst: v.Target,
-				Src: val.Name(),
+				Src: val.Name,
 			}, nil
 
 		default:

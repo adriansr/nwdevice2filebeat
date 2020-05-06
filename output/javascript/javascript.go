@@ -18,19 +18,6 @@ var header = `//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch 
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
 
-var processor = require("processor");
-var console   = require("console");
-
-var device;
-
-// Register params from configuration.
-function register(params) {
-    device = new DeviceProcessor();
-}
-
-function process(evt) {
-    return device.process(evt);
-}
 `
 
 func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
@@ -117,7 +104,7 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Write(")")
 
 	case parser.Match:
-		out.Write("match(").JS(v.Input).Write(", ").JS(v.Pattern.Tokenizer())
+		out.Write("match(").JS(v.ID).Write(", ").JS(v.Input).Write(", ").JS(v.Pattern.Tokenizer())
 		if len(v.OnSuccess) > 0 {
 			out.Write(", processor_chain([").
 				Indent().Newline()

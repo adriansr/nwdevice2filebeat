@@ -280,9 +280,9 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 //line pattern.go.rl:35
 
 		if !isPayload {
-			pattern = append(pattern, Field(data[mark:p]))
+			pattern = append(pattern, Field{Name: data[mark:p]})
 		} else {
-			pattern = append(pattern, Payload(Field(data[mark:p])))
+			pattern = append(pattern, Payload(Field{Name: data[mark:p]}))
 			isPayload = false
 		}
 		mark = p
@@ -325,9 +325,9 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 //line pattern.go.rl:35
 
 		if !isPayload {
-			pattern = append(pattern, Field(data[mark:p]))
+			pattern = append(pattern, Field{Name: data[mark:p]})
 		} else {
-			pattern = append(pattern, Payload(Field(data[mark:p])))
+			pattern = append(pattern, Payload(Field{Name: data[mark:p]}))
 			isPayload = false
 		}
 		mark = p
@@ -335,7 +335,7 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 //line pattern.go.rl:64
 
 		if isPayload {
-			pattern = append(pattern, Payload(Field("")))
+			pattern = append(pattern, Payload(Field{}))
 			isPayload = false
 		}
 
@@ -348,7 +348,7 @@ func ParsePattern(data string) (pattern Pattern, err error) {
 //line pattern.go.rl:64
 
 		if isPayload {
-			pattern = append(pattern, Payload(Field("")))
+			pattern = append(pattern, Payload(Field{}))
 			isPayload = false
 		}
 

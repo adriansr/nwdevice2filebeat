@@ -92,6 +92,8 @@ var transforms = PostprocessGroup{
 
 		//{"fix extra leading space in constants (2)", fixExtraLeadingSpaceInConstants},
 		{"fix extra space in constants", fixExtraSpaceInConstants},
+
+		{"make dissect captures greedy", makeDissectGreedy},
 	},
 }
 
@@ -152,7 +154,7 @@ func setPayloadField(parser *Parser) error {
 		if _, ok := last.(Payload); !ok {
 			return errors.New("expected payload as last field")
 		}
-		hdr.content[n-1] = Field("payload")
+		hdr.content[n-1] = Field{Name: "payload"}
 	}
 	return nil
 }
@@ -168,7 +170,7 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 		}
 		count := 0
 		for _, elem := range hdr.content {
-			if fld, ok := elem.(Field); ok && fld.Name() == payload {
+			if fld, ok := elem.(Field); ok && fld.Name == payload {
 				count++
 			}
 		}
@@ -254,7 +256,7 @@ func removeSpecialFields(parser *Parser) (err error) {
 		switch call := node.(type) {
 		case Call:
 			if len(call.Args) > 0 {
-				if fld, ok := call.Args[0].(Field); ok && (fld.Name() == "$MSG" || fld.Name() == "$HDR") {
+				if fld, ok := call.Args[0].(Field); ok && (fld.Name == "$MSG" || fld.Name == "$HDR") {
 					call.Args = call.Args[1:]
 					return WalkReplace, call
 				}
@@ -328,7 +330,7 @@ func translateCalls(parser *Parser) (err error) {
 						err = errors.Errorf("at %s: URL call argument %d is not a field: %v", call.Source(), idx+1, call.Hashable())
 						return WalkCancel, nil
 					}
-					param[idx] = fld.Name()
+					param[idx] = fld.Name
 				}
 				// Arg 1 is URL component identifier.
 				cp, found := VarNameToURLComponent[param[0]]
@@ -404,7 +406,7 @@ func convertEventTime(p *Parser) (err error) {
 			fields := make([]string, numArgs-numFormats)
 			for idx, arg := range call.Args[numFormats:] {
 				if field, ok := arg.(Field); ok {
-					fields[idx] = field.Name()
+					fields[idx] = field.Name
 				} else {
 					err = errors.Errorf("at %s: %s call argument %d is not a field", call.Source(), call.Function, idx+numFormats)
 					return WalkCancel, nil
@@ -470,7 +472,7 @@ func convertDuration(p *Parser) (err error) {
 			fields := make([]string, numArgs-numFormats)
 			for idx, arg := range call.Args[numFormats:] {
 				if field, ok := arg.(Field); ok {
-					fields[idx] = field.Name()
+					fields[idx] = field.Name
 				} else {
 					err = errors.Errorf("at %s: DUR call argument %d is not a field", call.Source(), idx+numFormats)
 					return WalkCancel, nil
@@ -532,9 +534,9 @@ func splitDissect(p *Parser) (err error) {
 						PayloadField:  "", // TODO
 					}
 					if found {
-						input = fmt.Sprintf("p%d", partCounter)
+						input = "part" //fmt.Sprintf("p%d", partCounter)
 						partCounter++
-						node.Pattern = append(node.Pattern, Field(input))
+						node.Pattern = append(node.Pattern, Field{Name: input})
 					}
 					repl.Nodes = append(repl.Nodes, node)
 				}
@@ -547,8 +549,8 @@ func splitDissect(p *Parser) (err error) {
 				var part Value
 				displayCounter := partCounter
 				if pos < len(match.Pattern)-1 {
-					input = fmt.Sprintf("p%d", partCounter)
-					part = Field(input)
+					input = "part" // fmt.Sprintf("p%d", partCounter)
+					part = Field{Name: input}
 					partCounter++
 				}
 				for idx, pattern := range alt {
@@ -568,10 +570,12 @@ func splitDissect(p *Parser) (err error) {
 			}
 			repl.onSuccessPos = len(repl.Nodes)
 			repl.Nodes = append(repl.Nodes, match.OnSuccess...)
+
 			var tmpFields RemoveFields
-			for i := 0; i < partCounter; i++ {
+			// TODO: Remove fields or not?
+			/*for i := 0; i < partCounter; i++ {
 				tmpFields = append(tmpFields, fmt.Sprintf("p%d", i))
-			}
+			}*/
 			if len(tmpFields) > 0 {
 				repl.Nodes = append(repl.Nodes, tmpFields)
 			}
@@ -581,6 +585,38 @@ func splitDissect(p *Parser) (err error) {
 			}
 			// TODO: cleanup on failure
 			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+func makeGreedyCaptures(pattern Pattern) (err error) {
+	n := len(pattern)
+	space := false
+	for i := n - 1; i >= 0; i-- {
+		switch v := pattern[i].(type) {
+		case Constant:
+			space = len(v.Value()) > 0 && v.Value()[0] == ' '
+		case Field:
+			if space {
+				pattern[i] = Field{Name: v.Name, Greedy: true}
+				space = false
+			}
+		default:
+			// Only constants and fields are expected at the stage this transformation
+			// is run. Alternatives have already been stripped.
+			return errors.Errorf("unexpected type in pattern: %T", v)
+		}
+	}
+	return nil
+}
+
+func makeDissectGreedy(p *Parser) (err error) {
+	// When a capture is followed by a space, replace it with a greedy capture.
+	p.Walk(func(node Operation) (WalkAction, Operation) {
+		if match, ok := node.(Match); ok {
+			makeGreedyCaptures(match.Pattern)
 		}
 		return WalkContinue, nil
 	})
@@ -992,7 +1028,7 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 				match.Pattern = append(match.Pattern, make(Pattern, len(inserts))...)
 				for shift, pos := range inserts {
 					copy(match.Pattern[pos+shift+1:], match.Pattern[pos+shift:])
-					match.Pattern[pos+shift] = Field("")
+					match.Pattern[pos+shift] = Field{}
 				}
 				return WalkReplace, match
 			}
@@ -1191,9 +1227,9 @@ func detectBrokenDissectPatterns(parser *Parser) error {
 					if prevIsField {
 						errs = append(errs,
 							errors.Errorf("at %s: consecutive field captures generated (fields %s and %s)",
-								match.Source(), prev, fld.Name()))
+								match.Source(), prev, fld.Name))
 					}
-					prev = fld.Name()
+					prev = fld.Name
 				}
 				prevIsField = isField
 			}

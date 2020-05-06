@@ -147,7 +147,7 @@ func newValue(op parser.Operation) (valueMapEntry, error) {
 	case parser.Constant:
 		return ct(v.Value()), nil
 	case parser.Field:
-		return fld(v.Name()), nil
+		return fld(v.Name), nil
 	default:
 		return nil, errors.Errorf("unexpected type in valuemap: %T", v)
 	}

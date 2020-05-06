@@ -2,11 +2,28 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+var processor = require("processor");
+var console   = require("console");
+
 var FLAG_FIELD = "log.flags";
 var FIELDS_OBJECT = "nwparser";
 var FIELDS_PREFIX = FIELDS_OBJECT + ".";
 
 var saved_flags = null;
+var debug = false;
+var device;
+
+// Register params from configuration.
+function register(params) {
+    if (params.debug) {
+        debug = true;
+    }
+    device = new DeviceProcessor();
+}
+
+function process(evt) {
+    return device.process(evt);
+}
 
 function processor_chain(subprocessors) {
     var builder = new processor.Chain();
@@ -22,25 +39,26 @@ function linear_select(subprocessors) {
         var i;
         for (i=0; i<subprocessors.length; i++) {
             evt.Delete(FLAG_FIELD);
-            //console.warn("linear_select trying entry " + i);
+            if (debug) console.warn("linear_select trying entry " + i);
             subprocessors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) == null) break;
-            //console.warn("linear_select failed entry " + i);
+            if (debug) console.warn("linear_select failed entry " + i);
         }
         if (saved_flags !== null) {
             evt.Put(FLAG_FIELD, saved_flags);
         }
-        /*if (i < subprocessors.length) {
-            console.warn("linear_select matched entry " + i);
-        } else {
-            console.warn("linear_select didn't match");
-        }*/
+        if (debug) {
+            if (i < subprocessors.length) {
+                console.warn("linear_select matched entry " + i);
+            } else {
+                console.warn("linear_select didn't match");
+            }
+        }
     }
 }
 
-function match(src, pattern, on_success) {
-    //console.debug("create tokenizer: " + options.dissect.tokenizer);
+function match(id, src, pattern, on_success) {
     var dissect = new processor.Dissect({
         field: src,
         tokenizer: pattern,
@@ -49,16 +67,18 @@ function match(src, pattern, on_success) {
         overwrite_keys: true,
     });
     return function(evt) {
-        //var src = evt.Get(options.dissect.field);
+        var msg = evt.Get(src);
         dissect.Run(evt);
         var failed = evt.Get(FLAG_FIELD) != null;
-        /*if (failed) {
-            console.debug("dissect fail: " + options.id + " field:" + options.dissect.field);
-        } else {
-            console.debug("dissect   OK: " + options.id + " field:" + options.dissect.field);
+        if (debug) {
+            if (failed) {
+                console.debug("dissect fail: " + id + " field:" + src);
+            } else {
+                console.debug("dissect   OK: " + id + " field:" + src);
+            }
+            console.debug("        expr: <<" + pattern + ">>");
+            console.debug("       input: <<" + msg + ">>");
         }
-        console.debug("        expr: <<" + options.dissect.tokenizer + ">>");
-        console.debug("       input: <<" + src + ">>");*/
         if (on_success != null && !failed) {
             on_success(evt);
         }
@@ -74,11 +94,11 @@ function all_match(opts) {
             opts.processors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) != null) {
-                //console.warn("all_match failure at " + i); // + ":" + JSON.stringify(evt));
+                if (debug) console.warn("all_match failure at " + i); // + ":" + JSON.stringify(evt));
                 if (opts.on_failure != null) opts.on_failure(evt);
                 return;
             }
-            //console.warn("all_match success at " + i); // + ":" + JSON.stringify(evt));
+            if (debug) console.warn("all_match success at " + i); // + ":" + JSON.stringify(evt));
         }
         if (opts.on_success != null) opts.on_success(evt);
     }
@@ -88,15 +108,15 @@ function msgid_select(mapping) {
     return function(evt) {
         var msgid = evt.Get(FIELDS_PREFIX + "messageid");
         if (msgid == null) {
-            //console.warn("msgid_select: no messageid captured!")
+            if (debug) console.warn("msgid_select: no messageid captured!")
             return;
         }
         var next = mapping[msgid];
         if (next === undefined) {
-            //console.warn("msgid_select: no mapping for messageid:" + msgid);
+            if (debug) console.warn("msgid_select: no mapping for messageid:" + msgid);
             return;
         }
-        //console.info("msgid_select: matched key=" + msgid);
+        if (debug) console.info("msgid_select: matched key=" + msgid);
         return next(evt);
     }
 }
@@ -282,7 +302,7 @@ function date_time_join_args(evt, arglist) {
             if (str != "") str += " ";
             str += val;
         } else {
-            console.warn("in date_time: input arg " + fname + " is not set");
+            if (debug) console.warn("in date_time: input arg " + fname + " is not set");
         }
     }
     return str;
@@ -308,11 +328,11 @@ function date_times(opts) {
         var i;
         for (i=0; i<opts.fmts.length; i++) {
             if (date_time_try_pattern(evt, opts, opts.fmts[i], str)) {
-                //console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
+                if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
                 return;
             }
         }
-        console.warn("in date_time: id="+opts.id+" (s) FAILED: " + str);
+        if (debug) console.warn("in date_time: id="+opts.id+" (s) FAILED: " + str);
     }
 }
 
@@ -320,7 +340,7 @@ function date_time(opts) {
     return function(evt) {
         var str = date_time_join_args(evt, opts.args);
         if (!date_time_try_pattern(evt, opts, opts.fmt, str)) {
-            console.warn("in date_time: id="+opts.id+" FAILED: " + str);
+            if (debug) console.warn("in date_time: id="+opts.id+" FAILED: " + str);
         }
     }
 }

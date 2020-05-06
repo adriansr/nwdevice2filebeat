@@ -172,7 +172,7 @@ func adjustOverlappingPayload(p *parser.Parser) (err error) {
 			var elem parser.Value
 			found := false
 			for pos, elem = range match.Pattern {
-				if field, ok := elem.(parser.Field); ok && field.Name() == match.PayloadField {
+				if field, ok := elem.(parser.Field); ok && field.Name == match.PayloadField {
 					found = true
 					break
 				}
@@ -251,7 +251,7 @@ func setTimestamp(p *parser.Parser) (err error) {
 		rootChain := p.Root.(parser.Chain)
 		rootChain.Nodes = append(rootChain.Nodes, parser.SetField{
 			Target: "@timestamp",
-			Value:  []parser.Operation{parser.Field(selectedField)},
+			Value:  []parser.Operation{parser.Field{Name: selectedField}},
 		})
 		p.Root = rootChain
 	} else {
@@ -452,7 +452,7 @@ func fixNonCapturingDissects(p *parser.Parser) error {
 			if _, ok := match.Pattern[0].(parser.Constant); !ok {
 				return parser.WalkContinue, nil
 			}
-			match.Pattern = append(match.Pattern, parser.Field(""))
+			match.Pattern = append(match.Pattern, parser.Field{})
 			return parser.WalkReplace, match
 		}
 		return parser.WalkContinue, nil
@@ -569,7 +569,7 @@ func promoteCopyFieldInList(list []parser.Operation) (changed bool) {
 			if field, isField := set.Value[0].(parser.Field); isField {
 				list[idx] = SetField{
 					set.Target,
-					field.Name(),
+					field.Name,
 				}
 				changed = true
 			}

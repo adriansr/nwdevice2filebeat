@@ -94,11 +94,11 @@ function all_match(opts) {
             opts.processors[i](evt);
             // Dissect processor succeeded?
             if (evt.Get(FLAG_FIELD) != null) {
-                if (debug) console.warn("all_match failure at " + i); // + ":" + JSON.stringify(evt));
+                if (debug) console.warn("all_match failure at " + i);
                 if (opts.on_failure != null) opts.on_failure(evt);
                 return;
             }
-            if (debug) console.warn("all_match success at " + i); // + ":" + JSON.stringify(evt));
+            if (debug) console.warn("all_match success at " + i);
         }
         if (opts.on_success != null) opts.on_success(evt);
     }
@@ -129,6 +129,7 @@ function msg(msg_id, match) {
         }
     }
 }
+
 var start;
 function save_flags(evt) {
     start = Date.now();

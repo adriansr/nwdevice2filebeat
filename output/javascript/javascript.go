@@ -17,7 +17,6 @@ import (
 var header = `//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 //  or more contributor license agreements. Licensed under the Elastic License;
 //  you may not use this file except in compliance with the Elastic License.
-
 `
 
 func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
@@ -77,10 +76,10 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Unindent().Write("};").Newline()
 
 	case parser.Constant:
-		out.Write("constant(").JS(v).Write(")")
+		out.Write("constant(").JS(v.Value()).Write(")")
 
 	case parser.Field:
-		out.Write("field(").JS(v).Write(")")
+		out.Write("field(").JS(v.Name).Write(")")
 
 	case parser.Chain:
 		out.Write("processor_chain([").Newline().Indent()

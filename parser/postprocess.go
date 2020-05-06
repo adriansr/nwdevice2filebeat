@@ -62,6 +62,7 @@ var transforms = PostprocessGroup{
 		{"translate calls", translateCalls},
 		{"strip REGX calls", stripRegex},
 		{"strip SYSVAL calls", pruneSysval},
+		{"strip same-field copy", pruneUnnecessaryCopies},
 		{"remove no-ops in function lists", removeNoops},
 
 		// Remove unnecessary $MSG and $HDR as first argument to calls
@@ -243,6 +244,24 @@ func pruneSysval(parser *Parser) (err error) {
 			for idx, op := range match.OnSuccess {
 				if call, ok := op.(Call); ok && call.Function == "SYSVAL" {
 					match.OnSuccess[idx] = Noop{}
+				}
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+// Prune actions like SetField{Target: myfield, Value: Field(myfield)}
+// These appear a lot as myfield=*HDR(myfield)
+func pruneUnnecessaryCopies(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (WalkAction, Operation) {
+		if match, ok := node.(Match); ok {
+			for idx, op := range match.OnSuccess {
+				if setf, ok := op.(SetField); ok {
+					if argf, ok := setf.Value[0].(Field); ok && setf.Target == argf.Name {
+						match.OnSuccess[idx] = Noop{}
+					}
 				}
 			}
 		}
@@ -534,7 +553,7 @@ func splitDissect(p *Parser) (err error) {
 						PayloadField:  "", // TODO
 					}
 					if found {
-						input = "part" //fmt.Sprintf("p%d", partCounter)
+						input = "p0" //fmt.Sprintf("p%d", partCounter)
 						partCounter++
 						node.Pattern = append(node.Pattern, Field{Name: input})
 					}
@@ -549,7 +568,7 @@ func splitDissect(p *Parser) (err error) {
 				var part Value
 				displayCounter := partCounter
 				if pos < len(match.Pattern)-1 {
-					input = "part" // fmt.Sprintf("p%d", partCounter)
+					input = "p0" // fmt.Sprintf("p%d", partCounter)
 					part = Field{Name: input}
 					partCounter++
 				}
@@ -636,7 +655,7 @@ func injectSpaceBetweenConsecutiveCaptures(pattern Pattern, loc util.XMLPos, war
 				// TODO: Revisit decision and check rsa2elk
 				fixes = append(fixes, idx)
 				warnings.Addf(loc, "consecutive captures in pattern: %s and %s (injected space)",
-					lastCapture, v)
+					lastCapture, v.Name)
 			}
 			lastCapture = op
 		case Payload:

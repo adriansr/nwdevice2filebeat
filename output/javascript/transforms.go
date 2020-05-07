@@ -14,6 +14,19 @@ import (
 	"github.com/adriansr/nwdevice2filebeat/parser"
 )
 
+// This needs to be disabled until proper dependency analysis is implemented.
+// These two action chains are not equivalent:
+//
+// field_a: const1
+// field_b: field_c
+// field_c: const2
+//
+//
+// set{
+//   field_a: const1
+//   field_c: const2
+// }
+// field_b: field_c
 const promoteSetConstant = false
 
 var preprocessors = parser.PostprocessGroup{

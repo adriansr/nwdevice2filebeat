@@ -55,6 +55,7 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 			Write("builder.Add(")
 		generate(v.inner[0], out)
 		out.Write(");").Newline().
+			Write("builder.Add(populate_fields);").Newline().
 			Write("builder.Add(restore_flags);").Newline().
 			Write("var chain = builder.Build();").Newline().
 			Write("return {").Newline().

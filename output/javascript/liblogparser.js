@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 var processor = require("processor");
-var console   = require("console");
+var console = require("console");
 
 var FLAG_FIELD = "log.flags";
 var FIELDS_OBJECT = "nwparser";
@@ -24,10 +24,10 @@ var device;
 
 // Register params from configuration.
 function register(params) {
-    debug    = params.debug    !== undefined? params.debug    : defaults.debug;
-    map_ecs  = params.ecs      !== undefined? params.ecs      : defaults.ecs;
-    map_rsa  = params.rsa      !== undefined? params.rsa      : defaults.rsa;
-    keep_raw = params.keep_raw !== undefined? params.keep_raw : defaults.keep_raw;
+    debug = params.debug !== undefined ? params.debug : defaults.debug;
+    map_ecs = params.ecs !== undefined ? params.ecs : defaults.ecs;
+    map_rsa = params.rsa !== undefined ? params.rsa : defaults.rsa;
+    keep_raw = params.keep_raw !== undefined ? params.keep_raw : defaults.keep_raw;
     device = new DeviceProcessor();
 }
 
@@ -42,17 +42,17 @@ function process(evt) {
 
 function processor_chain(subprocessors) {
     var builder = new processor.Chain();
-    for (var i=0; i<subprocessors.length; i++) {
+    for (var i = 0; i < subprocessors.length; i++) {
         builder.Add(subprocessors[i]);
     }
     return builder.Build().Run;
 }
 
 function linear_select(subprocessors) {
-    return function(evt) {
+    return function (evt) {
         var saved_flags = evt.Get(FLAG_FIELD);
         var i;
-        for (i=0; i<subprocessors.length; i++) {
+        for (i = 0; i < subprocessors.length; i++) {
             evt.Delete(FLAG_FIELD);
             if (debug) console.warn("linear_select trying entry " + i);
             subprocessors[i](evt);
@@ -81,7 +81,7 @@ function match(id, src, pattern, on_success) {
         ignore_failure: true,
         overwrite_keys: true,
     });
-    return function(evt) {
+    return function (evt) {
         var msg = evt.Get(src);
         dissect.Run(evt);
         var failed = evt.Get(FLAG_FIELD) != null;
@@ -101,9 +101,9 @@ function match(id, src, pattern, on_success) {
 }
 
 function all_match(opts) {
-    return function(evt) {
+    return function (evt) {
         var i;
-        for (i=0; i<opts.processors.length; i++) {
+        for (i = 0; i < opts.processors.length; i++) {
             evt.Delete(FLAG_FIELD);
             // TODO: What if dissect sets FLAG_FIELD? :)
             opts.processors[i](evt);
@@ -120,7 +120,7 @@ function all_match(opts) {
 }
 
 function msgid_select(mapping) {
-    return function(evt) {
+    return function (evt) {
         var msgid = evt.Get(FIELDS_PREFIX + "messageid");
         if (msgid == null) {
             if (debug) console.warn("msgid_select: no messageid captured!")
@@ -137,7 +137,7 @@ function msgid_select(mapping) {
 }
 
 function msg(msg_id, match) {
-    return function(evt) {
+    return function (evt) {
         match(evt);
         if (evt.Get(FLAG_FIELD) == null) {
             evt.Put(FIELDS_PREFIX + "msg_id1", msg_id);
@@ -146,6 +146,7 @@ function msg(msg_id, match) {
 }
 
 var start;
+
 function save_flags(evt) {
     saved_flags = evt.Get(FLAG_FIELD);
     evt.Put("event.original", evt.Get("message"));
@@ -158,14 +159,14 @@ function restore_flags(evt) {
 }
 
 function constant(value) {
-    return function(evt) {
+    return function (evt) {
         return value;
     }
 }
 
 function field(name) {
     var fullname = FIELDS_PREFIX + name;
-    return function(evt) {
+    return function (evt) {
         return evt.Get(fullname);
     }
 }
@@ -173,7 +174,7 @@ function field(name) {
 function STRCAT(evt, args) {
     var s = "";
     var i;
-    for (i=0; i<args.length; i++) {
+    for (i = 0; i < args.length; i++) {
         s += args[i];
     }
     return s;
@@ -232,7 +233,7 @@ function CALC(evt, args) {
             return;
     }
     // Always return a string
-    return result !== undefined? "" + result : result;
+    return result !== undefined ? "" + result : result;
 }
 
 function RMQ(evt, args) {
@@ -244,11 +245,11 @@ function UTC(evt, args) {
 }
 
 function call(opts) {
-    return function(evt) {
+    return function (evt) {
         // TODO: Optimize this
         var args = new Array(opts.args.length);
         var i;
-        for (i=0; i<opts.args.length; i++) {
+        for (i = 0; i < opts.args.length; i++) {
             args[i] = opts.args[i](evt);
         }
         var result = opts.fn(evt, args);
@@ -258,10 +259,11 @@ function call(opts) {
     }
 }
 
-function nop(evt) {}
+function nop(evt) {
+}
 
 function lookup(opts) {
-    return function(evt) {
+    return function (evt) {
         var key = opts.key(evt);
         if (key == null) return;
         var value = opts.map.keyvaluepairs[key];
@@ -282,27 +284,27 @@ function set(fields) {
 }
 
 function setf(dst, src) {
-    return function(evt) {
+    return function (evt) {
         var val = evt.Get(FIELDS_PREFIX + src);
         if (val != null) evt.Put(FIELDS_PREFIX + dst, val);
     }
 }
 
 function setc(dst, value) {
-    return function(evt) {
+    return function (evt) {
         evt.Put(FIELDS_PREFIX + dst, value);
     }
 }
 
 function set_field(opts) {
-    return function(evt) {
+    return function (evt) {
         var val = opts.value(evt);
         if (val != null) evt.Put(opts.dest, val);
     }
 }
 
 function dump(label) {
-    return function(evt) {
+    return function (evt) {
         console.log("Dump of event at " + label + ": " + JSON.stringify(evt, null, '\t'))
     }
 }
@@ -326,7 +328,7 @@ function date_time_try_pattern(evt, opts, fmt, str) {
     var date = new Date();
     var pos = 0;
     var len = str.length;
-    for (var proc=0; pos!==undefined && pos<len && proc<fmt.length; proc++) {
+    for (var proc = 0; pos !== undefined && pos < len && proc < fmt.length; proc++) {
         //console.warn("in date_time: enter proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
         pos = fmt[proc](str, pos, date);
         //console.warn("in date_time: leave proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
@@ -337,24 +339,24 @@ function date_time_try_pattern(evt, opts, fmt, str) {
 }
 
 function date_times(opts) {
-    return function(evt) {
+    return function (evt) {
         var str = date_time_join_args(evt, opts.args);
         var i;
-        for (i=0; i<opts.fmts.length; i++) {
+        for (i = 0; i < opts.fmts.length; i++) {
             if (date_time_try_pattern(evt, opts, opts.fmts[i], str)) {
                 if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
                 return;
             }
         }
-        if (debug) console.warn("in date_time: id="+opts.id+" (s) FAILED: " + str);
+        if (debug) console.warn("in date_time: id=" + opts.id + " (s) FAILED: " + str);
     }
 }
 
 function date_time(opts) {
-    return function(evt) {
+    return function (evt) {
         var str = date_time_join_args(evt, opts.args);
         if (!date_time_try_pattern(evt, opts, opts.fmt, str)) {
-            if (debug) console.warn("in date_time: id="+opts.id+" FAILED: " + str);
+            if (debug) console.warn("in date_time: id=" + opts.id + " FAILED: " + str);
         }
     }
 }
@@ -370,15 +372,15 @@ function durations(opts) {
 }
 
 function remove(fields) {
-    return function(evt) {
-        for (var i=0; i<fields.length; i++) {
+    return function (evt) {
+        for (var i = 0; i < fields.length; i++) {
             evt.Delete(FIELDS_PREFIX + fields[i]);
         }
     }
 }
 
 function dc(ct) {
-    return function(str, pos, date) {
+    return function (str, pos, date) {
         var n = str.length;
         if (n - pos < ct.length) return;
         var part = str.substr(pos, ct.length);
@@ -420,17 +422,17 @@ var shortMonths = {
 };
 
 var monthSetter = {
-  call: function(date, value) {
-      date.setMonth(value-1);
-  }
+    call: function (date, value) {
+        date.setMonth(value - 1);
+    }
 };
 
 // var dC = undefined;
 var dR = dateMonthName(true);
 var dB = dateMonthName(false);
-var dM = dateFixedWidthNumber('M', 2, 1, 12, monthSetter);//function(date, value) { date.setMonth(value-1); });
-var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);//function(date, value) { date.setMonth(value-1); });
-var dD = dateFixedWidthNumber('D',2, 1, 31, Date.prototype.setDate);
+var dM = dateFixedWidthNumber('M', 2, 1, 12, monthSetter);
+var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);
+var dD = dateFixedWidthNumber('D', 2, 1, 31, Date.prototype.setDate);
 var dF = dateVariableWidthNumber('F', 1, 31, Date.prototype.setDate);
 var dH = dateFixedWidthNumber('H', 2, 0, 24, Date.prototype.setHours);
 // TODO: var dI = ...
@@ -440,7 +442,7 @@ var dU = dateVariableWidthNumber('U', 0, 59, Date.prototype.setMinutes);
 // TODO: var dJ = ...Julian day...
 // TODO: var dP = ...AM|PM...
 // TODO: var dQ = ...A.M.|P.M....
-var dS = dateFixedWidthNumber('S', 2,0, 60, Date.prototype.setSeconds);
+var dS = dateFixedWidthNumber('S', 2, 0, 60, Date.prototype.setSeconds);
 var dO = dateVariableWidthNumber('O', 0, 60, Date.prototype.setSeconds);
 // TODO: var dY = ...YY...
 var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setFullYear);
@@ -449,8 +451,8 @@ var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setFullYear);
 // TODO: var dX = ...
 
 function skipws(str, pos) {
-    for ( var n = str.length
-        ; pos<n && str.charAt(pos) === ' '
+    for (var n = str.length
+        ; pos < n && str.charAt(pos) === ' '
         ; pos++)
         ;
     return pos;
@@ -458,18 +460,18 @@ function skipws(str, pos) {
 
 function skipdigits(str, pos) {
     var c;
-    for ( var n = str.length
-        ; pos<n && (c=str.charAt(pos)) >= '0' && c <= '9'
+    for (var n = str.length
+        ; pos < n && (c = str.charAt(pos)) >= '0' && c <= '9'
         ; pos++)
         ;
     return pos;
 }
 
 function dateVariableWidthNumber(fmtChar, min, max, setter) {
-    return function(str, pos, date) {
+    return function (str, pos, date) {
         var start = skipws(str, pos);
         pos = skipdigits(str, start);
-        var s = str.substr(start, pos-start);
+        var s = str.substr(start, pos - start);
         var value = parseInt(s, 10);
         if (value >= min && value <= max) {
             setter.call(date, value);
@@ -480,9 +482,8 @@ function dateVariableWidthNumber(fmtChar, min, max, setter) {
     }
 }
 
-
 function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
-    return function(str, pos, date) {
+    return function (str, pos, date) {
         pos = skipws(str, pos);
         var n = str.length;
         if (pos + width > n) return;
@@ -499,7 +500,7 @@ function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
 
 // Short month name (Jan..Dec).
 function dateMonthName(long) {
-    return function(str, pos, date) {
+    return function (str, pos, date) {
         pos = skipws(str, pos);
         var n = str.length;
         if (pos + 3 > n) return;
@@ -513,7 +514,7 @@ function dateMonthName(long) {
             return;
         }
         date.setMonth(idx[0]);
-        return pos + 3 + (long? idx[1] : 0);
+        return pos + 3 + (long ? idx[1] : 0);
     }
 }
 
@@ -580,7 +581,7 @@ var field_mappings = {
     'action': {ecs: ['event.action'], rsa: ['rsa.misc.action']},
     'info': {rsa: ['rsa.db.index']},
     'saddr': {convert: to_ip, ecs: ['source.ip']},
-    'payload': {convert: to_long, rsa: ['rsa.internal.payload']},
+    'payload': {rsa: ['rsa.internal.payload']},
     'message': {rsa: ['rsa.internal.message']},
     'hostname': {ecs: ['host.name'], rsa: ['rsa.network.alias_host']},
     'ec_activity': {rsa: ['rsa.investigations.ec_activity']},
@@ -1383,16 +1384,26 @@ var field_mappings = {
 }
 
 function to_date(value) {
-
+    switch (typeof (value)) {
+        case "object":
+            // This is a Date. But as it was obtained from evt.Get(), the VM
+            // doesn't see it as a JS Date anymore, thus value instanceof Date === false.
+            // Have to trust that any object here is a valid Date for Go.
+            return value;
+        case "string":
+            var asDate = new Date(value);
+            if (!isNaN(asDate)) return asDate;
+    }
 }
 
-var maxSafeInt = Math.pow(2, 53)-1;
+// ECMAScript 5.1 doesn't have Object.MAX_SAFE_INTEGER / Object.MIN_SAFE_INTEGER.
+var maxSafeInt = Math.pow(2, 53) - 1;
 var minSafeInt = -maxSafeInt;
 
 function to_long(value) {
     var num = parseInt(value);
-    // Better not to index a number if it's been truncated to 53 bits.
-    return !isNaN(num) && minSafeInt <= num && num <= maxSafeInt? num : undefined;
+    // Better not to index a number if it's not safe (above 53 bits).
+    return !isNaN(num) && minSafeInt <= num && num <= maxSafeInt ? num : undefined;
 }
 
 function to_ip(value) {
@@ -1403,58 +1414,61 @@ function to_ip(value) {
 
 var ipv4_regex = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
 var ipv6_hex_regex = /^[0-9A-Fa-f]{1,4}$/;
+
 function to_ipv4(value) {
     var result = ipv4_regex.exec(value);
     if (result == null || result.length !== 5) return;
-    for (var i=1; i<5; i++) {
+    for (var i = 1; i < 5; i++) {
         var num = parseInt(result[i]);
-        if (isNaN(num) || num<0 || num>255) return;
+        if (isNaN(num) || num < 0 || num > 255) return;
     }
     return value;
 }
-
 
 function to_ipv6(value) {
     var sqEnd = value.indexOf("]");
     if (sqEnd > -1) {
         if (value.charAt(0) != '[') return;
-        value = value.substr(1, sqEnd-1);
+        value = value.substr(1, sqEnd - 1);
     }
     var zoneOffset = value.indexOf('%');
     if (zoneOffset > -1) {
         value = value.substr(0, zoneOffset);
     }
     var parts = value.split(':');
-    if (parts == null || parts.length < 3 || parts.length > 8 ) return;
+    if (parts == null || parts.length < 3 || parts.length > 8) return;
     var numEmpty = 0;
     var innerEmpty = 0;
-    for (var i=0; i<parts.length; i++) {
+    for (var i = 0; i < parts.length; i++) {
         if (parts[i].length === 0) {
-            numEmpty ++;
-            if (i>0 && i+1 < parts.length) innerEmpty ++;
+            numEmpty++;
+            if (i > 0 && i + 1 < parts.length) innerEmpty++;
         } else if (!parts[i].match(ipv6_hex_regex) &&
             // Accept an IPv6 with a valid IPv4 at the end.
-            ((i+1 < parts.length) || !to_ipv4(parts[i]))) {
+            ((i + 1 < parts.length) || !to_ipv4(parts[i]))) {
             return
         }
     }
-    return innerEmpty === 0 && parts.length === 8 || innerEmpty === 1? value : undefined;
+    return innerEmpty === 0 && parts.length === 8 || innerEmpty === 1 ? value : undefined;
 }
 
 function to_double(value) {
-    return parseFloat(value)
+    return parseFloat(value);
 }
 
 function to_mac(value) {
-    return value // TODO
+    // ES doesn't have a mac datatype so it's safe to ingest whatever was captured.
+    return value;
 }
 
 function to_lowercase(value) {
-    return value.toLowerCase();
+    // to_lowercase is used against keyword fields, which can accept
+    // any other type (numbers, dates).
+    return typeof(value) === 'string'? value.toLowerCase() : value;
 }
 
 function map_all(evt, targets, value) {
-    for (var i=0; i<targets.length; i++) {
+    for (var i = 0; i < targets.length; i++) {
         evt.Put(targets[i], value);
     }
 }
@@ -1489,54 +1503,80 @@ function test() {
 }
 
 function test_conversions() {
-    var accept = function(input) { return {input: input, expected: input} }
-    var fail = function(input) { return {input: input} }
+    var accept = function (input, output) {
+        return {input: input, expected: output !== undefined ? output : input}
+    }
+    var drop = function (input) {
+        return {input: input}
+    }
     test_fn_call(to_ip, [
         accept("127.0.0.1"),
         accept("255.255.255.255"),
         accept("008.189.239.199"),
-        fail(""),
-        fail("not an IP"),
-        fail("42"),
-        fail("127.0.0.1."),
-        fail("127.0.0."),
-        fail("10.100.1000.1"),
+        drop(""),
+        drop("not an IP"),
+        drop("42"),
+        drop("127.0.0.1."),
+        drop("127.0.0."),
+        drop("10.100.1000.1"),
         accept("fd00:1111:2222:3333:4444:5555:6666:7777"),
-        { input: "fd00::7777%eth0", expected: "fd00::7777"},
-        { input: "[fd00::7777]", expected: "fd00::7777"},
-        { input: "[fd00::7777%enp0s3]", expected: "fd00::7777"},
+        accept("fd00::7777%eth0", "fd00::7777"),
+        accept("[fd00::7777]", "fd00::7777"),
+        accept("[fd00::7777%enp0s3]", "fd00::7777"),
         accept("::1"),
         accept("::"),
-        fail(":::"),
-        fail("fff::1::3"),
+        drop(":::"),
+        drop("fff::1::3"),
         accept("ffff::ffff"),
-        fail("::1ffff"),
-        fail(":1234:"),
-        fail("::1234z"),
+        drop("::1ffff"),
+        drop(":1234:"),
+        drop("::1234z"),
         accept("1::3:4:5:6:7:8"),
         accept("::255.255.255.255"),
         accept("64:ff9b::192.0.2.33"),
-        fail("::255.255.255.255:8"),
+        drop("::255.255.255.255:8"),
     ]);
-    test_fn_call( to_long, [
-        {input: "1234", expected: 1234},
-        {input: "0x2a", expected: 42},
-        fail("9007199254740992"),
-        fail("9223372036854775808"),
-        fail("NaN"),
-        {input: "-0x1fffffffffffff", expected: -9007199254740991},
-        {input: "+9007199254740991", expected: 9007199254740991},
-        fail("-0x20000000000000"),
-        fail("+9007199254740992"),
+    test_fn_call(to_long, [
+        accept("1234", 1234),
+        accept("0x2a", 42),
+        drop("9007199254740992"),
+        drop("9223372036854775808"),
+        drop("NaN"),
+        accept("-0x1fffffffffffff", -9007199254740991),
+        accept("+9007199254740991", 9007199254740991),
+        drop("-0x20000000000000"),
+        drop("+9007199254740992"),
+        accept(42),
+    ]);
+    test_fn_call(to_date, [
+        {
+            input: new Date("2017-10-16T08:30:42Z"),
+            expected: "2017-10-16T08:30:42.000Z",
+            convert: Date.prototype.toISOString,
+        },
+        {
+            input: "2017-10-16T08:30:42Z",
+            expected: new Date("2017-10-16T08:30:42Z").toISOString(),
+            convert: Date.prototype.toISOString,
+        },
+        drop("Not really a date."),
+    ]);
+    test_fn_call(to_lowercase, [
+        accept("Hello", "hello"),
+        accept(45),
+        accept(Date.now()),
     ]);
 }
 
 function test_fn_call(fn, cases) {
-    cases.forEach(function(test, idx) {
+    cases.forEach(function (test, idx) {
         var result = fn(test.input);
+        if (test.convert !== undefined) {
+            result = test.convert.call(result);
+        }
         if (result !== test.expected) {
-            throw "test "+fn.name+"#"+idx+" failed. Input:'" + test.input + "' Expected:'" + test.expected + "' Got:'" + result + "'";
+            throw "test " + fn.name + "#" + idx + " failed. Input:'" + test.input + "' Expected:'" + test.expected + "' Got:'" + result + "'";
         }
     });
-    if (debug) console.warn("test "+fn.name+" PASS.");
+    if (debug) console.warn("test " + fn.name + " PASS.");
 }

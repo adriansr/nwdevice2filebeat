@@ -9,23 +9,34 @@ var FLAG_FIELD = "log.flags";
 var FIELDS_OBJECT = "nwparser";
 var FIELDS_PREFIX = FIELDS_OBJECT + ".";
 
+var defaults = {
+    debug: false,
+    ecs: true,
+    rsa: false,
+    keep_raw: false,
+}
 var saved_flags = null;
-var debug = false;
-var map_ecs = true;
-var map_rsa = false;
-var keep_raw = false;
+var debug;
+var map_ecs;
+var map_rsa;
+var keep_raw;
 var device;
 
 // Register params from configuration.
 function register(params) {
-    debug = !!params.debug;
-    map_ecs = !!params.ecs;
-    map_rsa = !!params.rsa;
-    keep_raw = !!params.keep_raw;
+    debug    = params.debug    !== undefined? params.debug    : defaults.debug;
+    map_ecs  = params.ecs      !== undefined? params.ecs      : defaults.ecs;
+    map_rsa  = params.rsa      !== undefined? params.rsa      : defaults.rsa;
+    keep_raw = params.keep_raw !== undefined? params.keep_raw : defaults.keep_raw;
     device = new DeviceProcessor();
 }
 
 function process(evt) {
+    // Function register is only called by the processor when `params` are set
+    // in the processor config.
+    if (device === undefined) {
+        register(defaults);
+    }
     return device.process(evt);
 }
 
@@ -137,6 +148,7 @@ function msg(msg_id, match) {
 var start;
 function save_flags(evt) {
     saved_flags = evt.Get(FLAG_FIELD);
+    evt.Put("event.original", evt.Get("message"));
 }
 
 function restore_flags(evt) {
@@ -580,7 +592,7 @@ var field_mappings = {
     'daddr': {convert: to_ip, ecs: ['destination.ip']},
     'event_type': {ecs: ['event.category'], rsa: ['rsa.misc.event_type']},
     'id': {ecs: ['event.code'], rsa: ['rsa.misc.reference_id']},
-    'protocol': {ecs: ['network.protocol']},
+    'protocol': {convert: to_lowercase, ecs: ['network.protocol']},
     'version': {ecs: ['observer.version'], rsa: ['rsa.misc.version']},
     'filename': {ecs: ['file.name']},
     'hostip': {convert: to_ip, ecs: ['host.ip']},
@@ -654,7 +666,7 @@ var field_mappings = {
     'event_computer': {rsa: ['rsa.misc.event_computer']},
     'from': {rsa: ['rsa.email.email_src']},
     'id1': {rsa: ['rsa.misc.reference_id1']},
-    'stransaddr': {ecs: ['source.nat.ip']},
+    'stransaddr': {convert: to_ip, ecs: ['source.nat.ip']},
     'vid': {rsa: ['rsa.internal.msg_vid']},
     'privilege': {rsa: ['rsa.file.privilege']},
     'user_role': {rsa: ['rsa.identity.user_role']},
@@ -1371,16 +1383,62 @@ var field_mappings = {
 }
 
 function to_date(value) {
+
 }
 
+var maxSafeInt = Math.pow(2, 53)-1;
+var minSafeInt = -maxSafeInt;
+
 function to_long(value) {
-    var num = parseInt(value, 10)
-    // TODO: What to do with limits here.
-    return !isNaN(num)? num : undefined;
+    var num = parseInt(value);
+    // Better not to index a number if it's been truncated to 53 bits.
+    return !isNaN(num) && minSafeInt <= num && num <= maxSafeInt? num : undefined;
 }
 
 function to_ip(value) {
-    return value // TODO
+    if (value.indexOf(":") === -1)
+        return to_ipv4(value);
+    return to_ipv6(value);
+}
+
+var ipv4_regex = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
+var ipv6_hex_regex = /^[0-9A-Fa-f]{1,4}$/;
+function to_ipv4(value) {
+    var result = ipv4_regex.exec(value);
+    if (result == null || result.length !== 5) return;
+    for (var i=1; i<5; i++) {
+        var num = parseInt(result[i]);
+        if (isNaN(num) || num<0 || num>255) return;
+    }
+    return value;
+}
+
+
+function to_ipv6(value) {
+    var sqEnd = value.indexOf("]");
+    if (sqEnd > -1) {
+        if (value.charAt(0) != '[') return;
+        value = value.substr(1, sqEnd-1);
+    }
+    var zoneOffset = value.indexOf('%');
+    if (zoneOffset > -1) {
+        value = value.substr(0, zoneOffset);
+    }
+    var parts = value.split(':');
+    if (parts == null || parts.length < 3 || parts.length > 8 ) return;
+    var numEmpty = 0;
+    var innerEmpty = 0;
+    for (var i=0; i<parts.length; i++) {
+        if (parts[i].length === 0) {
+            numEmpty ++;
+            if (i>0 && i+1 < parts.length) innerEmpty ++;
+        } else if (!parts[i].match(ipv6_hex_regex) &&
+            // Accept an IPv6 with a valid IPv4 at the end.
+            ((i+1 < parts.length) || !to_ipv4(parts[i]))) {
+            return
+        }
+    }
+    return innerEmpty === 0 && parts.length === 8 || innerEmpty === 1? value : undefined;
 }
 
 function to_double(value) {
@@ -1389,6 +1447,10 @@ function to_double(value) {
 
 function to_mac(value) {
     return value // TODO
+}
+
+function to_lowercase(value) {
+    return value.toLowerCase();
 }
 
 function map_all(evt, targets, value) {
@@ -1420,4 +1482,61 @@ function populate_fields(evt) {
         evt.Put("rsa.raw", base);
     }
     evt.Delete(FIELDS_OBJECT);
+}
+
+function test() {
+    test_conversions();
+}
+
+function test_conversions() {
+    var accept = function(input) { return {input: input, expected: input} }
+    var fail = function(input) { return {input: input} }
+    test_fn_call(to_ip, [
+        accept("127.0.0.1"),
+        accept("255.255.255.255"),
+        accept("008.189.239.199"),
+        fail(""),
+        fail("not an IP"),
+        fail("42"),
+        fail("127.0.0.1."),
+        fail("127.0.0."),
+        fail("10.100.1000.1"),
+        accept("fd00:1111:2222:3333:4444:5555:6666:7777"),
+        { input: "fd00::7777%eth0", expected: "fd00::7777"},
+        { input: "[fd00::7777]", expected: "fd00::7777"},
+        { input: "[fd00::7777%enp0s3]", expected: "fd00::7777"},
+        accept("::1"),
+        accept("::"),
+        fail(":::"),
+        fail("fff::1::3"),
+        accept("ffff::ffff"),
+        fail("::1ffff"),
+        fail(":1234:"),
+        fail("::1234z"),
+        accept("1::3:4:5:6:7:8"),
+        accept("::255.255.255.255"),
+        accept("64:ff9b::192.0.2.33"),
+        fail("::255.255.255.255:8"),
+    ]);
+    test_fn_call( to_long, [
+        {input: "1234", expected: 1234},
+        {input: "0x2a", expected: 42},
+        fail("9007199254740992"),
+        fail("9223372036854775808"),
+        fail("NaN"),
+        {input: "-0x1fffffffffffff", expected: -9007199254740991},
+        {input: "+9007199254740991", expected: 9007199254740991},
+        fail("-0x20000000000000"),
+        fail("+9007199254740992"),
+    ]);
+}
+
+function test_fn_call(fn, cases) {
+    cases.forEach(function(test, idx) {
+        var result = fn(test.input);
+        if (result !== test.expected) {
+            throw "test "+fn.name+"#"+idx+" failed. Input:'" + test.input + "' Expected:'" + test.expected + "' Got:'" + result + "'";
+        }
+    });
+    if (debug) console.warn("test "+fn.name+" PASS.");
 }

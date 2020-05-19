@@ -427,6 +427,12 @@ var monthSetter = {
     }
 };
 
+var unixSetter = {
+    call: function (date, value) {
+        date.setTime(value * 1000);
+    }
+}
+
 // var dC = undefined;
 var dR = dateMonthName(true);
 var dB = dateMonthName(false);
@@ -448,7 +454,7 @@ var dO = dateVariableWidthNumber('O', 0, 60, Date.prototype.setSeconds);
 var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setFullYear);
 // TODO: var dZ = ...
 // TODO: var dA = ...
-// TODO: var dX = ...
+var dX = dateVariableWidthNumber('X', 0, 0x10000000000, unixSetter);
 
 function skipws(str, pos) {
     for (var n = str.length
@@ -1475,6 +1481,7 @@ function map_all(evt, targets, value) {
 
 function populate_fields(evt) {
     var base = evt.Get(FIELDS_OBJECT);
+    if (base === null) return;
     for (var key in base) {
         if (!base.hasOwnProperty(key)) continue;
         var mapping = field_mappings[key];

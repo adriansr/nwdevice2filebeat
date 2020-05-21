@@ -48,9 +48,13 @@ func (c *CodeWriter) write(data []byte) *CodeWriter {
 	return c
 }
 
-func (c *CodeWriter) AddRaw(raw string) *CodeWriter {
+func (c *CodeWriter) Raw(raw string) *CodeWriter {
+	return c.RawBytes([]byte(raw))
+}
+
+func (c *CodeWriter) RawBytes(raw []byte) *CodeWriter {
 	c.newline = false
-	return c.write([]byte(raw))
+	return c.write(raw)
 }
 
 func (c *CodeWriter) Err(err error) *CodeWriter {
@@ -119,7 +123,7 @@ func (c *CodeWriter) Finalize() (count uint64, err error) {
 			limit = 10
 		}
 		msg := []string{
-			fmt.Sprintf("found %d errors while generating javascript:\n", n),
+			fmt.Sprintf("found %d errors while generating code:\n", n),
 		}
 		for i := 0; i < limit; i++ {
 			msg = append(msg, "    "+c.errors[i].Error())

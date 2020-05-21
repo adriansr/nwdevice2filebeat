@@ -18,6 +18,9 @@ import (
 type Parser struct {
 	Config config.Config
 
+	Description model.DeviceHeader
+	Version     model.Version
+
 	ValueMaps []ValueMap
 	Regexs    []Regex
 	Headers   []header
@@ -33,6 +36,9 @@ type Parser struct {
 func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser, err error) {
 	p.warnings = warnings
 	p.Config = cfg
+	p.Description = dev.Description
+	p.Version = dev.Version
+
 	if len(dev.TagValMaps) > 0 {
 		//return p, errors.Errorf("TAGVALMAP is not implemented (at %s)", dev.TagValMaps[0].Pos())
 		warnings.Add(dev.TagValMaps[0].Pos(), "TAGVALMAP is not implemented")

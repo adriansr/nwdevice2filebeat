@@ -36,7 +36,7 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		}
 
 	case RawJS:
-		out.AddRaw(v.String())
+		out.Raw(v.String())
 
 	case Variable:
 		out.Newline()

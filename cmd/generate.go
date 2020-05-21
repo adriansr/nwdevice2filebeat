@@ -10,12 +10,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/adriansr/nwdevice2filebeat/output/logyml"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/model"
-	"github.com/adriansr/nwdevice2filebeat/output/javascript"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/util"
 )
@@ -40,7 +40,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 		log.Panic(err)
 	}
 	// TODO: Depend on output
-	cfg.Dissect = true
+	// TODO: cfg.Dissect = true
 	cfg.StripPayload = true
 
 	warnings := util.NewWarnings(20)
@@ -73,9 +73,9 @@ func generateRun(cmd *cobra.Command, args []string) {
 		defer outf.Close()
 		writer = outf
 	}
-	numBytes, err := javascript.Generate(p, writer)
+	numBytes, err := logyml.Generate(p, writer)
 	if err != nil {
-		LogError("Failed to generate javascript pipeline", "reason", err)
+		LogError("Failed to generate YAML pipeline", "reason", err)
 		return
 	}
 	var size int64

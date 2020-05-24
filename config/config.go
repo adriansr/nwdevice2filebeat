@@ -11,18 +11,31 @@ import (
 	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
+// Config contains the configuration for the conversion.
 type Config struct {
+	// DevicePath is the path to the NW device (directory or XML file).
 	DevicePath string
+	// OutputPath is TODO.
 	OutputPath string
 
+	// PipelineFormat is the kind of pipeline to generate.
+	// One of: javascript, yaml.
+	PipelineFormat string
+
+	// Verbosity is the logging verbosity level for this invocation of the tool.
 	Verbosity util.VerbosityLevel
 
-	// These are set depending on what the output supports
-	Dissect      bool
-	StripPayload bool
+	// PipelineSettings are set automatically depending on the selected pipeline
+	// format.
+	PipelineSettings PipelineSettings
 
-	Fixes   Fixes
-	Opt     Optimizations
+	// Fixes contains flags to workaround common problems in parsers.
+	Fixes Fixes
+
+	// Opt contains optimizations to apply on the generated parsers.
+	Opt Optimizations
+
+	// Runtime contains configuration for the runtime parser.
 	Runtime Runtime
 }
 
@@ -57,4 +70,13 @@ type Runtime struct {
 
 	// For network direction calculation (DIRCHK function).
 	LocalNetworks []net.IPNet
+}
+
+// PipelineSettings contains the configuration that a given pipeline format
+// generator needs.
+type PipelineSettings struct {
+	// Split patterns into multiple dissect patterns (for alternatives).
+	Dissect bool
+	// Strip payload information (for dissect).
+	StripPayload bool
 }

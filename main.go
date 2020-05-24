@@ -6,6 +6,10 @@ package main
 
 import (
 	"github.com/adriansr/nwdevice2filebeat/cmd"
+
+	// Register outputs.
+	_ "github.com/adriansr/nwdevice2filebeat/output/javascript"
+	_ "github.com/adriansr/nwdevice2filebeat/output/logyml"
 )
 
 func main() {

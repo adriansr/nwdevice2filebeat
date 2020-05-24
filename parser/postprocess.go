@@ -139,7 +139,7 @@ func checkPayloadPositionInHeaders(parser *Parser) error {
 }
 
 func setPayloadField(parser *Parser) error {
-	if !parser.Config.StripPayload {
+	if !parser.Config.PipelineSettings.StripPayload {
 		return nil
 	}
 	for idx, hdr := range parser.Headers {
@@ -526,7 +526,7 @@ func dupPattern(in []Value) (out []Value) {
 }
 
 func splitDissect(p *Parser) (err error) {
-	if !p.Config.Dissect {
+	if !p.Config.PipelineSettings.Dissect {
 		return nil
 	}
 	p.WalkPostOrder(func(node Operation) (action WalkAction, operation Operation) {
@@ -864,7 +864,7 @@ outer:
 }
 
 func fixAlternativesEdgeSpace(p *Parser) (err error) {
-	if !p.Config.Dissect {
+	if !p.Config.PipelineSettings.Dissect {
 		return nil
 	}
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
@@ -996,7 +996,7 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 }
 
 func fixExtraLeadingSpaceInConstants(parser *Parser) error {
-	if !parser.Config.Dissect {
+	if !parser.Config.PipelineSettings.Dissect {
 		return nil
 	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
@@ -1081,7 +1081,7 @@ func removeExtraSpaceInPattern(pattern Pattern) (modified bool) {
 }
 
 func fixExtraSpaceInConstants(parser *Parser) error {
-	if !parser.Config.Dissect {
+	if !parser.Config.PipelineSettings.Dissect {
 		return nil
 	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
@@ -1281,7 +1281,7 @@ func injectCapturesInAltsPattern(pattern Pattern) (Pattern, error) {
 }
 
 func injectCapturesInAlts(parser *Parser) (err error) {
-	if !parser.Config.Dissect {
+	if !parser.Config.PipelineSettings.Dissect {
 		return nil
 	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {

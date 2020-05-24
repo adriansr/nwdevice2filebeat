@@ -8,40 +8,47 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"time"
 
-	"github.com/adriansr/nwdevice2filebeat/output/logyml"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/model"
+	"github.com/adriansr/nwdevice2filebeat/output"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
+const defaultOutputFormat = "javascript"
+
 var generateCmd = &cobra.Command{
 	Use:   "generate",
-	Short: "Generate a new Filebeat fileset from a NetWitness device",
+	Short: "Generate a new Filebeat module from a NetWitness device",
 	Run:   generateRun,
 }
 
 func init() {
 	generateCmd.PersistentFlags().String("device", "", "Input device path")
 	generateCmd.PersistentFlags().String("output", "", "Output")
+	generateCmd.PersistentFlags().StringP("format", "f", defaultOutputFormat, "Output")
 	generateCmd.PersistentFlags().StringSliceP("optimize", "O", nil, "Optimizations")
 	generateCmd.PersistentFlags().StringSliceP("fix", "F", nil, "Fixes")
 	generateCmd.MarkPersistentFlagRequired("device")
+	rootCmd.AddCommand(generateCmd)
 }
 
 func generateRun(cmd *cobra.Command, args []string) {
-	cfg, err := readConf(cmd)
+	cfg, err := config.NewFromCommand(cmd)
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Depend on output
-	// TODO: cfg.Dissect = true
-	cfg.StripPayload = true
+
+	out, err := output.Registry.Get(cfg.PipelineFormat)
+	if err != nil {
+		LogError("Unable to initialize output", "reason", err)
+		return
+	}
+
+	cfg.PipelineSettings = out.Settings()
 
 	warnings := util.NewWarnings(20)
 	dev, err := model.NewDevice(cfg.DevicePath, &warnings)
@@ -73,9 +80,9 @@ func generateRun(cmd *cobra.Command, args []string) {
 		defer outf.Close()
 		writer = outf
 	}
-	numBytes, err := logyml.Generate(p, writer)
-	if err != nil {
-		LogError("Failed to generate YAML pipeline", "reason", err)
+	countWriter := util.NewCountingWriter(writer)
+	if err = out.Generate(p, countWriter); err != nil {
+		LogError("Failed writting output", "format", cfg.PipelineFormat, "reason", err)
 		return
 	}
 	var size int64
@@ -83,62 +90,6 @@ func generateRun(cmd *cobra.Command, args []string) {
 		size = st.Size()
 	}
 	log.Printf("INFO %d bytes for pipeline %s (%s) from %d original (%.2f%%)\n",
-		numBytes, dev.Description.DisplayName, dev.Description.Name,
-		size, 100.0*float64(numBytes)/float64(size))
-}
-
-var timezoneFormats = []string{"-07", "-0700", "-07:00"}
-
-// Copied from beats/libbeat/processor/timestamp.go
-func loadLocation(timezone string) (*time.Location, error) {
-	for _, format := range timezoneFormats {
-		t, err := time.Parse(format, timezone)
-		if err == nil {
-			name, offset := t.Zone()
-			return time.FixedZone(name, offset), nil
-		}
-	}
-
-	// Rest of location formats
-	return time.LoadLocation(timezone)
-}
-
-func readConf(cmd *cobra.Command) (cfg config.Config, err error) {
-	if cfg.DevicePath, err = cmd.PersistentFlags().GetString("device"); err != nil {
-		return cfg, err
-	}
-	if cfg.OutputPath, err = cmd.PersistentFlags().GetString("output"); err != nil {
-		return cfg, err
-	}
-	if opts, err := cmd.PersistentFlags().GetStringSlice("optimize"); err == nil {
-		log.Printf("opts = %v\n", opts)
-		for _, o := range opts {
-			switch o {
-			case "globals":
-				cfg.Opt.GlobalEntities = true
-			case "deduplicate":
-				cfg.Opt.DetectDuplicates = true
-			case "stripid1":
-				cfg.Opt.StripMessageID1 = true
-			}
-		}
-	}
-	if opts, err := cmd.PersistentFlags().GetStringSlice("fix"); err == nil {
-		log.Printf("fixes = %v\n", opts)
-		for _, o := range opts {
-			switch o {
-			case "space", "whitespace", "w", "s":
-				cfg.Fixes.StripLeadingSpace = true
-			}
-		}
-	}
-	if tzName, err := cmd.PersistentFlags().GetString("tz"); err == nil {
-		if cfg.Runtime.Timezone, err = loadLocation(tzName); err != nil {
-			return cfg, errors.Wrapf(err, "unable to parse timezone: '%s'", tzName)
-		}
-	}
-	if verbosity, err := cmd.PersistentFlags().GetCount("verbose"); err == nil {
-		cfg.Verbosity = util.VerbosityLevel(verbosity)
-	}
-	return cfg, nil
+		countWriter.Count(), dev.Description.DisplayName, dev.Description.Name,
+		size, 100.0*float64(countWriter.Count())/float64(size))
 }

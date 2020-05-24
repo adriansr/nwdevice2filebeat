@@ -18,8 +18,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "nwdevice2filebeat",
 	Short: "Converts RSA NetWitness device log parsers to Filebeat modules",
-	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		// Forbid running the root command.
+		return cmd.Usage()
 	},
 }
 
@@ -28,11 +29,6 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(generateCmd)
-	rootCmd.AddCommand(runCmd)
 }
 
 func LogError(msg string, keysAndValues ...interface{}) {

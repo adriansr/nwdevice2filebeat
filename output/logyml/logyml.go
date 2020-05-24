@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/output"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/pkg/errors"
@@ -23,7 +24,23 @@ const (
 `
 )
 
-func Generate(parser parser.Parser, dest io.Writer) (uint64, error) {
+type logYml struct{}
+
+func init() {
+	output.Registry.MustRegister("yaml", logYml{})
+	output.Registry.MustRegister("yml", logYml{})
+}
+
+func (l logYml) Settings() config.PipelineSettings {
+	return config.PipelineSettings{
+		// The Yaml format supports alternatives, no need to convert to dissect.
+		Dissect: false,
+		// Payload fields are required.
+		StripPayload: false,
+	}
+}
+
+func (l logYml) Generate(parser parser.Parser, dest io.Writer) error {
 	cw := output.NewCodeWriter(dest, "\t")
 	cw.Raw(license)
 

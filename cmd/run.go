@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/model"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/runtime"
@@ -34,10 +35,11 @@ func init() {
 	runCmd.PersistentFlags().CountP("verbose", "v", "Verbosity level, can be repeated.")
 	runCmd.MarkPersistentFlagRequired("device")
 	runCmd.MarkPersistentFlagRequired("logs")
+	rootCmd.AddCommand(runCmd)
 }
 
 func doRun(cmd *cobra.Command, args []string) {
-	cfg, err := readConf(cmd)
+	cfg, err := config.NewFromCommand(cmd)
 	if err != nil {
 		LogError("Failed to parse configuration", "reason", err)
 		return

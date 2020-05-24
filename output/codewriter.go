@@ -15,12 +15,10 @@ import (
 )
 
 type CodeWriter struct {
-	//buf bytes.Buffer
 	dest        io.Writer
 	errors      []error
 	prefix      []byte
 	indent      []byte
-	bytes       uint64
 	writeFailed bool
 	newline     bool
 }
@@ -44,7 +42,6 @@ func (c *CodeWriter) write(data []byte) *CodeWriter {
 		}
 		c.Err(errors.Wrap(err, "error writing output"))
 	}
-	c.bytes += uint64(total)
 	return c
 }
 
@@ -116,7 +113,7 @@ func (c *CodeWriter) Unindent() *CodeWriter {
 	return c
 }
 
-func (c *CodeWriter) Finalize() (count uint64, err error) {
+func (c *CodeWriter) Finalize() (err error) {
 	if n := len(c.errors); n > 0 {
 		limit := n
 		if limit > 10 {
@@ -133,5 +130,5 @@ func (c *CodeWriter) Finalize() (count uint64, err error) {
 		}
 		err = errors.New(strings.Join(msg, "\n"))
 	}
-	return c.bytes, err
+	return err
 }

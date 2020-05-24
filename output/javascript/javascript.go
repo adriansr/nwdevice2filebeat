@@ -8,6 +8,7 @@ import (
 	"io"
 	"sort"
 
+	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/pkg/errors"
 
 	"github.com/adriansr/nwdevice2filebeat/output"
@@ -19,9 +20,25 @@ var header = `//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch 
 //  you may not use this file except in compliance with the Elastic License.
 `
 
-func Generate(p parser.Parser, dest io.Writer) (bytes uint64, err error) {
+type javascript struct{}
+
+func init() {
+	output.Registry.MustRegister("javascript", javascript{})
+	output.Registry.MustRegister("js", javascript{})
+}
+
+func (javascript) Settings() config.PipelineSettings {
+	return config.PipelineSettings{
+		// Needs complex patterns split into dissect patterns.
+		Dissect: true,
+		// Needs payload fields stripped.
+		StripPayload: true,
+	}
+}
+
+func (javascript) Generate(p parser.Parser, dest io.Writer) error {
 	if err := p.Apply(preprocessors); err != nil {
-		return 0, err
+		return err
 	}
 	cw := output.NewCodeWriter(dest, "\t")
 	generate(p.Root, cw)

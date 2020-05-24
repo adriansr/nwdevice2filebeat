@@ -16,12 +16,14 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "nwdevice2filebeat",
-	Short: "Converts RSA NetWitness device log parsers to Filebeat modules",
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		// Forbid running the root command.
-		return cmd.Usage()
-	},
+	Use:     "nwdevice2filebeat",
+	Short:   "Converts RSA NetWitness device log parsers to Filebeat modules",
+	PreRunE: usage,
+}
+
+func usage(cmd *cobra.Command, args []string) error {
+	// Forbid running the root command.
+	return cmd.Usage()
 }
 
 func Execute() {

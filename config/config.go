@@ -22,6 +22,13 @@ type Config struct {
 	// One of: javascript, yaml.
 	PipelineFormat string
 
+	// Module generation settings.
+	Module struct {
+		Name    string
+		Fileset string
+		Port    uint16
+	}
+
 	// Verbosity is the logging verbosity level for this invocation of the tool.
 	Verbosity util.VerbosityLevel
 

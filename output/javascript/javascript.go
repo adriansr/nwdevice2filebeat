@@ -5,10 +5,13 @@
 package javascript
 
 import (
-	"io"
+	"fmt"
+	"io/ioutil"
+	"os"
 	"sort"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
+	"github.com/adriansr/nwdevice2filebeat/layout"
 	"github.com/pkg/errors"
 
 	"github.com/adriansr/nwdevice2filebeat/output"
@@ -20,14 +23,17 @@ var header = `//  Copyright Elasticsearch B.V. and/or licensed to Elasticsearch 
 //  you may not use this file except in compliance with the Elastic License.
 `
 
-type javascript struct{}
-
-func init() {
-	output.Registry.MustRegister("javascript", javascript{})
-	output.Registry.MustRegister("js", javascript{})
+type javascript struct {
+	tmpFile *os.File
 }
 
-func (javascript) Settings() config.PipelineSettings {
+func init() {
+	instance := new(javascript)
+	output.Registry.MustRegister("javascript", instance)
+	output.Registry.MustRegister("js", instance)
+}
+
+func (js *javascript) Settings() config.PipelineSettings {
 	return config.PipelineSettings{
 		// Needs complex patterns split into dissect patterns.
 		Dissect: true,
@@ -36,11 +42,48 @@ func (javascript) Settings() config.PipelineSettings {
 	}
 }
 
-func (javascript) Generate(p parser.Parser, dest io.Writer) error {
+func (js *javascript) Populate(lyt *layout.Generator) (err error) {
+	err = lyt.SetVar("extra_processors", fmt.Sprintf(`
+- script:
+    lang: javascript
+    params:
+      ecs: true
+    files:
+    - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/liblogparser.js
+    - ((getvar "basedir"))/((relpath "rel.dir" "helpers.dir"))/pipeline.js
+`))
+	if err != nil {
+		return err
+	}
+	err = lyt.AddFile("__config.dir__/pipeline.js", layout.Move{
+		Path: js.tmpFile.Name(),
+	})
+	if err != nil {
+		return err
+	}
+	err = lyt.AddFile("__helpers.dir__/liblogparser.js", layout.Copy{
+		Path: "output/javascript/liblogparser.js",
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (js *javascript) OutputFile() string {
+	return js.tmpFile.Name()
+}
+
+func (js *javascript) Generate(p parser.Parser) (err error) {
+	js.tmpFile, err = ioutil.TempFile("", "pipeline-*.js")
+	if err != nil {
+		return err
+	}
+	defer js.tmpFile.Close()
 	if err := p.Apply(preprocessors); err != nil {
 		return err
 	}
-	cw := output.NewCodeWriter(dest, "\t")
+	cw := output.NewCodeWriter(js.tmpFile, "\t")
 	generate(p.Root, cw)
 	return cw.Finalize()
 }

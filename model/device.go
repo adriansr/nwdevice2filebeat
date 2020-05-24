@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/adriansr/nwdevice2filebeat/util"
@@ -35,13 +34,15 @@ type Device struct {
 
 // New turns a new Device from the given directory path.
 func NewDevice(path string, _ *util.Warnings) (Device, error) {
-	files, err := listFilesByExtensions(path)
+	files, err := util.ListFiles(path)
 	if err != nil {
 		return Device{}, err
 	}
-	log.Printf("Found files: %+v", files)
 
-	xmlFiles := files[".xml"]
+	byExt := util.ByExtension(files)
+	log.Printf("Found files: %+v", byExt)
+
+	xmlFiles := byExt[".xml"]
 	// Device log parser dirs only contain one XML.
 	switch len(xmlFiles) {
 	case 0:
@@ -134,18 +135,6 @@ func (dev *Device) load() error {
 	}
 	log.Printf("loaded %d elements", numItems)
 	return nil
-}
-
-func listFilesByExtensions(dir string) (filesByExt map[string][]string, err error) {
-	filesByExt = make(map[string][]string)
-	return filesByExt, filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if info == nil || info.IsDir() {
-			return nil
-		}
-		ext := strings.ToLower(filepath.Ext(info.Name()))
-		filesByExt[ext] = append(filesByExt[ext], path)
-		return nil
-	})
 }
 
 type stateFn func(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error)

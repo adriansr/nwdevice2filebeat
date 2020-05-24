@@ -6,14 +6,17 @@ package logyml
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
+	"os"
+
+	"github.com/adriansr/nwdevice2filebeat/layout"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
 	"github.com/adriansr/nwdevice2filebeat/output"
 	"github.com/adriansr/nwdevice2filebeat/parser"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -24,14 +27,17 @@ const (
 `
 )
 
-type logYml struct{}
-
-func init() {
-	output.Registry.MustRegister("yaml", logYml{})
-	output.Registry.MustRegister("yml", logYml{})
+type logYml struct {
+	tmpFile *os.File
 }
 
-func (l logYml) Settings() config.PipelineSettings {
+func init() {
+	instance := new(logYml)
+	output.Registry.MustRegister("yaml", instance)
+	output.Registry.MustRegister("yml", instance)
+}
+
+func (l *logYml) Settings() config.PipelineSettings {
 	return config.PipelineSettings{
 		// The Yaml format supports alternatives, no need to convert to dissect.
 		Dissect: false,
@@ -40,8 +46,13 @@ func (l logYml) Settings() config.PipelineSettings {
 	}
 }
 
-func (l logYml) Generate(parser parser.Parser, dest io.Writer) error {
-	cw := output.NewCodeWriter(dest, "\t")
+func (l *logYml) Generate(parser parser.Parser) (err error) {
+	l.tmpFile, err = ioutil.TempFile("", "pipeline-*.yml")
+	if err != nil {
+		return err
+	}
+	defer l.tmpFile.Close()
+	cw := output.NewCodeWriter(l.tmpFile, "\t")
 	cw.Raw(license)
 
 	file := logParserFile{
@@ -63,6 +74,24 @@ func (l logYml) Generate(parser parser.Parser, dest io.Writer) error {
 	}
 	cw.RawBytes(bytes)
 	return cw.Finalize()
+}
+
+func (l *logYml) Populate(lyt *layout.Generator) (err error) {
+	err = lyt.SetVar("extra_processors", fmt.Sprintf(`
+- logparser:
+    files:
+    - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/pipeline.yml
+`))
+	if err != nil {
+		return err
+	}
+	return lyt.AddFile("__config.dir__/pipeline.yml", layout.Move{
+		Path: l.tmpFile.Name(),
+	})
+}
+
+func (l *logYml) OutputFile() string {
+	return l.tmpFile.Name()
 }
 
 func generate(node parser.Operation, path string) {

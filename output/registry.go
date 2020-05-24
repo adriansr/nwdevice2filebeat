@@ -5,9 +5,8 @@
 package output
 
 import (
-	"io"
-
 	"github.com/adriansr/nwdevice2filebeat/config"
+	"github.com/adriansr/nwdevice2filebeat/layout"
 	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/pkg/errors"
 )
@@ -16,7 +15,9 @@ import (
 // language.
 type Output interface {
 	Settings() config.PipelineSettings
-	Generate(parser parser.Parser, dest io.Writer) error
+	Generate(parser parser.Parser) error
+	Populate(layout *layout.Generator) error
+	OutputFile() string
 }
 
 type registry map[string]Output

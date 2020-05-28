@@ -3,9 +3,11 @@
 :modulename: ((.Module))
 :has-dashboards: false
 
-== ((.Module)) module
+== ((.Module | title)) module
 
-This is a module for receiving ((.DisplayName)) data over Syslog.
+This is a module for receiving ((.DisplayName)) logs over Syslog or a file.
+
+NOTE: This was converted from RSA NetWitness log parser XML ((.LogParser.Description.Name | printf "%q")) device revision ((.LogParser.Version.Revision)).
 
 include::../include/gs-link.asciidoc[]
 
@@ -30,7 +32,7 @@ Set to `0.0.0.0` to bind to all available interfaces.
 
 *`var.syslog_port`*::
 
-The UDP port to listen for syslog traffic. Defaults to `((.Port))`
+The port to listen for syslog traffic. Defaults to `((.Port))`
 
 NOTE: Ports below 1024 require Filebeat to run as root.
 

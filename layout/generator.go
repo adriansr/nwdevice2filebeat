@@ -14,9 +14,11 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/adriansr/nwdevice2filebeat/parser"
 	"github.com/adriansr/nwdevice2filebeat/util"
 )
 
@@ -46,11 +48,13 @@ type Generator struct {
 }
 
 type Vars struct {
-	Device      string
-	DisplayName string
-	Module      string
-	Fileset     string
-	Port        uint16
+	LogParser     parser.Parser
+	DisplayName   string
+	Group         string
+	Module        string
+	Fileset       string
+	Port          uint16
+	GeneratedTime time.Time
 }
 
 type pathReplacements map[string]string
@@ -138,6 +142,7 @@ func New(layout string, vars Vars) (*Generator, error) {
 		"relpath": gen.doRelPath,
 		"getvar":  gen.doVar,
 		"setvar":  gen.doSet,
+		"title":   strings.Title,
 	}
 	for _, sourcePath := range files {
 		// Strip <templatesDir>/<template> prefix from paths.

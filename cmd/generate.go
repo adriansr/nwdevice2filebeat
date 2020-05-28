@@ -7,6 +7,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -136,11 +137,13 @@ func generate(cmd *cobra.Command, targetLayout string) error {
 		cfg.Module.Port = 9010
 	}
 	outLayout, err := layout.New(targetLayout, layout.Vars{
-		Device:      p.Description.Name,
-		DisplayName: p.Description.DisplayName,
-		Module:      cfg.Module.Name,
-		Fileset:     cfg.Module.Fileset,
-		Port:        cfg.Module.Port,
+		LogParser:     p,
+		DisplayName:   p.Description.DisplayName,
+		Group:         p.Description.Group,
+		Module:        cfg.Module.Name,
+		Fileset:       cfg.Module.Fileset,
+		Port:          cfg.Module.Port,
+		GeneratedTime: time.Now().UTC(),
 	})
 	if err != nil {
 		LogError("Failed loading output layout", "format", targetLayout, "reason", err)

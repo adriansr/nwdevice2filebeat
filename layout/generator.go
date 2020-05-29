@@ -53,13 +53,14 @@ type Vars struct {
 	Group         string
 	Module        string
 	Fileset       string
+	Version       string
 	Port          uint16
 	GeneratedTime time.Time
 }
 
 type pathReplacements map[string]string
 
-var validPathRepl = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
+var validPathRepl = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
 
 func (v Vars) pathReplacements() pathReplacements {
 	repl := make(pathReplacements)
@@ -110,9 +111,9 @@ func (g *Generator) doVar(name string) (result string, err error) {
 }
 
 func (g *Generator) doSet(name, value string) (empty string, err error) {
-	if _, exists := g.dynVars[name]; exists {
-		return empty, errors.Errorf("variable %s is already defined", name)
-	}
+	//if _, exists := g.dynVars[name]; exists {
+	//	return empty, errors.Errorf("variable %s is already defined", name)
+	//}
 	g.dynVars[name] = value
 	return empty, nil
 }

@@ -35,6 +35,14 @@ var genModuleCmd = &cobra.Command{
 	},
 }
 
+var genPackageCmd = &cobra.Command{
+	Use:   "package",
+	Short: "Generate an Ingest Manager package from a NetWitness device",
+	Run: func(cmd *cobra.Command, args []string) {
+		generate(cmd, "package")
+	},
+}
+
 var genPipelineCmd = &cobra.Command{
 	Use:   "pipeline",
 	Short: "Generate a pipeline from a NetWitness device",
@@ -44,7 +52,7 @@ var genPipelineCmd = &cobra.Command{
 }
 
 func init() {
-	for _, cmd := range []*cobra.Command{genModuleCmd, genPipelineCmd} {
+	for _, cmd := range []*cobra.Command{genModuleCmd, genPipelineCmd, genPackageCmd} {
 		cmd.PersistentFlags().String("device", "", "Input device path")
 		cmd.PersistentFlags().StringP("format", "f", defaultPipelineFormat, "Pipeline format (js or yml)")
 		cmd.PersistentFlags().StringSliceP("optimize", "O", nil, "Optimizations")
@@ -52,13 +60,21 @@ func init() {
 		cmd.MarkPersistentFlagRequired("device")
 		generateCmd.AddCommand(cmd)
 	}
-
-	genModuleCmd.PersistentFlags().String("output", "", "Output directory where module is written to")
+	genModuleCmd.PersistentFlags().String("output", "", "Output directory where the module is written to")
 	genModuleCmd.PersistentFlags().String("module", "", "Module name")
 	genModuleCmd.PersistentFlags().String("fileset", "", "Fileset name")
 	genModuleCmd.PersistentFlags().Uint16("port", 9010, "Default port number")
 	genModuleCmd.MarkPersistentFlagDirname("output")
 	genModuleCmd.MarkPersistentFlagRequired("output")
+
+	genPackageCmd.PersistentFlags().String("output", "", "Output directory where the package is written to")
+	genPackageCmd.PersistentFlags().String("module", "", "Package name")
+	genPackageCmd.PersistentFlags().String("fileset", "", "Dataset name")
+	genPackageCmd.PersistentFlags().String("version", "0.0.1", "Package version")
+	genPackageCmd.PersistentFlags().Uint16("port", 9010, "Default port number")
+	genPackageCmd.MarkPersistentFlagDirname("output")
+	genPackageCmd.MarkPersistentFlagRequired("output")
+
 	genPipelineCmd.PersistentFlags().String("output", "", "Output directory where pipeline is written to")
 	genPipelineCmd.MarkPersistentFlagFilename("output")
 	genPipelineCmd.MarkPersistentFlagRequired("output")
@@ -142,6 +158,7 @@ func generate(cmd *cobra.Command, targetLayout string) error {
 		Group:         p.Description.Group,
 		Module:        cfg.Module.Name,
 		Fileset:       cfg.Module.Fileset,
+		Version:       cfg.Module.Version,
 		Port:          cfg.Module.Port,
 		GeneratedTime: time.Now().UTC(),
 	})

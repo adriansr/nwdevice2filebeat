@@ -26,6 +26,7 @@ type Config struct {
 	Module struct {
 		Name    string
 		Fileset string
+		Version string
 		Port    uint16
 	}
 

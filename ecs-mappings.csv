@@ -1,0 +1,809 @@
+revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,flags,nullTokens,failureKey,failureMapping,ecsName,Proposed,nbOccurrences,shortMeta,name_noDot, old ecsType
+1,Reserved,Message,This key is used to capture the raw message that comes into the Log Decoder,msg,msg,Text,Transient,,,,rsa.internal.msg,log.original,272,internal,msg,text
+1,,,,messageid,,,,,,,rsa.internal.messageid,event.code,270,internal,messageid,keyword
+1,Time,Event Time,This key is used to capture the time mentioned in a raw session that represents the actual time an event occured in a standard normalized form,event_time,event.time,TimeT,None,,,,rsa.time.event_time,@timestamp,253,time,event_time,keyword
+1,Identity,Destination User Account,This key should only be used to capture the Primary/Destination User in the event,username,user.dst,Text,None,none|-,,,user.name,,248,identity,user_dst,keyword
+1,,,,event_description,event.desc,Text,None,,,,rsa.internal.event_desc,message,223,internal,event_desc,keyword
+1,,,,action,action,Text,None,,,,rsa.misc.action,event.action,217,misc,action,keyword
+1,Database,Index ID,This key captures IndexID of the index.,info,index,Text,Transient,,,,rsa.db.index,,214,db,index,keyword
+1,Network,Source IP Address,This key should only be used when it’s a Source IP Address.,saddr,ip.src,IPv4,None,(null)|-,ipv6.src,saddr_v6,source.ip,,209,network,ip_src,ip
+1,Reserved,Payload Size,"This is the size of a payload in a Packet Session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",payload,payload,UInt32,Transient,,,,rsa.internal.payload,,206,internal,payload,integer
+1,Miscellaneous,Message,This key captures the contents of instant messages,message,message,Text,Transient,,,,rsa.internal.message,,193,internal,message,keyword
+1,Network,Hostname Aliases,This key should be used when the source or destination context of a hostname is not clear.Also it captures the Device Hostname. Any Hostname that isnt ad.computer.,hostname,alias.host,Text,None,,,,rsa.network.alias_host,host.name,192,network,alias_host,keyword
+1,Investigations,Event Activity,This key captures the particular event activity(Ex:Logoff),ec_activity,ec.activity,Text,None,,,,rsa.investigations.ec_activity,,183,investigations,ec_activity,keyword
+1,Investigations,Event Theme,This key captures the Theme of a particular Event(Ex:Authentication),ec_theme,ec.theme,Text,None,,,,rsa.investigations.ec_theme,,181,investigations,ec_theme,keyword
+1,Investigations,Event Subject,This key captures the Subject of a particular Event(Ex:User),ec_subject,ec.subject,Text,None,,,,rsa.investigations.ec_subject,,179,investigations,ec_subject,keyword
+1,Miscellaneous,Result,This key is used to capture the outcome/result string value of an action in a session.,result,result,Text,None,,,,rsa.misc.result,,179,misc,result,keyword
+1,Miscellaneous,Severity,This key is used to capture the severity given the session,severity,severity,Text,Transient,,,,rsa.misc.severity,log.level,167,misc,severity,keyword
+1,Investigations,Event Outcome,This key captures the outcome of a particular Event(Ex:Success),ec_outcome,ec.outcome,Text,None,,,,rsa.investigations.ec_outcome,event.outcome,153,investigations,ec_outcome,keyword
+1,Network,Destination IP address,This key should only be used when it’s a Destination IP Address.,daddr,ip.dst,IPv4,None,(null)|-,ipv6.dst,daddr_v6,destination.ip,,152,network,ip_dst,ip
+1,Miscellaneous,Event Type,This key captures the event category type as specified by the event source.,event_type,event.type,Text,None,,,,rsa.misc.event_type,event.category,149,misc,event_type,keyword
+1,Miscellaneous,Reference ID,This key is used to capture an event id from the session directly,id,reference.id,Text,None,,,,rsa.misc.reference_id,event.code,138,misc,reference_id,keyword
+1,Network,Protocol,This key should be used to capture the protocol name,protocol,protocol,Text,Transient,,,,network.protocol,,133,network,protocol,keyword
+1,Miscellaneous,Versions,This key captures Version of the application or OS which is generating the event.,version,version,Text,None,,,,observer.version,rsa.misc.version,133,misc,version,keyword
+1,File,Filename,This key is used to capture the complete filename/Webpage with extension where the directionality is not clear. This should not include the directory/path,filename,filename,Text,File,N/A,,,file.name,,128,file,filename,keyword
+1,,IP Address,"Deprecated, use alias.ip",hostip,ip.addr,IPv4,None,(null)|-,ipv6.addr,hostip_v6,host.ip,,128,network,ip_addr,ip
+1,,IP Source Port,"Deprecated, use port.src",sport,ip.srcport,UInt16,Transient,-|(null)|N/A,,,source.port,,123,network,ip_srcport,long
+1,,Destination Port,"Deprecated, use port.dst",dport,ip.dstport,UInt16,None,-|(null)|null|N/A,,,destination.port,,115,network,ip_dstport,long
+1,Miscellaneous,Disposition,This key captures the The end state of an action.,disposition,disposition,Text,Transient,,,,rsa.misc.disposition,,113,misc,disposition,keyword
+1,Miscellaneous,Result Code,This key is used to capture the outcome/result numeric value of an action in a session,resultcode,result.code,Text,None,,,,rsa.misc.result_code,,112,misc,result_code,keyword
+1,Miscellaneous,Category,This key is used to capture the category of an event given by the vendor in the session,category,category,Text,None,,,,rsa.misc.category,,105,misc,category,keyword
+1,Miscellaneous,Object Name,This is used to capture name of object,obj_name,obj.name,Text,None,,,,rsa.misc.obj_name,,102,misc,obj_name,keyword
+1,Network,Source Hostname,This key should only be used when it’s a Source Hostname.,shost,host.src,Text,None,,,,host.hostname,source.address,99,network,host_src,keyword
+1,Miscellaneous,Object Type,This is used to capture type of object,obj_type,obj.type,Text,None,,,,rsa.misc.obj_type,,96,misc,obj_type,keyword
+1,Web,URL,This key is used for capturing complete url,url,url,Text,Transient,,,,url.original,,93,web,url,keyword
+1,Miscellaneous,Server Application,This key is used to capture the name of the server application only,application,server,Text,Transient,,,,network.application,,91,misc,server,keyword
+1,Miscellaneous,Event Source,This key captures Source of the event that’s not a hostname,event_source,event.source,Text,None,,,,rsa.misc.event_source,,90,misc,event_source,keyword
+1,Network,Service Name,"This is used to capture descriptive service name, typically seen in Windows",service,service.name,Text,None,,,,service.name,,88,network,service_name,keyword
+1,,,,domain,domain,Text,None,,,,server.domain,rsa.network.domain,84,network,domain,keyword
+1,Miscellaneous,Event Session ID,This key is used to capture a sessionid from the session directly,sessionid,log.session.id,Text,Transient,,,,rsa.misc.log_session_id,,82,misc,log_session_id,keyword
+1,Miscellaneous,Group Name,This key captures the Group Name value,group,group,Text,None,,,,rsa.misc.group,,81,misc,group,keyword
+1,Network,Destination Hostname,This key should only be used when it’s a Destination Hostname,dhost,host.dst,Text,None,,,,rsa.network.host_dst,destination.address,81,network,host_dst,keyword
+1,Counters,Device class Counter 1,This is a generic counter key that should be used with the label dclass.c1.str only,dclass_counter1,dclass.c1,Int32,Transient,,,,rsa.counters.dclass_c1,,80,counters,dclass_c1,integer
+1,Miscellaneous,Policy Name,This key is used to capture the Policy Name only.,policyname,policy.name,Text,None,,,,rsa.misc.policy_name,,80,misc,policy_name,keyword
+1,Identity,Source User Account,This key should only be used to capture the Secondary/Source User in the event,c_username,user.src,Text,None,none|-,,,user.name,,77,identity,user_src,keyword
+1,Miscellaneous,Process ID,"This key is used to capture the Process ID, in case of parent child relationship, this can be used for child process id context.",process_id,process.id,Int64,Transient,(null)|-,process.id.val,process_id_val,process.pid,,75,misc,process_id,long
+1,,,,process,process,Text,None,,,,process.name,,74,misc,process,keyword
+1,Miscellaneous,Rule Name,This key captures the Rule Name,rulename,rule.name,Text,Transient,,,,rsa.misc.rule_name,rule.name,72,misc,rule_name,keyword
+1,Miscellaneous,Context,This key captures Information which adds additional context to the event.,context,context,Text,None,,,,rsa.misc.context,,70,misc,context,keyword
+1,Miscellaneous,Change New,This key is used to capture the new values of the attribute that’s changing in a session,change_new,change.new,Text,Transient,,,,rsa.misc.change_new,,69,misc,change_new,keyword
+1,Miscellaneous,Product Name,This key is used to capture the name of the product.,product,product,Text,Transient,,,,observer.product,,69,misc,product,keyword
+1,,,,space,,,,,,,rsa.misc.space,,68,misc,space,keyword
+1,Miscellaneous,Client Application,This key is used to capture only the name of the client application requesting resources of the server. See the user.agent meta key for capture of the specific user agent identifier or browser identification string.,agent,client,Text,None,,,,rsa.misc.client,,67,misc,client,keyword
+1,Time,Duration in seconds,This key is used to capture the normalized duration/lifetime in seconds.,duration,duration.time,Float64,None,,duration.str,duration_string,rsa.time.duration_time,,63,time,duration_time,double
+1,,,,msgIdPart1,,,,,,,rsa.misc.msgIdPart1,,63,misc,msgIdPart1,keyword
+1,Network,Network Service Name,This is used to capture layer 7 protocols/service names,network_service,network.service,Text,Transient,,,,rsa.network.network_service,,62,network,network_service,keyword
+1,File,Directory,This key is used to capture the file directory or path only,directory,directory,Text,None,,,,file.directory,,60,file,directory,keyword
+1,Network,Interface Generic,This key should be used when the source or destination context of an interface is not clear,interface,interface,Text,Transient,,,,rsa.network.interface,network.interface.name,60,network,interface,keyword
+1,,,,msgIdPart2,,,,,,,rsa.misc.msgIdPart2,,60,misc,msgIdPart2,keyword
+1,Miscellaneous,Change Old,This key is used to capture the old value of the attribute that’s changing in a session,change_old,change.old,Text,Transient,,,,rsa.misc.change_old,,59,misc,change_old,keyword
+1,Time,Event Time String,This key is used to capture the incomplete time mentioned in a session as a string,event_time_string,event.time.str,Text,Transient,,,,rsa.time.event_time_str,,58,time,event_time_str,keyword
+1,Reserved,Time,"This is the time at which a session hits a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness.",time,time,TimeT,Transient,,,,rsa.internal.time,,58,internal,time,keyword
+1,Network,Bytes Total,"This key is the total number of Bytes sent/received in a session. Also, in cases where the Sent or Received context is not clear, this can be used.",bytes,bytes,UInt64,None,(null)|-,,,network.bytes,,56,network,bytes,long
+1,Network,Ethernet Source,This key should only be used when it’s a Source Mac Address.,smacaddr,eth.src,MAC,None,Unknown|Irresolvable,,,source.mac,,56,network,eth_src,keyword
+1,Miscellaneous,Operation Number,An alert number or operation number. The values should be unique and non-repeating.,operation_id,operation.id,Text,Transient,,,,rsa.misc.operation_id,,56,misc,operation_id,keyword
+1,Miscellaneous,Event State,This key captures the current state of the object/item referenced within the event. Describing an on-going event.,event_state,event.state,Text,None,,,,rsa.misc.event_state,,55,misc,event_state,keyword
+1,Network,Bytes Sent,This key should only be used to capture the size of Bytes Sent,sbytes,bytes.src,UInt64,None,(null)|-,,,source.bytes,,53,network,bytes_src,long
+1,,Network Port,"Deprecated, use port. NOTE: There is a type discrepancy as currently used, TM: Int32, INDEX: UInt64 (why neither chose the correct UInt16?!)",network_port,network.port,UInt64,None,(null),,,rsa.network.network_port,,51,network,network_port,long
+1,Network,Bytes Received,This key should only be used to capture the size of Bytes Received,rbytes,rbytes,UInt64,None,(null)|-,,,destination.bytes,,51,network,rbytes,long
+1,Time,Time Start,This key is used to capture the Start time mentioned in a session in a standard form,starttime,starttime,TimeT,None,,,,rsa.time.starttime,,50,time,starttime,keyword
+1,,,,uid,username,Text,None,none|-,,,user.name,,50,identity,username,keyword
+1,Miscellaneous,Action Event,This key is used to capture the primary action in a session,web_method,action,Text,None,,,,rsa.misc.action,,49,misc,action,keyword
+1,,,,month,,,,,,,rsa.time.month,,49,time,month,keyword
+1,Identity,Authentication Method,This key is used to capture authentication methods used only,authmethod,auth.method,Text,Transient,,,,rsa.identity.auth_method,,46,identity,auth_method,keyword
+1,,,,day,,,,,,,rsa.time.day,,46,time,day,keyword
+1,,,Deprecated key defined only in table map.,level,level,Int32,None,,,,rsa.internal.level,,45,internal,level,integer
+1,Miscellaneous,Group Object,This key captures a collection/grouping of entities. Specific usage,group_object,group.object,Text,Transient,,,,rsa.misc.group_object,,42,misc,group_object,keyword
+1,Miscellaneous,Node,Common use case is the node name within a cluster. The cluster name is reflected by the host name.,node,node,Text,Transient,,,,rsa.misc.node,,42,misc,node,keyword
+1,Miscellaneous,Rule Number,This key captures the Rule number,rule,rule,Text,Transient,,,,rsa.misc.rule,,41,misc,rule,keyword
+1,,Ethernet Host Address,"Deprecated, use alias.mac",macaddr,eth.host,MAC,None,,,,rsa.network.eth_host,,39,network,eth_host,keyword
+1,Network,Source Interface,This key should only be used when it’s a Source Interface,sinterface,sinterface,Text,Transient,,,,rsa.network.sinterface,observer.ingress.interface.name,39,network,sinterface,keyword
+1,Miscellaneous,Device Name,"This is used to capture name of the Device associated with the node Like: a physical disk, printer, etc",device,device.name,Text,Transient,,,,rsa.misc.device_name,,38,misc,device_name,keyword
+1,Time,Event End time,This key is used to capture the End time mentioned in a session in a standard form,endtime,endtime,TimeT,Transient,,,,rsa.time.endtime,,38,time,endtime,keyword
+1,Miscellaneous,User Agent,This key captures the user agent identifier or the browser identification string. See the client meta key for the client application making the request.,user_agent,user.agent,Text,None,,,,user_agent.original,,37,misc,user_agent,keyword
+1,Reserved,Message ID,"This is the Message ID1 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",msg_id,msg.id,Text,None,,,,rsa.internal.msg_id,,36,internal,msg_id,keyword
+1,Time,Time Zone,This key is used to capture the timezone of the Event Time,timezone,timezone,Text,None,,,,rsa.time.timezone,event.timezone,36,time,timezone,keyword
+1,Miscellaneous,Parameter,"This key is the parameters passed as part of a command or application, etc.",param,param,Text,None,,,,rsa.misc.param,,35,misc,param,keyword
+1,Email,Destination E-mail Address,"This key is used to capture the Destination email address only, when the destination context is not clear use email",to,email.dst,Text,None,,,,rsa.email.email_dst,,34,email,email_dst,keyword
+1,Network,Ethernet Destination,This key should only be used when it’s a Destination Mac Address,dmacaddr,eth.dst,MAC,None,,,,destination.mac,,34,network,eth_dst,keyword
+1,Miscellaneous,Change Attribute,This key is used to capture the name of the attribute that’s changing in a session,change_attribute,change.attrib,Text,Transient,,,,rsa.misc.change_attrib,,33,misc,change_attrib,keyword
+1,Network,Traffic Flow Direction,"This Key should never be used in a parser, this is a reserved key used by the product to calculate the direction.",direction,direction,Text,None,,,,network.direction,,33,network,direction,keyword
+1,Investigations,Event Categorization ID,This key captures the Event category number,event_cat,event.cat,UInt32,Transient,,,,rsa.investigations.event_cat,,33,investigations,event_cat,integer
+1,Investigations,Event Category Name,This key captures the event category name corresponding to the event cat code,event_cat_name,event.cat.name,Text,None,,,,rsa.investigations.event_cat_name,,33,investigations,event_cat_name,keyword
+1,Miscellaneous,Event Hostname,"This key is a windows only concept, where this key is used to capture fully qualified domain name in a windows log.",event_computer,event.computer,Text,None,,,,rsa.misc.event_computer,,33,misc,event_computer,keyword
+1,Email,Source E-mail Address,"This key is used to capture the source email address only, when the source context is not clear use email",from,email.src,Text,None,,,,rsa.email.email_src,,32,email,email_src,keyword
+1,Miscellaneous,Reference Id1,"This key is for Linked ID to be used as an addition to ""reference.id""",id1,reference.id1,Text,Transient,,,,rsa.misc.reference_id1,,32,misc,reference_id1,keyword
+1,,Translated Source Address,"Deprecated, use ip.trans.src",stransaddr,stransaddr,Text,Transient,,,,source.nat.ip,,32,network,stransaddr,ip
+1,Reserved,Message ID1,"This is the Message ID2 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",vid,msg.vid,Text,Transient,,,,rsa.internal.msg_vid,,31,internal,msg_vid,keyword
+1,,Privilege,"Deprecated, use permissions",privilege,privilege,Text,Transient,,,,rsa.file.privilege,,31,file,privilege,keyword
+1,Identity,User Role,This key is used to capture the Role of a user only,user_role,user.role,Text,Transient,,,,rsa.identity.user_role,,31,identity,user_role,keyword
+1,Miscellaneous,Event Log Name,This key captures the Name of the event log,event_log,event.log,Text,Transient,,,,rsa.misc.event_log,,30,misc,event_log,keyword
+1,Web,FQDN,Fully Qualified Domain Names,fqdn,fqdn,Text,None,,,,rsa.web.fqdn,,29,web,fqdn,keyword
+1,,User Account,"Deprecated, use user",administrator,username,Text,None,none|-,,,user.name,,29,identity,username,keyword
+1,,,,hostid,alias.host,Text,None,,,,rsa.network.alias_host,,28,network,alias_host,keyword
+1,,,Deprecated key defined only in table map.,data,data,Text,Transient,,,,rsa.internal.data,,28,internal,data,keyword
+1,Counters,Device class Counter 2,This is a generic counter key that should be used with the label dclass.c2.str only,dclass_counter2,dclass.c2,Int32,Transient,,,,rsa.counters.dclass_c2,,28,counters,dclass_c2,integer
+1,Network,Interface Destination,This key should only be used when it’s a Destination Interface,dinterface,dinterface,Text,Transient,,,,rsa.network.dinterface,observer.egress.interface.name,28,network,dinterface,keyword
+1,Miscellaneous,Operating System,This key captures the Name of the Operating System,os,OS,Text,None,,,,rsa.misc.OS,,28,misc,OS,keyword
+1,Web,Web page,The captures the web page information,webpage,web.page,Text,Transient,,,,http.response.body.content,,28,web,web_page,keyword
+1,Miscellaneous,Name of the Terminal,This key captures the Terminal Names only,terminal,terminal,Text,Transient,,,,rsa.misc.terminal,,27,misc,terminal,keyword
+1,,,,msgIdPart3,,,,,,,rsa.misc.msgIdPart3,,27,misc,msgIdPart3,keyword
+1,Miscellaneous,Filter,This key captures Filter used to reduce result set,filter,filter,Text,None,,,,rsa.misc.filter,,26,misc,filter,keyword
+1,Miscellaneous,Serial Number,This key is the Serial number associated with a physical asset.,serial_number,serial.number,Text,Transient,,,,rsa.misc.serial_number,,26,misc,serial_number,keyword
+1,Email,Subject,This key is used to capture the subject string from an Email only.,subject,subject,Text,None,,,,rsa.email.subject,,26,email,subject,keyword
+1,Identity,Domain OU,X.500 (LDAP) Distinguished Name,dn,dn,Text,None,,,,rsa.identity.dn,,25,identity,dn,keyword
+1,Time,Duration,A text string version of the duration,duration_string,duration.str,Text,Transient,,,,rsa.time.duration_str,,25,time,duration_str,keyword
+1,Database,Database instance name,This key is used to capture the database server instance name,instance,instance,Text,Transient,,,,rsa.db.instance,,25,db,instance,keyword
+1,,,,signame,policy.name,Text,None,,,,rsa.misc.policy_name,,25,misc,policy_name,keyword
+1,,,,web_query,query,Text,None,,,,url.query,,25,web,query,keyword
+1,,,,date,,,,,,,rsa.time.date,,25,time,date,keyword
+1,Identity,Logon Type,This key is used to capture the type of logon method used.,logon_type,logon.type,Text,None,,,,rsa.identity.logon_type,,24,identity,logon_type,keyword
+1,Web,Referer,This is used to capture the Web Referrer URL address specifically.,web_referer,referer,Text,None,None|-,,,http.request.referrer,,24,web,referer,keyword
+1,,Translated Destination Address,"Deprecated, use ip.trans.dst",dtransaddr,dtransaddr,Text,Transient,,,,destination.nat.ip,,23,network,dtransaddr,ip
+1,Threat,Threat Category,This key captures Threat Name/Threat Category/Categorization of alert,threat_name,threat.category,Text,None,,,,rsa.threat.threat_category,,23,threat,threat_category,keyword
+1,Network,Vlan Number,This key should only be used to capture the ID of the Virtual LAN,vlan,vlan,UInt16,Transient,,vlan.name,vlan.name,rsa.network.vlan,,23,network,vlan,integer
+1,Miscellaneous,Checksum,This key is used to capture the checksum or hash of the entity such as a file or process. Checksum should be used over checksum.src or checksum.dst when it is unclear whether the entity is a source or target of an action.,checksum,checksum,Text,None,,,,rsa.misc.checksum,,22,misc,checksum,keyword
+1,Miscellaneous,Event User,"This key is a windows only concept, where this key is used to capture combination of domain name and username in a windows log.",event_user,event.user,Text,None,,,,rsa.misc.event_user,,22,misc,event_user,keyword
+1,,,,year,,,,,,,rsa.time.year,,22,time,year,keyword
+1,Physical,Location,This is used to capture either the complete address or a description about a location being referenced in a session,location_desc,loc.desc,Text,Transient,,,,geo.name,,21,physical,loc_desc,keyword
+1,Miscellaneous,Virus Name,This key captures the name of the virus,virusname,virusname,Text,None,,,,rsa.misc.virusname,,21,misc,virusname,keyword
+1,Email,E-mail Address,This key is used to capture a generic email address where the source or destination context is not clear,user_address,email,Text,None,,,,rsa.email.email,,20,email,email,keyword
+1,File,File Size,This key is used to capture the size of the file only,filename_size,filename.size,Int32,None,(null)|-|N/A,,,file.size,,20,file,filename_size,long
+1,,Translated Source Port,"Deprecated, use port.trans.src. NOTE: There is a type discrepancy as currently used, TM: Text, INDEX: UInt16",stransport,stransport,UInt16,Transient,,,,source.nat.port,,20,network,stransport,long
+1,Miscellaneous,Content Type,This key is used to capture Content Type only.,content_type,content.type,Text,Transient,,,,rsa.misc.content_type,,19,misc,content_type,keyword
+1,Database,Database Name,This key is used to capture the name of a database or an instance as seen in a session,db_name,database,Text,Transient,,,,rsa.db.database,,19,db,database,keyword
+1,,Translated Destination Port,"Deprecated, use port.trans.dst. NOTE: There is a type discrepancy as currently used, TM: Text, INDEX: UInt16",dtransport,dtransport,UInt16,Transient,,,,destination.nat.port,,19,network,dtransport,long
+1,Miscellaneous,Group ID,This key captures Group ID Number (related to the group name),groupid,group.id,Text,Transient,,,,rsa.misc.group_id,,19,misc,group_id,keyword
+1,Miscellaneous,Policy ID,"This key is used to capture the Policy ID only, this should be a numeric value, use policy.name otherwise",policy_id,policy.id,Text,Transient,,,,rsa.misc.policy_id,,19,misc,policy_id,keyword
+1,Cryptography,Cipher Name,This key is used to capture the Encryption Type or Encryption Key only,encryption_type,crypto,Text,Transient,,,,rsa.crypto.crypto,,18,crypto,crypto,keyword
+1,Time,Recorded time,The event time as recorded by the system the event is collected from. The usage scenario is a multi-tier application where the management layer of the system records it's own timestamp at the time of collection from its child nodes. Must be in timestamp format.,recorded_time,recorded.time,TimeT,Transient,,,,rsa.time.recorded_time,,18,time,recorded_time,keyword
+1,Miscellaneous,Virtual system name,This key captures Virtual System Name,vsys,vsys,Text,Transient,,,,rsa.misc.vsys,,18,misc,vsys,keyword
+1,Web,Web request Domain,This key captures Domain name in the Web Request,web_domain,web.domain,Text,Transient,,,,url.domain,,18,web,web_domain,keyword
+1,Miscellaneous,Connection ID,This key captures the Connection ID,connectionid,connection.id,Text,Transient,,,,rsa.misc.connection_id,,17,misc,connection_id,keyword
+1,Investigations,Vendor supplied Event Category,This is a vendor supplied category. This should be used in situations where the vendor has adopted their own event_category taxonomy.,vendor_event_cat,event.vcat,Text,Transient,,,,rsa.investigations.event_vcat,,17,investigations,event_vcat,keyword
+1,Miscellaneous,Packets Total,"This key is the total number of packets sent/received in a session. Also, in cases where the Sent or Received context is not clear, this can be used.",packets,packets,UInt32,Transient,(null)|-,,,network.packets,,17,misc,packets,long
+1,,Parent Pid,"Deprecated, use process.id.src",parent_pid,parent.pid,Int32,Transient,,parent.pid.val,parent_pid_val,process.ppid,,17,misc,parent_pid,long
+1,Identity,User Profile,This key is used to capture the user profile,profile,profile,Text,Transient,,,,rsa.identity.profile,,17,identity,profile,keyword
+1,Miscellaneous,Reference Id2,"This key is for the 2nd Linked ID. Can be either linked to ""reference.id"" or ""reference.id1"" value but should not be used unless the other two variables are in play.",id2,reference.id2,Text,Transient,,,,rsa.misc.reference_id2,,17,misc,reference_id2,keyword
+1,Miscellaneous,Sensor Name,This key captures Name of the sensor. Typically used in IDS/IPS based devices,sensor,sensor,Text,Transient,,,,rsa.misc.sensor,,17,misc,sensor,keyword
+1,Miscellaneous,Signature ID,This key captures IDS/IPS Int Signature ID,sigid,sig.id,Int32,None,(null),sig.id.str,sigid_string,rsa.misc.sig_id,,17,misc,sig_id,integer
+1,,,,logon_id,username,Text,None,none|-,,,user.name,,17,identity,username,keyword
+1,,,,datetime,,,,,,,rsa.time.datetime,,17,time,datetime,keyword
+1,Network,Zone Source,This key should only be used when it’s a Source Zone.,src_zone,zone.src,Text,Transient,,,,rsa.network.zone_src,,16,network,zone_src,keyword
+1,,,,user_fullname,fullname,Text,Transient,,,,user.full_name,,15,identity,fullname,keyword
+1,Miscellaneous,Port(Physical/Logical),This key is used for Physical or logical port connection but does NOT include a network port. (Example: Printer port name).,portname,port.name,Text,Transient,,,,rsa.misc.port_name,,15,misc,port_name,keyword
+1,Miscellaneous,Rule Group,This key captures the Rule group name,rule_group,rule.group,Text,Transient,,,,rsa.misc.rule_group,,15,misc,rule_group,keyword
+1,,,,owner,username,Text,None,none|-,,,user.name,,15,identity,username,keyword
+1,Wireless,WLAN Service Set Identifier,This key is used to capture the ssid of a Wireless Session,ssid,wlan.ssid,Text,Transient,,,,rsa.wireless.wlan_ssid,,15,wireless,wlan_ssid,keyword
+1,Network,Zone Generic,This key should be used when the source or destination context of a Zone is not clear,zone,zone,Text,Transient,,,,rsa.network.zone,,15,network,zone,keyword
+1,Network,Zone Destination,This key should only be used when it’s a Destination Zone.,dst_zone,zone.dst,Text,Transient,,,,rsa.network.zone_dst,,15,network,zone_dst,keyword
+1,Identity,Accesses,This key is used to capture actual privileges used in accessing an object,accesses,accesses,Text,None,,,,rsa.identity.accesses,,14,identity,accesses,keyword
+1,Network,Gateway,This key is used to capture the IP Address of the gateway,gateway,gateway,Text,Transient,,,,rsa.network.gateway,,14,network,gateway,keyword
+1,Miscellaneous,Risk Number,This key captures a Numeric Risk value,risk_num,risk.num,Float64,None,,,,rsa.misc.risk_num,,14,misc,risk_num,double
+1,Miscellaneous,Trigger Value,This key captures the Value of the trigger or threshold condition.,trigger_val,trigger.val,Text,Transient,,,,rsa.misc.trigger_val,,14,misc,trigger_val,keyword
+1,Cryptography,Source (Server) Cipher,This key is for Source (Client) Cipher,s_cipher,cipher.src,Text,Transient,,,,rsa.crypto.cipher_src,,13,crypto,cipher_src,keyword
+1,Network,ICMP Type,This key is used to capture the ICMP type only,icmptype,icmp.type,UInt32,Transient,,,,rsa.network.icmp_type,,13,network,icmp_type,integer
+1,Miscellaneous,Linked (Related) Session ID,This key is used to capture a Linked (Related) Session ID from the session directly,sessionid1,log.session.id1,Text,Transient,,,,rsa.misc.log_session_id1,,13,misc,log_session_id1,keyword
+1,,,Deprecated key defined only in table map.,obj_server,obj.server,Text,Transient,,,,rsa.internal.obj_server,,13,internal,obj_server,keyword
+1,Threat,Threat Description,This key is used to capture the threat description from the session directly or inferred,threat_val,threat.desc,Text,None,,,,rsa.threat.threat_desc,,13,threat,threat_desc,keyword
+1,Web,Web Cookie,This key is used to capture the Web cookies specifically.,web_cookie,web.cookie,Text,Transient,,,,rsa.web.web_cookie,,13,web,web_cookie,keyword
+1,Web,Root URLPath,This key captures the root URL path,web_root,web.root,Text,Transient,,,,url.path,,13,web,web_root,keyword
+1,,,,web_host,alias.host,Text,None,,,,rsa.web.alias_host,,12,web,alias_host,keyword
+1,Miscellaneous,Sub component Version,This key captures the Version level of a sub-component of a product.,component_version,comp.version,Text,Transient,,,,rsa.misc.comp_version,,12,misc,comp_version,keyword
+1,Miscellaneous,Content Version,This key captures Version level of a signature or database content.,content_version,content.version,Text,Transient,,,,rsa.misc.content_version,,12,misc,content_version,keyword
+1,Counters,Event Counter,This is used to capture the number of times an event repeated,event_counter,event.counter,Int32,Transient,,,,rsa.counters.event_counter,,12,counters,event_counter,integer
+1,Miscellaneous,Hardware/Serial ID,This key is used to capture unique identifier for a device or system (NOT a Mac address),hardware_id,hardware.id,Text,Transient,,,,rsa.misc.hardware_id,,12,misc,hardware_id,keyword
+1,Network,Network mask Generic,This key is used to capture the device network IPmask.,mask,mask,Text,Transient,,,,rsa.network.mask,,12,network,mask,keyword
+1,Miscellaneous,Risk,This key captures the non-numeric risk value,risk,risk,Text,Transient,,,,rsa.misc.risk,,12,misc,risk,keyword
+1,,,,event_id,,,,,,,rsa.misc.event_id,,12,misc,event_id,keyword
+1,,,,reason,,,,,,,rsa.misc.reason,,12,misc,reason,keyword
+1,,,,status,,,,,,,rsa.misc.status,,12,misc,status,keyword
+1,Counters,Device class Ratio 1,This is a generic ratio key that should be used with the label dclass.r1.str only,dclass_ratio1,dclass.r1,Text,Transient,,,,rsa.counters.dclass_r1,,11,counters,dclass_r1,keyword
+1,,Destination Domain,"Deprecated, use domain.dst",ddomain,ddomain,Text,Transient,,,,destination.domain,,11,network,ddomain,keyword
+1,File,File Type,This key is used to capture the type of file only,filetype,filetype,Text,Transient,,,,file.type,,11,file,filetype,keyword
+1,Network,ICMP Code,This key is used to capture the ICMP code only,icmpcode,icmp.code,UInt32,Transient,,,,rsa.network.icmp_code,,11,network,icmp_code,integer
+1,Miscellaneous,Mailbox ID/Name,This key is used to capture the mailbox id/name,mail_id,mail.id,Text,Transient,,,,rsa.misc.mail_id,,11,misc,mail_id,keyword
+1,Identity,Realm,Radius realm or similar grouping of accounts,realm,realm,Text,Transient,,,,rsa.identity.realm,,11,identity,realm,keyword
+1,,,,sdomain,sdomain,Text,Transient,,,,source.domain,,11,network,sdomain,keyword
+1,Identity,Destination User Session ID,This key captures Destination User Session ID,sid,user.sid.dst,Text,Transient,,,,rsa.identity.user_sid_dst,,11,identity,user_sid_dst,keyword
+1,Cryptography,Certificate Subject,This key is used to capture the Certificate organization only,cert_subject,cert.subject,Text,None,,,,rsa.crypto.cert_subject,,10,crypto,cert_subject,keyword
+1,Counters,Device class Counter 3,This is a generic counter key that should be used with the label dclass.c3.str only,dclass_counter3,dclass.c3,Int32,Transient,,,,rsa.counters.dclass_c3,,10,counters,dclass_c3,integer
+1,Storage,Disk Volume,A unique name assigned to logical units (volumes) within a physical disk,disk_volume,disk.volume,Text,Transient,,,,rsa.storage.disk_volume,,10,storage,disk_volume,keyword
+1,Web,Reputation Number,Reputation Number of an entity. Typically used for Web Domains,reputation_num,reputation.num,Float64,Transient,None|-|ns|n/a|Risk unknown,,,rsa.web.reputation_num,,10,web,reputation_num,double
+1,Wireless,Access Point,This key is used to capture the access point name.,access_point,access.point,Text,None,,,,rsa.wireless.access_point,,9,wireless,access_point,keyword
+1,Counters,Device class Counter 1 Description,This is a generic counter string key that should be used with the label dclass.c1 only,dclass_counter1_string,dclass.c1.str,Text,Transient,,,,rsa.counters.dclass_c1_str,,9,counters,dclass_c1_str,keyword
+1,Identity,Distinguished Name Source,An X.500 (LDAP) Distinguished name that is used in a context that indicates a Source dn,src_dn,dn.src,Text,Transient,,,,rsa.identity.dn_src,,9,identity,dn_src,keyword
+1,Cryptography,Encryption peer's IP Address,This key is for Encryption peer's IP Address,peer,peer,Text,Transient,,,,rsa.crypto.peer,,9,crypto,peer,keyword
+1,Network,Protocol Detail,This key should be used to capture additional protocol information,protocol_detail,protocol.detail,Text,Transient,,,,rsa.network.protocol_detail,,9,network,protocol_detail,keyword
+1,Miscellaneous,Rule Unique ID,This key is the Unique Identifier for a rule.,rule_uid,rule.uid,Text,Transient,,,,rsa.misc.rule_uid,,9,misc,rule_uid,keyword
+1,,Source Domain,"Deprecated, use domain.src",c_domain,sdomain,Text,Transient,,,,source.domain,,9,network,sdomain,keyword
+1,Miscellaneous,Trigger Description,This key captures the Description of the trigger or threshold condition.,trigger_desc,trigger.desc,Text,Transient,,,,rsa.misc.trigger_desc,,9,misc,trigger_desc,keyword
+1,,,,host,,,,,,,host.name,,9,network,host,keyword
+1,,,,inout,,,,,,,rsa.misc.inout,,9,misc,inout,keyword
+1,,,,p_msgid,,,,,,,rsa.misc.p_msgid,,9,misc,p_msgid,keyword
+1,,Child Pid,"Deprecated, use process.id",child_pid,child.pid,Int32,Transient,,child.pid.val,child_pid_val,process.pid,,8,misc,child_pid,long
+1,Physical,Source Country,This is used to capture Source Country,location_src,country.src,Text,None,,,,source.geo.country_name,,8,physical,country_src,keyword
+1,Network,Network mask Destination,This key is used for Destionation Device network mask,dmask,dmask,Text,Transient,,,,rsa.network.dmask,,8,network,dmask,keyword
+1,Time,Event Effective time,This key is the effective time referenced by an individual event in a Standard Timestamp format,effective_time,effective.time,TimeT,Transient,,,,rsa.time.effective_time,,8,time,effective_time,keyword
+1,Network,Source IPv6 Address,This key should only be used when it’s a Source IP v6 Address,saddr_v6,ipv6.src,IPv6,None,(null)|-,host.src,shost,source.ip,,8,network,ipv6_src,ip
+1,Network,Port Generic,This key should only be used to capture a Network Port when the directionality is not clear,port,port,UInt16,None,,,,rsa.network.port,,8,network,port,integer
+1,,,,process_src,process.src,Text,Transient,,,,process.parent.name,,8,misc,process_src,keyword
+1,Network,Network mask Source,This key is used for capturing source Network Mask,smask,smask,Text,Transient,,,,rsa.network.smask,,8,network,smask,keyword
+1,Database,SQL Transaction ID,This key captures the SQL transantion ID of the current session,trans_id,transact.id,Text,Transient,,,,rsa.db.transact_id,,8,db,transact_id,keyword
+1,Web,Web referer Domain,Web referer's domain,web_ref_domain,web.ref.domain,Text,Transient,,,,rsa.web.web_ref_domain,,8,web,web_ref_domain,keyword
+1,,,,data_type,,,,,,,rsa.misc.data_type,,8,misc,data_type,keyword
+1,,,,msgIdPart4,,,,,,,rsa.misc.msgIdPart4,,8,misc,msgIdPart4,keyword
+1,Cryptography,Source (Server) Cipher size,This key captures Source (Client) Cipher Size,s_ciphersize,cipher.size.src,Int32,Transient,,,,rsa.crypto.cipher_size_src,,7,crypto,cipher_size_src,integer
+1,Physical,Destination Country,This is used to capture Destination Country,location_dst,country.dst,Text,None,,,,destination.geo.country_name,,7,physical,country_dst,keyword
+1,Miscellaneous,Errors,This key captures All non successful Error codes or responses,error,error,Text,Transient,,,,rsa.misc.error,,7,misc,error,keyword
+1,Time,Expiration time,This key is the timestamp that explicitly refers to an expiration.,expiration_time,expire.time,TimeT,Transient,,expire.time.str,expiration_time_string,rsa.time.expire_time,,7,time,expire_time,keyword
+1,Cryptography,IKE Negotiation Phase,IKE negotiation phase.,ike,ike,Text,Transient,,,,rsa.crypto.ike,,7,crypto,ike,keyword
+1,,,,index,index,Text,Transient,,,,rsa.misc.index,,7,misc,index,keyword
+1,Miscellaneous,Listnum,"This key is used to capture listname or listnumber, primarily for collecting access-list",listnum,listnum,Text,Transient,,,,rsa.misc.listnum,,7,misc,listnum,keyword
+1,Physical,Country name,"This is used to capture the Country Name when the Source/Destination Context is not clear, as seen in a session.",location_country,loc.country,Text,Transient,,,,geo.country_name,,7,physical,loc_country,keyword
+1,Storage,Logical Unit Number,Logical Unit Number.This key is a very useful concept in Storage.,lun,lun,Text,Transient,,,,rsa.storage.lun,,7,storage,lun,keyword
+1,,,Deprecated key defined only in table map.,obj_value,obj.val,Text,Transient,,,,rsa.internal.obj_val,,7,internal,obj_val,keyword
+1,Identity,Organization,This key captures the User organization,user_org,org,Text,Transient,,,,rsa.identity.org,,7,identity,org,keyword
+1,,,Deprecated key defined only in table map.,resource,resource,Text,Transient,,,,rsa.internal.resource,,7,internal,resource,keyword
+1,Cryptography,Encryption scheme used,This key captures the Encryption scheme used,scheme,scheme,Text,Transient,,,,rsa.crypto.scheme,,7,crypto,scheme,keyword
+1,,,,service_account,username,Text,None,none|-,,,user.name,,7,identity,username,keyword
+1,,,,ntype,,,,,,,rsa.misc.ntype,,7,misc,ntype,keyword
+1,Identity,Distinguished Name Destination,An X.500 (LDAP) Distinguished name that used in a context that indicates a Destination dn,dst_dn,dn.dst,Text,Transient,,,,rsa.identity.dn_dst,,6,identity,dn_dst,keyword
+1,Identity,Domain ID,This key captures Pre Windows 2000 (NetBIOS) name of the domain ONLY,domain_id,domain.id,Text,Transient,,,,user.domain,,6,identity,domain_id,keyword
+1,Identity,First name of a Person,"This key is for First Names only, this is used for Healthcare predominantly to capture Patients information",user_fname,firstname,Text,Transient,,,,rsa.identity.firstname,,6,identity,firstname,keyword
+1,Identity,Last name of a Person,"This key is for Last Names only, this is used for Healthcare predominantly to capture Patients information",user_lname,lastname,Text,Transient,,,,rsa.identity.lastname,,6,identity,lastname,keyword
+1,Miscellaneous,Observed Value,This key captures the Value observed (from the perspective of the device generating the log).,observed_val,observed.val,Text,Transient,,,,rsa.misc.observed_val,,6,misc,observed_val,keyword
+1,Miscellaneous,Policy Contents,This key captures the contents of the policy. This contains details about the policy,policy_value,policy.value,Text,Transient,,,,rsa.misc.policy_value,,6,misc,policy_value,keyword
+1,Miscellaneous,Pool Name,This key captures the name of a resource pool,pool_name,pool.name,Text,Transient,,,,rsa.misc.pool_name,,6,misc,pool_name,keyword
+1,Miscellaneous,Source Process ID,"This key is used to capture the Source Process ID, in case of parent child relationship, this can be used for parent process id context",process_id_src,process.id.src,Int64,Transient,(null)|-,process.src,process_src,process.ppid,,6,misc,process_id_src,long
+1,Miscellaneous,Rule Template,A default set of parameters which are overlayed onto a rule (or rulename) which efffectively constitutes a template,rule_template,rule.template,Text,Transient,,,,rsa.misc.rule_template,,6,misc,rule_template,keyword
+1,,,,count,,,,,,,rsa.misc.count,,6,misc,count,keyword
+1,,,,number,,,,,,,rsa.misc.number,,6,misc,number,keyword
+1,,,,sigcat,,,,,,,rsa.misc.sigcat,,6,misc,sigcat,keyword
+1,,,,type,,,,,,,rsa.misc.type,,6,misc,type,keyword
+1,,,,r_hostid,alias.host,Text,None,,,,rsa.network.alias_host,,5,network,alias_host,keyword
+1,Miscellaneous,Comments,Comment information provided in the log message,comments,comments,Text,Transient,,,,rsa.misc.comments,,5,misc,comments,keyword
+1,Miscellaneous,DNS Query Type,This key is used to capture the DNS Query type only,dns_querytype,dns.querytype,Text,Transient,,,,dns.question.type,,5,misc,dns_querytype,keyword
+1,Miscellaneous,Document/File number,This key captures File Identification number,doc_number,doc.number,Int32,Transient,,,,rsa.misc.doc_number,,5,misc,doc_number,integer
+1,,,,cc,email,Text,None,,,,rsa.email.email,,5,email,email,keyword
+1,Miscellaneous,Expected Value,This key captures the Value expected (from the perspective of the device generating the log).,expected_val,expected.val,Text,Transient,,,,rsa.misc.expected_val,,5,misc,expected_val,keyword
+1,Network,Destination IPv6 address,This key should only be used when it’s a Destination IP v6 Address.,daddr_v6,ipv6.dst,IPv6,None,(null)|-,host.dst,dhost,destination.ip,,5,network,ipv6_dst,ip
+1,Miscellaneous,Job Number,This key captures the Job Number,jobnum,job.num,Text,Transient,,,,rsa.misc.job_num,,5,misc,job_num,keyword
+1,,,Deprecated key defined only in table map.,obj_id,obj.id,Text,Transient,,,,rsa.internal.obj_id,,5,internal,obj_id,keyword
+1,Cryptography,Encryption peer’s identity,This key is for Encryption peer’s identity,peer_id,peer.id,Text,Transient,,,,rsa.crypto.peer_id,,5,crypto,peer_id,keyword
+1,Database,Permissions,This key captures permission or privilege level assigned to a resource.,permissions,permissions,Text,Transient,(null)|-,,,rsa.db.permissions,,5,db,permissions,keyword
+1,,Process Time,"Deprecated, use duration.time",processing_time,process.time,Text,Transient,,,,rsa.time.process_time,,5,time,process_time,keyword
+1,Cryptography,Encryption scheme used,This key captures the Signature Type,sigtype,sig.type,Text,Transient,,,,rsa.crypto.sig_type,,5,crypto,sig_type,keyword
+1,Miscellaneous,Destination SPI Index,Destination SPI Index,dst_spi,spi.dst,Text,Transient,,,,rsa.misc.spi_dst,,5,misc,spi_dst,keyword
+1,Miscellaneous,Source SPI Index,Source SPI Index,src_spi,spi.src,Text,Transient,,,,rsa.misc.spi_src,,5,misc,spi_src,keyword
+1,,,Deprecated key defined only in table map.,statement,statement,Text,Transient,,,,rsa.internal.statement,,5,internal,statement,keyword
+1,Identity,User's Department,User's Department Names only,user_dept,user.dept,Text,Transient,,,,rsa.identity.user_dept,,5,identity,user_dept,keyword
+1,Identity,Source User Session ID,This key captures Source User Session ID,c_sid,user.sid.src,Text,Transient,,,,rsa.identity.user_sid_src,,5,identity,user_sid_src,keyword
+1,Web,Web referer query,This key captures Web referer's query portion of the URL,web_ref_query,web.ref.query,Text,Transient,,,,rsa.web.web_ref_query,,5,web,web_ref_query,keyword
+1,Wireless,WLAN frequency channel,This is used to capture the channel names,wifi_channel,wlan.channel,UInt16,Transient,,,,rsa.wireless.wlan_channel,,5,wireless,wlan_channel,integer
+1,,,,bssid,wlan.ssid,Text,Transient,,,,rsa.wireless.wlan_ssid,,5,wireless,wlan_ssid,keyword
+1,,,,cert_issuer,,,,,,,rsa.crypto.cert_issuer,,5,crypto,cert_issuer,keyword
+1,,,,code,,,,,,,rsa.misc.code,,5,misc,code,keyword
+1,,,,method,,,,,,,http.request.method,,5,web,method,keyword
+1,,,,remote_domain,,,,,,,rsa.web.remote_domain,,5,web,remote_domain,keyword
+1,Miscellaneous,Agent Id,This key is used to capture agent id,agent.id,agent.id,Text,None,,,,rsa.misc.agent_id,,4,misc,agent_id,keyword
+1,,,Deprecated key defined only in table map.,cert_hostname,cert.host.name,Text,Transient,,,,rsa.crypto.cert_host_name,,4,crypto,cert_host_name,keyword
+1,Network,IP Address Originating,This is used to capture the original systems IPv4 address in case of a Forwarding Agent or a Proxy in between.,ip.orig,ip.orig,IPv4,None,,ipv6.orig,ipv6.orig,network.forwarded_ip,,4,network,ip_orig,ip
+1,Physical,City name,"This is used to capture the CIty Name when the Source/Destination Context is not clear, as seen in a session. There is a separate key for GeoIP based City",location_city,loc.city,Text,Transient,,,,geo.city_name,,4,physical,loc_city,keyword
+1,Miscellaneous,Message Body,This key captures the The contents of the message body.,message_body,message.body,Text,Transient,,,,rsa.misc.message_body,,4,misc,message_body,keyword
+1,,,,calling_to,phone,Text,Transient,,,,rsa.misc.phone,,4,misc,phone,keyword
+1,Miscellaneous,Signature String,This key captures a string object of the sigid variable.,sigid_string,sig.id.str,Text,Transient,,,,rsa.misc.sig_id_str,,4,misc,sig_id_str,keyword
+1,Database,Table Name,This key is used to capture the table name,tbl_name,table.name,Text,Transient,,,,rsa.db.table_name,,4,db,table_name,keyword
+1,,,,c_user_name,,,,,,,user.name,,4,identity,c_user_name,keyword
+1,,,,cmd,,,,,,,rsa.misc.cmd,,4,misc,cmd,keyword
+1,,,,misc,,,,,,,rsa.misc.misc,,4,misc,misc,keyword
+1,,,,name,,,,,,,rsa.misc.name,,4,misc,name,keyword
+1,,,,web_ref_host,alias.host,Text,None,,,,rsa.network.alias_host,,3,network,alias_host,keyword
+1,,,Deprecated key defined only in table map.,audit_class,audit.class,Text,Transient,,,,rsa.internal.audit_class,,3,internal,audit_class,keyword
+1,Cryptography,Certificate Error String,This key captures the Certificate Error String,cert_error,cert.error,Text,Transient,,,,rsa.crypto.cert_error,,3,crypto,cert_error,keyword
+1,Cryptography,Destination (Server) Cipher,This key is for Destination (Server) Cipher,d_cipher,cipher.dst,Text,Transient,,,,rsa.crypto.cipher_dst,,3,crypto,cipher_dst,keyword
+1,Cryptography,Destination (Server) Cipher size,This key captures Destination (Server) Cipher Size,d_ciphersize,cipher.size.dst,Int32,Transient,,,,rsa.crypto.cipher_size_dst,,3,crypto,cipher_size_dst,integer
+1,Miscellaneous,CPU Time,This key is the CPU time used in the execution of the event being recorded.,cpu,cpu,UInt32,Transient,(null)|-,,,rsa.misc.cpu,,3,misc,cpu,integer
+1,Database,Database ID,This key is used to capture the unique identifier for a database,db_id,db.id,Text,Transient,,,,rsa.db.db_id,,3,db,db_id,keyword
+1,Database,Database server Process ID,This key captures the process id of a connection with database server,db_pid,db.pid,Int32,Transient,,,,rsa.db.db_pid,,3,db,db_pid,integer
+1,,,Deprecated key defined only in table map.,entry,entry,Text,Transient,,,,rsa.internal.entry,,3,internal,entry,keyword
+1,Miscellaneous,Event Description,This key is used to capture a description of an event available directly or inferred,detail,event.desc,Text,None,,,,rsa.misc.event_desc,,3,misc,event_desc,keyword
+1,Identity,Federated Service Provider,This key is the Federated Service Provider. This is the application requesting authentication.,federated_sp,federated.sp,Text,Transient,,,,rsa.identity.federated_sp,,3,identity,federated_sp,keyword
+1,Network,Network Name,This key is used to capture the network name associated with an IP range. This is configured by the end user.,netname,netname,Text,Transient,,,,rsa.network.netname,,3,network,netname,keyword
+1,,Device Address,Deprecated,paddr,paddr,IPv4,None,(null)|-,paddr.host,,rsa.network.paddr,,3,network,paddr,ip
+1,Miscellaneous,Phone,This is used to capture the Phone Number or a Calling station ID,calling_from,phone,Text,Transient,,,,rsa.misc.phone,,3,misc,phone,keyword
+1,Miscellaneous,Process,"This key is used to capture the Process Name, in case of parent child relationship, this can be used for child process name context.",child_process,process,Text,None,,,,process.name,,3,misc,process,keyword
+1,Miscellaneous,Source Process Name,"This key is used to capture the Source Proccess Name, in case of parent child relationship, this can be used for parent process name context",parent_process,process.src,Text,Transient,,,,process.parent.name,,3,misc,process_src,keyword
+1,Miscellaneous,Linked Signature ID,This key captures IDS/IPS Int Signature ID. This must be linked to the sig.id,sigid1,sig.id1,Int32,Transient,,,,rsa.misc.sig_id1,,3,misc,sig_id1,integer
+1,,SSL Source Version,"Deprecated, use version",s_sslver,ssl.ver.src,Text,Transient,,,,rsa.crypto.ssl_ver_src,,3,crypto,ssl_ver_src,keyword
+1,,,Deprecated key defined only in table map.,trans_from,trans.from,Text,Transient,,,,rsa.email.trans_from,,3,email,trans_from,keyword
+1,Web,Web Referrer page,This key captures Web referer's page information,web_ref_page,web.ref.page,Text,Transient,,,,rsa.web.web_ref_page,,3,web,web_ref_page,keyword
+1,Web,Web referer Root URLPath,Web referer's root URL path,web_ref_root,web.ref.root,Text,Transient,,,,rsa.web.web_ref_root,,3,web,web_ref_root,keyword
+1,Wireless,WLAN name/number,This key captures either WLAN number/name,wlan,wlan.name,Text,Transient,,,,rsa.wireless.wlan_name,,3,wireless,wlan_name,keyword
+1,,,,d_certauth,,,,,,,rsa.crypto.d_certauth,,3,crypto,d_certauth,keyword
+1,,,,faddr,,,,,,,rsa.network.faddr,,3,network,faddr,keyword
+1,,,,hour,,,,,,,rsa.time.hour,,3,time,hour,keyword
+1,,,,im_buddyid,,,,,,,rsa.misc.im_buddyid,,3,misc,im_buddyid,keyword
+1,,,,im_client,,,,,,,rsa.misc.im_client,,3,misc,im_client,keyword
+1,,,,im_userid,,,,,,,rsa.misc.im_userid,,3,misc,im_userid,keyword
+1,,,,lhost,,,,,,,rsa.network.lhost,,3,network,lhost,keyword
+1,,,,min,,,,,,,rsa.time.min,,3,time,min,keyword
+1,,,,origin,,,,,,,rsa.network.origin,,3,network,origin,keyword
+1,,,,pid,,,,,,,rsa.misc.pid,,3,misc,pid,keyword
+1,,,,priority,,,,,,,rsa.misc.priority,,3,misc,priority,keyword
+1,,,,remote_domain_id,,,,,,,rsa.network.remote_domain_id,,3,network,remote_domain_id,keyword
+1,,,,s_certauth,,,,,,,rsa.crypto.s_certauth,,3,crypto,s_certauth,keyword
+1,,,,timestamp,,,,,,,rsa.time.timestamp,,3,time,timestamp,keyword
+1,,,,urldomain,,,,,,,url.domain,,3,web,urldomain,keyword
+1,File,Attachment,This key captures the attachment file name,attachment,attachment,Text,None,,,,rsa.file.attachment,,2,file,attachment,keyword
+1,Miscellaneous,Context Subject,This key is to be used in an audit context where the subject is the object being identified,s_context,context.subject,Text,Transient,,,,rsa.misc.context_subject,,2,misc,context_subject,keyword
+1,,,,t_context,context.target,Text,Transient,,,,rsa.misc.context_target,,2,misc,context_target,keyword
+1,Miscellaneous,CVE,This key captures CVE (Common Vulnerabilities and Exposures) - an identifier for known information security vulnerabilities.,cve,cve,Text,Transient,,,,rsa.misc.cve,,2,misc,cve,keyword
+1,Counters,Device class Counter 2 Description,This is a generic counter string key that should be used with the label dclass.c2 only,dclass_counter2_string,dclass.c2.str,Text,Transient,,,,rsa.counters.dclass_c2_str,,2,counters,dclass_c2_str,keyword
+1,Counters,Device class Ratio 1 Description,This is a generic ratio string key that should be used with the label dclass.r1 only,dclass_ratio1_string,dclass.r1.str,Text,Transient,,,,rsa.counters.dclass_r1_str,,2,counters,dclass_r1_str,keyword
+1,Counters,Device class Ratio 2,This is a generic ratio key that should be used with the label dclass.r2.str only,dclass_ratio2,dclass.r2,Text,Transient,,,,rsa.counters.dclass_r2,,2,counters,dclass_r2,keyword
+1,Time,Event Queing Time,This key is the Time that the event was queued.,event_queue_time,event.queue.time,TimeT,Transient,,,,rsa.time.event_queue_time,,2,time,event_queue_time,keyword
+1,File,Extension,This key is used to capture the extension portion of a filename / extension of the page that was requested,web_extension,extension,Text,None,,,,file.extension,,2,file,extension,keyword
+1,Miscellaneous,Filter Category Number,This key captures Filter Category Number. Legacy Usage,fcatnum,fcatnum,Text,Transient,,,,rsa.misc.fcatnum,,2,misc,fcatnum,keyword
+1,Identity,Federated Identity Provider,This key is the federated Identity Provider. This is the server providing the authentication.,federated_idp,federated.idp,Text,Transient,,,,rsa.identity.federated_idp,,2,identity,federated_idp,keyword
+1,,,Deprecated key defined only in table map.,h_code,hcode,Text,Transient,,,,rsa.internal.hcode,,2,internal,hcode,keyword
+1,Cryptography,IkE Cookie 1,ID of the negotiation — sent for ISAKMP Phase One,ike_cookie1,ike.cookie1,Text,Transient,,,,rsa.crypto.ike_cookie1,,2,crypto,ike_cookie1,keyword
+1,Cryptography,IKE Cookie 2,ID of the negotiation — sent for ISAKMP Phase Two,ike_cookie2,ike.cookie2,Text,Transient,,,,rsa.crypto.ike_cookie2,,2,crypto,ike_cookie2,keyword
+1,,,Deprecated key defined only in table map.,inode,inode,Int64,Transient,,,,rsa.internal.inode,,2,internal,inode,long
+1,,IPv6 Address,"Deprecated, use alias.ipv6",hostip_v6,ipv6.addr,IPv6,Transient,(null)|-,alias.host,alias.host,host.ip,,2,network,ipv6_addr,ip
+1,Miscellaneous,Library,This key is used to capture library information in mainframe devices,library,library,Text,Transient,,,,rsa.misc.library,,2,misc,library,keyword
+1,Physical,State or province name,This is used to capture the State Name as seen in a session.,location_state,loc.state,Text,Transient,,,,geo.region_name,,2,physical,loc_state,keyword
+1,Database,Logical Reads,This key is used for the number of logical reads,lread,lread,Int32,Transient,(null),,,rsa.db.lread,,2,db,lread,integer
+1,Database,Logical Writes,This key is used for the number of logical writes,lwrite,lwrite,Int32,Transient,(null),,,rsa.db.lwrite,,2,db,lwrite,integer
+1,Miscellaneous,Parent Node Name,This key captures the Parent Node Name. Must be related to node variable.,parent_node,parent.node,Text,Transient,,,,rsa.misc.parent_node,,2,misc,parent_node,keyword
+1,,,,phone_number,phone,Text,Transient,,,,rsa.misc.phone,,2,misc,phone,keyword
+1,Storage,Port World Wide Name,This uniquely identifies a port on a HBA.,pwwn,pwwn,Text,Transient,,,,rsa.storage.pwwn,,2,storage,pwwn,keyword
+1,,,,referer,referer,Text,None,,,,http.request.referrer,,2,web,referer,keyword
+1,,,Deprecated key defined only in table map.,resource_class,resource.class,Text,Transient,,,,rsa.internal.resource_class,,2,internal,resource_class,keyword
+1,,Risk: Informational,"Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)",risk_info,risk.info,Text,None,,,,rsa.misc.risk_info,,2,misc,risk_info,keyword
+1,Miscellaneous,TCP Flags,This key is captures the TCP flags set in any packet of session,tcp_flags,tcp.flags,UInt8,None,,,,rsa.misc.tcp_flags,,2,misc,tcp_flags,integer
+1,Miscellaneous,Type Of Service,This key describes the type of service,tos,tos,Int32,Transient,,,,rsa.misc.tos,,2,misc,tos,integer
+1,,,Deprecated key defined only in table map.,trans_to,trans.to,Text,Transient,,,,rsa.email.trans_to,,2,email,trans_to,keyword
+1,Identity,User Account,This key should be used when the source/destination/initiated/target of a username is not clear,user,user,Text,None,,,,user.name,,2,identity,user,keyword
+1,Miscellaneous,VMWARE Target,VMWare Target **VMWARE** only varaible.,vm_target,vm.target,Text,Transient,,,,rsa.misc.vm_target,,2,misc,vm_target,keyword
+1,Miscellaneous,Workspace Description,This key captures Workspace Description,workspace_desc,workspace,Text,Transient,,,,rsa.misc.workspace,,2,misc,workspace,keyword
+1,,,,addr,,,,,,,rsa.network.addr,,2,network,addr,keyword
+1,,,,cn_asn_dst,,,,,,,rsa.web.cn_asn_dst,,2,web,cn_asn_dst,keyword
+1,,,,cn_rpackets,,,,,,,rsa.web.cn_rpackets,,2,web,cn_rpackets,keyword
+1,,,,command,,,,,,,rsa.misc.command,,2,misc,command,keyword
+1,,,,dns_a_record,,,,,,,rsa.network.dns_a_record,,2,network,dns_a_record,keyword
+1,,,,dns_ptr_record,,,,,,,rsa.network.dns_ptr_record,,2,network,dns_ptr_record,keyword
+1,,,,event_category,,,,,,,rsa.misc.event_category,,2,misc,event_category,keyword
+1,,,,facilityname,,,,,,,rsa.misc.facilityname,,2,misc,facilityname,keyword
+1,,,,fhost,,,,,,,rsa.network.fhost,,2,network,fhost,keyword
+1,,,,filepath,,,,,,,file.path,,2,file,filepath,keyword
+1,,,,filesystem,,,,,,,rsa.file.filesystem,,2,file,filesystem,keyword
+1,,,,forensic_info,,,,,,,rsa.misc.forensic_info,,2,misc,forensic_info,keyword
+1,,,,fport,,,,,,,rsa.network.fport,,2,network,fport,keyword
+1,,,,jobname,,,,,,,rsa.misc.jobname,,2,misc,jobname,keyword
+1,,,,laddr,,,,,,,rsa.network.laddr,,2,network,laddr,keyword
+1,,,,linterface,,,,,,,rsa.network.linterface,,2,network,linterface,keyword
+1,,,,mode,,,,,,,rsa.misc.mode,,2,misc,mode,keyword
+1,,,,p_time1,,,,,,,rsa.time.p_time1,,2,time,p_time1,keyword
+1,,,,phost,,,,,,,rsa.network.phost,,2,network,phost,keyword
+1,,,,policy,,,,,,,rsa.misc.policy,,2,misc,policy,keyword
+1,,,,policy_waiver,,,,,,,rsa.misc.policy_waiver,,2,misc,policy_waiver,keyword
+1,,,,second,,,,,,,rsa.misc.second,,2,misc,second,keyword
+1,,,,space1,,,,,,,rsa.misc.space1,,2,misc,space1,keyword
+1,,,,subcategory,,,,,,,rsa.misc.subcategory,,2,misc,subcategory,keyword
+1,,,,tbdstr2,,,,,,,rsa.misc.tbdstr2,,2,misc,tbdstr2,keyword
+1,,,,tzone,,,,,,,rsa.time.tzone,,2,time,tzone,keyword
+1,,,,urlpage,,,,,,,rsa.web.urlpage,,2,web,urlpage,keyword
+1,,,,urlquery,,,,,,,url.query,,2,web,urlquery,keyword
+1,,,,urlroot,,,,,,,rsa.web.urlroot,,2,web,urlroot,keyword
+1,,,,user_id,,,,,,,user.id,,2,identity,user_id,keyword
+1,,Active Directory Workstation Destination,"Deprecated, use host.dst",ad_computer_dst,ad.computer.dst,Text,None,,,,rsa.network.ad_computer_dst,,1,network,ad_computer_dst,keyword
+1,Threat,Alerts,This key is used to capture name of the alert,alert,alert,Text,Transient,,,,rsa.threat.alert,,1,threat,alert,keyword
+1,,Alert ID,"Deprecated, New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)",alert_id,alert.id,Text,None,,,,rsa.misc.alert_id,,1,misc,alert_id,keyword
+1,,,,devicehostname,alias.host,Text,None,,,,rsa.network.alias_host,,1,network,alias_host,keyword
+1,,,Deprecated key defined only in table map.,binary,binary,Text,Transient,,,,rsa.file.binary,,1,file,binary,keyword
+1,,,,cert_checksum,cert.checksum,Text,None,,,,rsa.crypto.cert_checksum,,1,crypto,cert_checksum,keyword
+1,Cryptography,Certificate host category,This key is used for the hostname category value of a certificate,cert_hostname_cat,cert.host.cat,Text,Transient,,,,rsa.crypto.cert_host_cat,,1,crypto,cert_host_cat,keyword
+1,Cryptography,Certificate serial number,This key is used to capture the Certificate serial number only,cert.serial,cert.serial,Text,Transient,,,,rsa.crypto.cert_serial,,1,crypto,cert_serial,keyword
+1,Cryptography,Certificate status,This key captures Certificate validation status,cert_status,cert.status,Text,Transient,,,,rsa.crypto.cert_status,,1,crypto,cert_status,keyword
+1,Miscellaneous,Target Checksum,This key is used to capture the checksum or hash of the the target entity such as a process or file.,checksum.dst,checksum.dst,Text,None,,,,rsa.misc.checksum_dst,,1,misc,checksum_dst,keyword
+1,Miscellaneous,Source Checksum,This key is used to capture the checksum or hash of the source entity such as a file or process.,checksum.src,checksum.src,Text,None,,,,rsa.misc.checksum_src,,1,misc,checksum_src,keyword
+1,Counters,Device class Counter 3 Description,This is a generic counter string key that should be used with the label dclass.c3 only,dclass_counter3_string,dclass.c3.str,Text,Transient,,,,rsa.counters.dclass_c3_str,,1,counters,dclass_c3_str,keyword
+1,Counters,Device class Ratio 3,This is a generic ratio key that should be used with the label dclass.r3.str only,dclass_ratio3,dclass.r3,Text,Transient,,,,rsa.counters.dclass_r3,,1,counters,dclass_r3,keyword
+1,,,Deprecated key defined only in table map.,dead,dead,Int32,Transient,(null)|-,,,rsa.internal.dead,,1,internal,dead,integer
+1,Web,DNS Response Text,This key is used to capture the DNS response text only,dns.resptext,dns.resptext,Text,Transient,,,,dns.answers.name,,1,web,dns_resptext,keyword
+1,Network,Domain,This key should only be used to capture a Network Domain when the directionality is not clear. Use web.domain/tld/cctld/sld for Web based Domains,domainname,domain,Text,None,,,,server.domain,,1,network,domain,keyword
+1,,,,bcc,email,Text,None,,,,rsa.email.email,,1,email,email,keyword
+1,,,,email,email,Text,None,,,,rsa.email.email,,1,email,email,keyword
+1,Network,Ethernet Protocol,"This key is used to capture Ethernet Type, Used for Layer 3 Protocols Only",eth_type,eth.type,UInt16,None,,,,rsa.network.eth_type,,1,network,eth_type,integer
+1,,,,extension,extension,Text,None,,,,file.extension,,1,file,extension,keyword
+1,Reserved,Feed Description,"This is used to capture the description of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",feed_desc,feed.desc,Text,None,,,,rsa.internal.feed_desc,,1,internal,feed_desc,keyword
+1,Reserved,Feed Name,"This is used to capture the name of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",feed_name,feed.name,Text,None,,,,rsa.internal.feed_name,,1,internal,feed_name,keyword
+1,File,Filename Destination,This is used to capture name of the file targeted by the action,filename_dst,filename.dst,Text,None,,,,rsa.file.filename_dst,,1,file,filename_dst,keyword
+1,File,Filename Source,"This is used to capture name of the parent filename, the file which performed the action",filename_src,filename.src,Text,None,,,,rsa.file.filename_src,,1,file,filename_src,keyword
+1,Miscellaneous,Filter Result,This key captures the Filter Result,fresult,fresult,Int32,Transient,,,,rsa.misc.fresult,,1,misc,fresult,integer
+1,Healthcare,Full Name,"This key is for Full Names only, this is used for Healthcare predominantly to capture Patients information",patient_fullname,fullname,Text,Transient,,,,user.full_name,,1,healthcare,fullname,keyword
+1,Network,IP Protocol,"This key should be used to capture the Protocol number, all the protocol nubers are converted into string in UI",ip_proto,ip.proto,UInt8,None,(null)|-,protocol,protocol,rsa.network.ip_proto,,1,network,ip_proto,integer
+1,Physical,Destination Latitude,This is used to capture the destination Latitude based on the GEOPIP Maxmind database.,latdec_dst,latdec.dst,Float32,None,,,,destination.geo.location.lat,,1,physical,latdec_dst,float
+1,Physical,Source Latitude,This is used to capture the source Latitude based on the GEOPIP Maxmind database.,latdec_src,latdec.src,Float32,None,,,,source.geo.location.lat,,1,physical,latdec_src,float
+1,Identity,Description of Logon Type,This key is used to capture the textual description of an integer logon type as stored in the meta key 'logon.type'.,logon_type_desc,logon.type.desc,Text,None,,,,rsa.identity.logon_type_desc,,1,identity,logon_type_desc,keyword
+1,Physical,Source Longitude,This is used to capture the source Longitude based on the GEOPIP Maxmind database.,longdec_src,longdec.src,Float32,None,,,,source.geo.location.lon,,1,physical,longdec_src,float
+1,Identity,Middle name of a Person,"This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information",user_mname,middlename,Text,Transient,,,,rsa.identity.middlename,,1,identity,middlename,keyword
+1,Physical,Destination Organization,This is used to capture the destination organization based on the GEOPIP Maxmind database.,org_dst,org.dst,Text,None,,,,rsa.physical.org_dst,,1,physical,org_dst,keyword
+1,,Originating IP Address,"Deprecated, use ip.orig, ipv6.orig or host.orig based on value type",orig_ip,orig_ip,Text,None,,,,network.forwarded_ip,,1,network,orig_ip,ip
+1,Identity,Password,"This key is for Passwords seen in any session, plain text or encrypted",password,password,Text,Transient,,,,rsa.identity.password,,1,identity,password,keyword
+1,Healthcare,Patient's First Name,"This key is for First Names only, this is used for Healthcare predominantly to capture Patients information",patient_fname,patient.fname,Text,Transient,,,,rsa.healthcare.patient_fname,,1,healthcare,patient_fname,keyword
+1,Healthcare,Patient Identifier,This key captures the unique ID for a patient,patient_id,patient.id,Text,Transient,,,,rsa.healthcare.patient_id,,1,healthcare,patient_id,keyword
+1,Healthcare,Patient's Last Name,"This key is for Last Names only, this is used for Healthcare predominantly to capture Patients information",patient_lname,patient.lname,Text,Transient,,,,rsa.healthcare.patient_lname,,1,healthcare,patient_lname,keyword
+1,Healthcare,Patient's Middle Name,"This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information",patient_mname,patient.mname,Text,Transient,,,,rsa.healthcare.patient_mname,,1,healthcare,patient_mname,keyword
+1,Miscellaneous,Payload Destination,This key is used to capture destination payload,dst_payload,payload.dst,Text,Transient,,,,rsa.misc.payload_dst,,1,misc,payload_dst,keyword
+1,Miscellaneous,Payload Source,This key is used to capture source payload,src_payload,payload.src,Text,Transient,,,,rsa.misc.payload_src,,1,misc,payload_src,keyword
+1,Miscellaneous,Pool ID,This key captures the identifier (typically numeric field) of a resource pool,pool_id,pool.id,Text,Transient,,,,rsa.misc.pool_id,,1,misc,pool_id,keyword
+1,Database,Physical Reads,This key is used for the number of physical writes,pread,pread,Int32,Transient,(null),,,rsa.db.pread,,1,db,pread,integer
+1,Miscellaneous,Process ID Value,This key is a failure key for Process ID when it is not an integer value,process_id_val,process.id.val,Text,Transient,,,,rsa.misc.process_id_val,,1,misc,process_id_val,keyword
+1,Miscellaneous,Risk Number Community,This key captures Risk Number Community,risk_num_comm,risk.num.comm,Float32,None,N/R,,,rsa.misc.risk_num_comm,,1,misc,risk_num_comm,float
+1,Miscellaneous,Risk Number NextGen,This key captures Risk Number NextGen,risk_num_next,risk.num.next,Float32,None,N/R,,,rsa.misc.risk_num_next,,1,misc,risk_num_next,float
+1,Miscellaneous,Risk Number SandBox,This key captures Risk Number SandBox,risk_num_sand,risk.num.sand,Float32,None,N/R,,,rsa.misc.risk_num_sand,,1,misc,risk_num_sand,float
+1,Miscellaneous,Risk Number Static,This key captures Risk Number Static,risk_num_static,risk.num.static,Float32,None,N/R,,,rsa.misc.risk_num_static,,1,misc,risk_num_static,float
+1,,Risk: Suspicious,"Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)",risk_suspicious,risk.suspicious,Text,None,,,,rsa.misc.risk_suspicious,,1,misc,risk_suspicious,keyword
+1,,Risk: Warning,"Deprecated, use New Hunting Model (inv.*, ioc, boc, eoc, analysis.*)",risk_warning,risk.warning,Text,None,,,,rsa.misc.risk_warning,,1,misc,risk_warning,keyword
+1,,,,service.name,service.name,Text,None,,,,service.name,,1,network,service_name,keyword
+1,Miscellaneous,SNMP OID,SNMP Object Identifier,snmp.oid,snmp.oid,Text,Transient,,,,rsa.misc.snmp_oid,,1,misc,snmp_oid,keyword
+1,Miscellaneous,SQL Query,This key captures the SQL query,sql,sql,Text,Transient,,,,rsa.misc.sql,,1,misc,sql,keyword
+1,,SSL Destination Version,"Deprecated, use version",d_sslver,ssl.ver.dst,Text,Transient,,,,rsa.crypto.ssl_ver_dst,,1,crypto,ssl_ver_dst,keyword
+1,Threat,Threat Source,This key is used to capture source of the threat,threat_source,threat.source,Text,None,,,,rsa.threat.threat_source,,1,threat,threat_source,keyword
+1,,,Deprecated key defined only in table map.,url_raw,url.raw,Text,Transient,,,,url.original,,1,web,url_raw,keyword
+1,Identity,User Unique ID/Logon ID,This key is used to capture Unique identifier for an account.,user.id,user.id,Text,None,,,,user.id,,1,identity,user_id,keyword
+1,Miscellaneous,Vulnerability Reference,This key captures the Vulnerability Reference details,vuln_ref,vuln.ref,Text,Transient,,,,rsa.misc.vuln_ref,,1,misc,vuln_ref,keyword
+1,,,,acl_id,,,,,,,rsa.misc.acl_id,,1,misc,acl_id,keyword
+1,,,,acl_op,,,,,,,rsa.misc.acl_op,,1,misc,acl_op,keyword
+1,,,,acl_pos,,,,,,,rsa.misc.acl_pos,,1,misc,acl_pos,keyword
+1,,,,acl_table,,,,,,,rsa.misc.acl_table,,1,misc,acl_table,keyword
+1,,,,admin,,,,,,,rsa.misc.admin,,1,misc,admin,keyword
+1,,,,alarm_id,,,,,,,rsa.misc.alarm_id,,1,misc,alarm_id,keyword
+1,,,,alarmname,,,,,,,rsa.misc.alarmname,,1,misc,alarmname,keyword
+1,,,,app_id,,,,,,,rsa.misc.app_id,,1,misc,app_id,keyword
+1,,,,audit,,,,,,,rsa.misc.audit,,1,misc,audit,keyword
+1,,,,audit_object,,,,,,,rsa.misc.audit_object,,1,misc,audit_object,keyword
+1,,,,auditdata,,,,,,,rsa.misc.auditdata,,1,misc,auditdata,keyword
+1,,,,benchmark,,,,,,,rsa.misc.benchmark,,1,misc,benchmark,keyword
+1,,,,bypass,,,,,,,rsa.misc.bypass,,1,misc,bypass,keyword
+1,,,,c_logon_id,,,,,,,user.id,,1,identity,c_logon_id,keyword
+1,,,,cache,,,,,,,rsa.misc.cache,,1,misc,cache,keyword
+1,,,,cache_hit,,,,,,,rsa.misc.cache_hit,,1,misc,cache_hit,keyword
+1,,,,cefversion,,,,,,,rsa.misc.cefversion,,1,misc,cefversion,keyword
+1,,,,cert_keysize,,,,,,,rsa.crypto.cert_keysize,,1,crypto,cert_keysize,keyword
+1,,,,cert_username,,,,,,,rsa.crypto.cert_username,,1,crypto,cert_username,keyword
+1,,,,cfg.attr,,,,,,,rsa.misc.cfg_attr,,1,misc,cfg_attr,keyword
+1,,,,cfg.obj,,,,,,,rsa.misc.cfg_obj,,1,misc,cfg_obj,keyword
+1,,,,cfg.path,,,,,,,rsa.misc.cfg_path,,1,misc,cfg_path,keyword
+1,,,,changes,,,,,,,rsa.misc.changes,,1,misc,changes,keyword
+1,,,,client,,,,,,,rsa.misc.client,,1,misc,client,keyword
+1,,,,client_ip,,,,,,,rsa.misc.client_ip,,1,misc,client_ip,keyword
+1,,,,clustermembers,,,,,,,rsa.misc.clustermembers,,1,misc,clustermembers,keyword
+1,,,,cn_acttimeout,,,,,,,rsa.misc.cn_acttimeout,,1,misc,cn_acttimeout,keyword
+1,,,,cn_asn_src,,,,,,,rsa.misc.cn_asn_src,,1,misc,cn_asn_src,keyword
+1,,,,cn_bgpv4nxthop,,,,,,,rsa.misc.cn_bgpv4nxthop,,1,misc,cn_bgpv4nxthop,keyword
+1,,,,cn_ctr_dst_code,,,,,,,rsa.misc.cn_ctr_dst_code,,1,misc,cn_ctr_dst_code,keyword
+1,,,,cn_dst_tos,,,,,,,rsa.misc.cn_dst_tos,,1,misc,cn_dst_tos,keyword
+1,,,,cn_dst_vlan,,,,,,,rsa.misc.cn_dst_vlan,,1,misc,cn_dst_vlan,keyword
+1,,,,cn_engine_id,,,,,,,rsa.misc.cn_engine_id,,1,misc,cn_engine_id,keyword
+1,,,,cn_engine_type,,,,,,,rsa.misc.cn_engine_type,,1,misc,cn_engine_type,keyword
+1,,,,cn_f_switch,,,,,,,rsa.misc.cn_f_switch,,1,misc,cn_f_switch,keyword
+1,,,,cn_flowsampid,,,,,,,rsa.misc.cn_flowsampid,,1,misc,cn_flowsampid,keyword
+1,,,,cn_flowsampintv,,,,,,,rsa.misc.cn_flowsampintv,,1,misc,cn_flowsampintv,keyword
+1,,,,cn_flowsampmode,,,,,,,rsa.misc.cn_flowsampmode,,1,misc,cn_flowsampmode,keyword
+1,,,,cn_inacttimeout,,,,,,,rsa.misc.cn_inacttimeout,,1,misc,cn_inacttimeout,keyword
+1,,,,cn_inpermbyts,,,,,,,rsa.misc.cn_inpermbyts,,1,misc,cn_inpermbyts,keyword
+1,,,,cn_inpermpckts,,,,,,,rsa.misc.cn_inpermpckts,,1,misc,cn_inpermpckts,keyword
+1,,,,cn_invalid,,,,,,,rsa.misc.cn_invalid,,1,misc,cn_invalid,keyword
+1,,,,cn_ip_proto_ver,,,,,,,rsa.misc.cn_ip_proto_ver,,1,misc,cn_ip_proto_ver,keyword
+1,,,,cn_ipv4_ident,,,,,,,rsa.misc.cn_ipv4_ident,,1,misc,cn_ipv4_ident,keyword
+1,,,,cn_l_switch,,,,,,,rsa.misc.cn_l_switch,,1,misc,cn_l_switch,keyword
+1,,,,cn_log_did,,,,,,,rsa.misc.cn_log_did,,1,misc,cn_log_did,keyword
+1,,,,cn_log_rid,,,,,,,rsa.misc.cn_log_rid,,1,misc,cn_log_rid,keyword
+1,,,,cn_max_ttl,,,,,,,rsa.misc.cn_max_ttl,,1,misc,cn_max_ttl,keyword
+1,,,,cn_maxpcktlen,,,,,,,rsa.misc.cn_maxpcktlen,,1,misc,cn_maxpcktlen,keyword
+1,,,,cn_min_ttl,,,,,,,rsa.misc.cn_min_ttl,,1,misc,cn_min_ttl,keyword
+1,,,,cn_minpcktlen,,,,,,,rsa.misc.cn_minpcktlen,,1,misc,cn_minpcktlen,keyword
+1,,,,cn_mpls_lbl_1,,,,,,,rsa.misc.cn_mpls_lbl_1,,1,misc,cn_mpls_lbl_1,keyword
+1,,,,cn_mpls_lbl_10,,,,,,,rsa.misc.cn_mpls_lbl_10,,1,misc,cn_mpls_lbl_10,keyword
+1,,,,cn_mpls_lbl_2,,,,,,,rsa.misc.cn_mpls_lbl_2,,1,misc,cn_mpls_lbl_2,keyword
+1,,,,cn_mpls_lbl_3,,,,,,,rsa.misc.cn_mpls_lbl_3,,1,misc,cn_mpls_lbl_3,keyword
+1,,,,cn_mpls_lbl_4,,,,,,,rsa.misc.cn_mpls_lbl_4,,1,misc,cn_mpls_lbl_4,keyword
+1,,,,cn_mpls_lbl_5,,,,,,,rsa.misc.cn_mpls_lbl_5,,1,misc,cn_mpls_lbl_5,keyword
+1,,,,cn_mpls_lbl_6,,,,,,,rsa.misc.cn_mpls_lbl_6,,1,misc,cn_mpls_lbl_6,keyword
+1,,,,cn_mpls_lbl_7,,,,,,,rsa.misc.cn_mpls_lbl_7,,1,misc,cn_mpls_lbl_7,keyword
+1,,,,cn_mpls_lbl_8,,,,,,,rsa.misc.cn_mpls_lbl_8,,1,misc,cn_mpls_lbl_8,keyword
+1,,,,cn_mpls_lbl_9,,,,,,,rsa.misc.cn_mpls_lbl_9,,1,misc,cn_mpls_lbl_9,keyword
+1,,,,cn_mplstoplabel,,,,,,,rsa.misc.cn_mplstoplabel,,1,misc,cn_mplstoplabel,keyword
+1,,,,cn_mplstoplabip,,,,,,,rsa.misc.cn_mplstoplabip,,1,misc,cn_mplstoplabip,keyword
+1,,,,cn_mul_dst_byt,,,,,,,rsa.misc.cn_mul_dst_byt,,1,misc,cn_mul_dst_byt,keyword
+1,,,,cn_mul_dst_pks,,,,,,,rsa.misc.cn_mul_dst_pks,,1,misc,cn_mul_dst_pks,keyword
+1,,,,cn_muligmptype,,,,,,,rsa.misc.cn_muligmptype,,1,misc,cn_muligmptype,keyword
+1,,,,cn_sampalgo,,,,,,,rsa.misc.cn_sampalgo,,1,misc,cn_sampalgo,keyword
+1,,,,cn_sampint,,,,,,,rsa.misc.cn_sampint,,1,misc,cn_sampint,keyword
+1,,,,cn_seqctr,,,,,,,rsa.misc.cn_seqctr,,1,misc,cn_seqctr,keyword
+1,,,,cn_spackets,,,,,,,rsa.misc.cn_spackets,,1,misc,cn_spackets,keyword
+1,,,,cn_src_tos,,,,,,,rsa.misc.cn_src_tos,,1,misc,cn_src_tos,keyword
+1,,,,cn_src_vlan,,,,,,,rsa.misc.cn_src_vlan,,1,misc,cn_src_vlan,keyword
+1,,,,cn_sysuptime,,,,,,,rsa.misc.cn_sysuptime,,1,misc,cn_sysuptime,keyword
+1,,,,cn_template_id,,,,,,,rsa.misc.cn_template_id,,1,misc,cn_template_id,keyword
+1,,,,cn_totbytsexp,,,,,,,rsa.misc.cn_totbytsexp,,1,misc,cn_totbytsexp,keyword
+1,,,,cn_totflowexp,,,,,,,rsa.misc.cn_totflowexp,,1,misc,cn_totflowexp,keyword
+1,,,,cn_totpcktsexp,,,,,,,rsa.misc.cn_totpcktsexp,,1,misc,cn_totpcktsexp,keyword
+1,,,,cn_unixnanosecs,,,,,,,rsa.misc.cn_unixnanosecs,,1,misc,cn_unixnanosecs,keyword
+1,,,,cn_v6flowlabel,,,,,,,rsa.misc.cn_v6flowlabel,,1,misc,cn_v6flowlabel,keyword
+1,,,,cn_v6optheaders,,,,,,,rsa.misc.cn_v6optheaders,,1,misc,cn_v6optheaders,keyword
+1,,,,comp_class,,,,,,,rsa.misc.comp_class,,1,misc,comp_class,keyword
+1,,,,comp_name,,,,,,,rsa.misc.comp_name,,1,misc,comp_name,keyword
+1,,,,comp_rbytes,,,,,,,rsa.misc.comp_rbytes,,1,misc,comp_rbytes,keyword
+1,,,,comp_sbytes,,,,,,,rsa.misc.comp_sbytes,,1,misc,comp_sbytes,keyword
+1,,,,connection_id,,,,,,,rsa.misc.connection_id,,1,misc,connection_id,keyword
+1,,,,cpu_data,,,,,,,rsa.misc.cpu_data,,1,misc,cpu_data,keyword
+1,,,,criticality,,,,,,,rsa.misc.criticality,,1,misc,criticality,keyword
+1,,,,cs_agency_dst,,,,,,,rsa.misc.cs_agency_dst,,1,misc,cs_agency_dst,keyword
+1,,,,cs_analyzedby,,,,,,,rsa.misc.cs_analyzedby,,1,misc,cs_analyzedby,keyword
+1,,,,cs_av_other,,,,,,,rsa.misc.cs_av_other,,1,misc,cs_av_other,keyword
+1,,,,cs_av_primary,,,,,,,rsa.misc.cs_av_primary,,1,misc,cs_av_primary,keyword
+1,,,,cs_av_secondary,,,,,,,rsa.misc.cs_av_secondary,,1,misc,cs_av_secondary,keyword
+1,,,,cs_bgpv6nxthop,,,,,,,rsa.misc.cs_bgpv6nxthop,,1,misc,cs_bgpv6nxthop,keyword
+1,,,,cs_bit9status,,,,,,,rsa.misc.cs_bit9status,,1,misc,cs_bit9status,keyword
+1,,,,cs_context,,,,,,,rsa.misc.cs_context,,1,misc,cs_context,keyword
+1,,,,cs_control,,,,,,,rsa.misc.cs_control,,1,misc,cs_control,keyword
+1,,,,cs_data,,,,,,,rsa.misc.cs_data,,1,misc,cs_data,keyword
+1,,,,cs_datecret,,,,,,,rsa.misc.cs_datecret,,1,misc,cs_datecret,keyword
+1,,,,cs_dst_tld,,,,,,,rsa.misc.cs_dst_tld,,1,misc,cs_dst_tld,keyword
+1,,,,cs_eth_dst_ven,,,,,,,rsa.misc.cs_eth_dst_ven,,1,misc,cs_eth_dst_ven,keyword
+1,,,,cs_eth_src_ven,,,,,,,rsa.misc.cs_eth_src_ven,,1,misc,cs_eth_src_ven,keyword
+1,,,,cs_event_uuid,,,,,,,rsa.misc.cs_event_uuid,,1,misc,cs_event_uuid,keyword
+1,,,,cs_filetype,,,,,,,rsa.misc.cs_filetype,,1,misc,cs_filetype,keyword
+1,,,,cs_fld,,,,,,,rsa.misc.cs_fld,,1,misc,cs_fld,keyword
+1,,,,cs_if_desc,,,,,,,rsa.misc.cs_if_desc,,1,misc,cs_if_desc,keyword
+1,,,,cs_if_name,,,,,,,rsa.misc.cs_if_name,,1,misc,cs_if_name,keyword
+1,,,,cs_ip_next_hop,,,,,,,rsa.misc.cs_ip_next_hop,,1,misc,cs_ip_next_hop,keyword
+1,,,,cs_ipv4dstpre,,,,,,,rsa.misc.cs_ipv4dstpre,,1,misc,cs_ipv4dstpre,keyword
+1,,,,cs_ipv4srcpre,,,,,,,rsa.misc.cs_ipv4srcpre,,1,misc,cs_ipv4srcpre,keyword
+1,,,,cs_lifetime,,,,,,,rsa.misc.cs_lifetime,,1,misc,cs_lifetime,keyword
+1,,,,cs_log_medium,,,,,,,rsa.misc.cs_log_medium,,1,misc,cs_log_medium,keyword
+1,,,,cs_loginname,,,,,,,rsa.misc.cs_loginname,,1,misc,cs_loginname,keyword
+1,,,,cs_modulescore,,,,,,,rsa.misc.cs_modulescore,,1,misc,cs_modulescore,keyword
+1,,,,cs_modulesign,,,,,,,rsa.misc.cs_modulesign,,1,misc,cs_modulesign,keyword
+1,,,,cs_opswatresult,,,,,,,rsa.misc.cs_opswatresult,,1,misc,cs_opswatresult,keyword
+1,,,,cs_payload,,,,,,,rsa.misc.cs_payload,,1,misc,cs_payload,keyword
+1,,,,cs_registrant,,,,,,,rsa.misc.cs_registrant,,1,misc,cs_registrant,keyword
+1,,,,cs_registrar,,,,,,,rsa.misc.cs_registrar,,1,misc,cs_registrar,keyword
+1,,,,cs_represult,,,,,,,rsa.misc.cs_represult,,1,misc,cs_represult,keyword
+1,,,,cs_rpayload,,,,,,,rsa.misc.cs_rpayload,,1,misc,cs_rpayload,keyword
+1,,,,cs_sampler_name,,,,,,,rsa.misc.cs_sampler_name,,1,misc,cs_sampler_name,keyword
+1,,,,cs_sourcemodule,,,,,,,rsa.misc.cs_sourcemodule,,1,misc,cs_sourcemodule,keyword
+1,,,,cs_streams,,,,,,,rsa.misc.cs_streams,,1,misc,cs_streams,keyword
+1,,,,cs_targetmodule,,,,,,,rsa.misc.cs_targetmodule,,1,misc,cs_targetmodule,keyword
+1,,,,cs_v6nxthop,,,,,,,rsa.misc.cs_v6nxthop,,1,misc,cs_v6nxthop,keyword
+1,,,,cs_whois_server,,,,,,,rsa.misc.cs_whois_server,,1,misc,cs_whois_server,keyword
+1,,,,cs_yararesult,,,,,,,rsa.misc.cs_yararesult,,1,misc,cs_yararesult,keyword
+1,,,,description,,,,,,,rsa.misc.description,,1,misc,description,keyword
+1,,,,devvendor,,,,,,,rsa.misc.devvendor,,1,misc,devvendor,keyword
+1,,,,distance,,,,,,,rsa.misc.distance,,1,misc,distance,keyword
+1,,,,dns_cname_record,,,,,,,rsa.network.dns_cname_record,,1,network,dns_cname_record,keyword
+1,,,,dns_id,,,,,,,rsa.network.dns_id,,1,network,dns_id,keyword
+1,,,,dns_opcode,,,,,,,rsa.network.dns_opcode,,1,network,dns_opcode,keyword
+1,,,,dns_resp,,,,,,,rsa.network.dns_resp,,1,network,dns_resp,keyword
+1,,,,dns_type,,,,,,,rsa.network.dns_type,,1,network,dns_type,keyword
+1,,,,domain1,,,,,,,rsa.network.domain1,,1,network,domain1,keyword
+1,,,,dstburb,,,,,,,rsa.misc.dstburb,,1,misc,dstburb,keyword
+1,,,,edomain,,,,,,,rsa.misc.edomain,,1,misc,edomain,keyword
+1,,,,edomaub,,,,,,,rsa.misc.edomaub,,1,misc,edomaub,keyword
+1,,,,euid,,,,,,,rsa.misc.euid,,1,misc,euid,keyword
+1,,,,event_time_str,,,,,,,rsa.time.event_time_str,,1,time,event_time_str,keyword
+1,,,,eventtime,,,,,,,rsa.time.eventtime,,1,time,eventtime,keyword
+1,,,,facility,,,,,,,rsa.misc.facility,,1,misc,facility,keyword
+1,,,,filename_tmp,,,,,,,rsa.file.filename_tmp,,1,file,filename_tmp,keyword
+1,,,,finterface,,,,,,,rsa.misc.finterface,,1,misc,finterface,keyword
+1,,,,flags,,,,,,,rsa.misc.flags,,1,misc,flags,keyword
+1,,,,gaddr,,,,,,,rsa.misc.gaddr,,1,misc,gaddr,keyword
+1,,,,gmtdate,,,,,,,rsa.time.gmtdate,,1,time,gmtdate,keyword
+1,,,,gmttime,,,,,,,rsa.time.gmttime,,1,time,gmttime,keyword
+1,,,,host.type,,,,,,,rsa.network.host_type,,1,network,host_type,keyword
+1,,,,https.insact,,,,,,,rsa.crypto.https_insact,,1,crypto,https_insact,keyword
+1,,,,https.valid,,,,,,,rsa.crypto.https_valid,,1,crypto,https_valid,keyword
+1,,,,id3,,,,,,,rsa.misc.id3,,1,misc,id3,keyword
+1,,,,im_buddyname,,,,,,,rsa.misc.im_buddyname,,1,misc,im_buddyname,keyword
+1,,,,im_croomid,,,,,,,rsa.misc.im_croomid,,1,misc,im_croomid,keyword
+1,,,,im_croomtype,,,,,,,rsa.misc.im_croomtype,,1,misc,im_croomtype,keyword
+1,,,,im_members,,,,,,,rsa.misc.im_members,,1,misc,im_members,keyword
+1,,,,im_username,,,,,,,rsa.misc.im_username,,1,misc,im_username,keyword
+1,,,,ipkt,,,,,,,rsa.misc.ipkt,,1,misc,ipkt,keyword
+1,,,,ipscat,,,,,,,rsa.misc.ipscat,,1,misc,ipscat,keyword
+1,,,,ipspri,,,,,,,rsa.misc.ipspri,,1,misc,ipspri,keyword
+1,,,,latitude,,,,,,,rsa.misc.latitude,,1,misc,latitude,keyword
+1,,,,linenum,,,,,,,rsa.misc.linenum,,1,misc,linenum,keyword
+1,,,,list_name,,,,,,,rsa.misc.list_name,,1,misc,list_name,keyword
+1,,,,load_data,,,,,,,rsa.misc.load_data,,1,misc,load_data,keyword
+1,,,,location_floor,,,,,,,rsa.misc.location_floor,,1,misc,location_floor,keyword
+1,,,,location_mark,,,,,,,rsa.misc.location_mark,,1,misc,location_mark,keyword
+1,,,,log_id,,,,,,,rsa.misc.log_id,,1,misc,log_id,keyword
+1,,,,log_type,,,,,,,rsa.misc.log_type,,1,misc,log_type,keyword
+1,,,,logid,,,,,,,rsa.misc.logid,,1,misc,logid,keyword
+1,,,,logip,,,,,,,rsa.misc.logip,,1,misc,logip,keyword
+1,,,,logname,,,,,,,rsa.misc.logname,,1,misc,logname,keyword
+1,,,,longitude,,,,,,,rsa.misc.longitude,,1,misc,longitude,keyword
+1,,,,lport,,,,,,,rsa.misc.lport,,1,misc,lport,keyword
+1,,,,mbug_data,,,,,,,rsa.misc.mbug_data,,1,misc,mbug_data,keyword
+1,,,,misc_name,,,,,,,rsa.misc.misc_name,,1,misc,misc_name,keyword
+1,,,,msg_type,,,,,,,rsa.misc.msg_type,,1,misc,msg_type,keyword
+1,,,,msgid,,,,,,,rsa.misc.msgid,,1,misc,msgid,keyword
+1,,,,netsessid,,,,,,,rsa.misc.netsessid,,1,misc,netsessid,keyword
+1,,,,num,,,,,,,rsa.misc.num,,1,misc,num,keyword
+1,,,,number1,,,,,,,rsa.misc.number1,,1,misc,number1,keyword
+1,,,,number2,,,,,,,rsa.misc.number2,,1,misc,number2,keyword
+1,,,,nwwn,,,,,,,rsa.misc.nwwn,,1,misc,nwwn,keyword
+1,,,,object,,,,,,,rsa.misc.object,,1,misc,object,keyword
+1,,,,operation,,,,,,,rsa.misc.operation,,1,misc,operation,keyword
+1,,,,opkt,,,,,,,rsa.misc.opkt,,1,misc,opkt,keyword
+1,,,,orig_from,,,,,,,rsa.misc.orig_from,,1,misc,orig_from,keyword
+1,,,,owner_id,,,,,,,rsa.misc.owner_id,,1,misc,owner_id,keyword
+1,,,,p_action,,,,,,,rsa.misc.p_action,,1,misc,p_action,keyword
+1,,,,p_date,,,,,,,rsa.time.p_date,,1,time,p_date,keyword
+1,,,,p_filter,,,,,,,rsa.misc.p_filter,,1,misc,p_filter,keyword
+1,,,,p_group_object,,,,,,,rsa.misc.p_group_object,,1,misc,p_group_object,keyword
+1,,,,p_id,,,,,,,rsa.misc.p_id,,1,misc,p_id,keyword
+1,,,,p_month,,,,,,,rsa.time.p_month,,1,time,p_month,keyword
+1,,,,p_msgid1,,,,,,,rsa.misc.p_msgid1,,1,misc,p_msgid1,keyword
+1,,,,p_msgid2,,,,,,,rsa.misc.p_msgid2,,1,misc,p_msgid2,keyword
+1,,,,p_result1,,,,,,,rsa.misc.p_result1,,1,misc,p_result1,keyword
+1,,,,p_time,,,,,,,rsa.time.p_time,,1,time,p_time,keyword
+1,,,,p_time2,,,,,,,rsa.time.p_time2,,1,time,p_time2,keyword
+1,,,,p_url,,,,,,,rsa.web.p_url,,1,web,p_url,keyword
+1,,,,p_user_agent,,,,,,,rsa.web.p_user_agent,,1,web,p_user_agent,keyword
+1,,,,p_web_cookie,,,,,,,rsa.web.p_web_cookie,,1,web,p_web_cookie,keyword
+1,,,,p_web_method,,,,,,,rsa.web.p_web_method,,1,web,p_web_method,keyword
+1,,,,p_web_referer,,,,,,,rsa.web.p_web_referer,,1,web,p_web_referer,keyword
+1,,,,p_year,,,,,,,rsa.time.p_year,,1,time,p_year,keyword
+1,,,,packet_length,,,,,,,rsa.network.packet_length,,1,network,packet_length,keyword
+1,,,,password_chg,,,,,,,rsa.misc.password_chg,,1,misc,password_chg,keyword
+1,,,,password_expire,,,,,,,rsa.misc.password_expire,,1,misc,password_expire,keyword
+1,,,,permgranted,,,,,,,rsa.misc.permgranted,,1,misc,permgranted,keyword
+1,,,,permwanted,,,,,,,rsa.misc.permwanted,,1,misc,permwanted,keyword
+1,,,,pgid,,,,,,,rsa.misc.pgid,,1,misc,pgid,keyword
+1,,,,policyUUID,,,,,,,rsa.misc.policyUUID,,1,misc,policyUUID,keyword
+1,,,,prog_asp_num,,,,,,,rsa.misc.prog_asp_num,,1,misc,prog_asp_num,keyword
+1,,,,program,,,,,,,rsa.misc.program,,1,misc,program,keyword
+1,,,,real_data,,,,,,,rsa.misc.real_data,,1,misc,real_data,keyword
+1,,,,rec_asp_device,,,,,,,rsa.misc.rec_asp_device,,1,misc,rec_asp_device,keyword
+1,,,,rec_asp_num,,,,,,,rsa.misc.rec_asp_num,,1,misc,rec_asp_num,keyword
+1,,,,rec_library,,,,,,,rsa.misc.rec_library,,1,misc,rec_library,keyword
+1,,,,recordnum,,,,,,,rsa.misc.recordnum,,1,misc,recordnum,keyword
+1,,,,result_code,,,,,,,rsa.misc.result_code,,1,misc,result_code,keyword
+1,,,,ruid,,,,,,,rsa.misc.ruid,,1,misc,ruid,keyword
+1,,,,sburb,,,,,,,rsa.misc.sburb,,1,misc,sburb,keyword
+1,,,,sdomain_fld,,,,,,,rsa.misc.sdomain_fld,,1,misc,sdomain_fld,keyword
+1,,,,sec,,,,,,,rsa.misc.sec,,1,misc,sec,keyword
+1,,,,sensorname,,,,,,,rsa.misc.sensorname,,1,misc,sensorname,keyword
+1,,,,seqnum,,,,,,,rsa.misc.seqnum,,1,misc,seqnum,keyword
+1,,,,session,,,,,,,rsa.misc.session,,1,misc,session,keyword
+1,,,,sessiontype,,,,,,,rsa.misc.sessiontype,,1,misc,sessiontype,keyword
+1,,,,sigUUID,,,,,,,rsa.misc.sigUUID,,1,misc,sigUUID,keyword
+1,,,,spi,,,,,,,rsa.misc.spi,,1,misc,spi,keyword
+1,,,,srcburb,,,,,,,rsa.misc.srcburb,,1,misc,srcburb,keyword
+1,,,,srcdom,,,,,,,rsa.misc.srcdom,,1,misc,srcdom,keyword
+1,,,,srcservice,,,,,,,rsa.misc.srcservice,,1,misc,srcservice,keyword
+1,,,,state,,,,,,,rsa.misc.state,,1,misc,state,keyword
+1,,,,status1,,,,,,,rsa.misc.status1,,1,misc,status1,keyword
+1,,,,svcno,,,,,,,rsa.misc.svcno,,1,misc,svcno,keyword
+1,,,,system,,,,,,,rsa.misc.system,,1,misc,system,keyword
+1,,,,tbdstr1,,,,,,,rsa.misc.tbdstr1,,1,misc,tbdstr1,keyword
+1,,,,tgtdom,,,,,,,rsa.misc.tgtdom,,1,misc,tgtdom,keyword
+1,,,,tgtdomain,,,,,,,rsa.misc.tgtdomain,,1,misc,tgtdomain,keyword
+1,,,,threshold,,,,,,,rsa.misc.threshold,,1,misc,threshold,keyword
+1,,,,type1,,,,,,,rsa.misc.type1,,1,misc,type1,keyword
+1,,,,udb_class,,,,,,,rsa.misc.udb_class,,1,misc,udb_class,keyword
+1,,,,url_fld,,,,,,,rsa.misc.url_fld,,1,misc,url_fld,keyword
+1,,,,user_div,,,,,,,rsa.misc.user_div,,1,misc,user_div,keyword
+1,,,,userid,,,,,,,rsa.misc.userid,,1,misc,userid,keyword
+1,,,,username_fld,,,,,,,rsa.misc.username_fld,,1,misc,username_fld,keyword
+1,,,,utcstamp,,,,,,,rsa.misc.utcstamp,,1,misc,utcstamp,keyword
+1,,,,v_instafname,,,,,,,rsa.misc.v_instafname,,1,misc,v_instafname,keyword
+1,,,,virt_data,,,,,,,rsa.misc.virt_data,,1,misc,virt_data,keyword
+1,,,,vpnid,,,,,,,rsa.misc.vpnid,,1,misc,vpnid,keyword
+1,,,,web_extension_tmp,,,,,,,rsa.web.web_extension_tmp,,1,web,web_extension_tmp,keyword
+1,,,,web_page,,,,,,,rsa.web.web_page,,1,web,web_page,keyword
+1,,,,alias.host,alias.host,Text,None,N/A,,,rsa.network.alias_host,,0,network,alias_host,keyword
+1,,,,workstation,alias.host,Text,None,,,,rsa.network.alias_host,,0,network,alias_host,keyword
+1,Network,IP Aliases,This key should be used when the source/destination/local/remote context of an IPv4 address is not clear,devicehostip,alias.ip,IPv4,None,,,,host.ip,,0,network,alias_ip,ip
+1,,,,alias.ip,alias.ip,IPv4,None,,alias.ipv6,alias.ipv6,host.ip,,0,network,alias_ip,ip
+1,Network,IPv6 Aliases,This key should be used when the source or destination context of an IPv6 address is not clear,alias.ipv6,alias.ipv6,IPv6,None,,alias.host,alias.host,host.ip,,0,network,alias_ipv6,ip
+1,Network,MAC Address Generic,This key should be used when the source or destination context of a Mac Address is not clear,devicehostmac,alias.mac,MAC,None,,,,host.mac,,0,network,alias_mac,keyword
+1,,,,alias.mac,alias.mac,MAC,None,,,,host.mac,,0,network,alias_mac,keyword
+1,Investigations,File Analysis,This is used to capture all indicators used in a File Analysis. This key should be used to capture an analysis of a file,analysis.file,analysis.file,Text,None,,,,rsa.investigations.analysis_file,,0,investigations,analysis_file,keyword
+1,Investigations,Service Analysis,This is used to capture all indicators used in a Service Analysis. This key should be used to capture an analysis of a service,analysis.service,analysis.service,Text,None,,,,rsa.investigations.analysis_service,,0,investigations,analysis_service,keyword
+1,Investigations,Session Analysis,This is used to capture all indicators used for a Session Analysis. This key should be used to capture an analysis of a session,analysis.session,analysis.session,Text,None,,,,rsa.investigations.analysis_session,,0,investigations,analysis_session,keyword
+1,Miscellaneous,Autorun Type,This is used to capture Auto Run type,autorun_type,autorun.type,Text,None,,,,rsa.misc.autorun_type,,0,misc,autorun_type,keyword
+1,Investigations,Behaviors of Compromise,This is used to capture behaviour of compromise,boc,boc,Text,None,,,,rsa.investigations.boc,,0,investigations,boc,keyword
+1,Miscellaneous,Credit Card Number,Valid Credit Card Numbers only,cc.number,cc.number,Int32,Transient,,,,rsa.misc.cc_number,,0,misc,cc_number,integer
+1,Web,Country Code Top level domain,This key captures Country Top Level Domain extracted from a URL,cctld,cctld,Text,Transient,,,,url.top_level_domain,,0,web,cctld,keyword
+1,Cryptography,Certificate Authority,This key is used to capture the Certificate signing authority only,cert_ca,cert.ca,Text,None,,,,rsa.crypto.cert_ca,,0,crypto,cert_ca,keyword
+1,Cryptography,Certificate Common Name,This key is used to capture the Certificate common name only,cert_common,cert.common,Text,None,,,,rsa.crypto.cert_common,,0,crypto,cert_common,keyword
+1,,Child Pid Value,"Deprecated, use process.id.val",child_pid_val,child.pid.val,Text,Transient,,,,process.title,,0,misc,child_pid_val,keyword
+1,Reserved,Concentrator Source,"This is the unique identifier used to identify a NetWitness Concentrator. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",cid,cid,Text,Transient,,,,rsa.internal.cid,,0,internal,cid,keyword
+1,Physical,Destination City,This is used to capture the destination City location based on the GEOPIP Maxmind database.,city.dst,city.dst,Text,Transient,,,,destination.geo.city_name,,0,physical,city_dst,keyword
+1,Physical,Source City,This is used to capture the source City location based on the GEOPIP Maxmind database.,city.src,city.src,Text,Transient,,,,source.geo.city_name,,0,physical,city_src,keyword
+1,Miscellaneous,Content Type,This key captures the content type from protocol headers,content,content,Text,Transient,,,,rsa.misc.content,,0,misc,content,keyword
+1,Counters,Device class Ratio 2 Description,This is a generic ratio string key that should be used with the label dclass.r2 only,dclass_ratio2_string,dclass.r2.str,Text,Transient,,,,rsa.counters.dclass_r2_str,,0,counters,dclass_r2_str,keyword
+1,Counters,Device class Ratio 3 Description,This is a generic ratio string key that should be used with the label dclass.r3 only,dclass_ratio3_string,dclass.r3.str,Text,Transient,,,,rsa.counters.dclass_r3_str,,0,counters,dclass_r3_str,keyword
+1,Reserved,Device Class,"This is the Classification of the Log Event Source under a predefined fixed set of Event Source Classifications. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",device.class,device.class,Text,None,,,,rsa.internal.device_class,,0,internal,device_class,keyword
+1,Reserved,Event Source Group,"This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",device.group,device.group,Text,None,,,,rsa.internal.device_group,,0,internal,device_group,keyword
+1,Reserved,Device Host,"This is the Hostname of the log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",device.host,device.host,Text,None,,,,rsa.internal.device_host,,0,internal,device_host,keyword
+1,Reserved,Device IP,"This is the IPv4 address of the Log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",device.ip,device.ip,IPv4,None,,,,rsa.internal.device_ip,,0,internal,device_ip,ip
+1,Reserved,Device IPv6,"This is the IPv6 address of the Log Event Source sending the logs to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",device.ipv6,device.ipv6,IPv6,None,,,,rsa.internal.device_ipv6,,0,internal,device_ipv6,ip
+1,Reserved,Device Type,"This is the name of the log parser which parsed a given session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",device.type,device.type,Text,None,,,,rsa.internal.device_type,,0,internal,device_type,keyword
+1,,,Deprecated key defined only in table map.,device.type.id,device.type.id,Int32,Transient,,,,rsa.internal.device_type_id,,0,internal,device_type_id,integer
+1,Reserved,Decoder Source,"This is the unique identifier used to identify a NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",did,did,Text,Transient,,,,rsa.internal.did,,0,internal,did,keyword
+1,File,Target File Directory,<span>This key is used to capture the directory of the target process or file</span>,directory.dst,directory.dst,Text,None,,,,rsa.file.directory_dst,,0,file,directory_dst,keyword
+1,File,Source File Directory,This key is used to capture the directory of the source process or file,directory.src,directory.src,Text,None,,,,rsa.file.directory_src,,0,file,directory_src,keyword
+1,Web,DNS Response Type,This key is used to capture the DNS Response type only,dns.responsetype,dns.responsetype,Text,Transient,,,,dns.answers.type,,0,web,dns_responsetype,keyword
+1,Network,Destination Domain,This key should only be used to capture Destination Domain Only.,domain.dst,domain.dst,Text,None,,,,destination.domain,,0,network,domain_dst,keyword
+1,Network,Source Domain,This key should only be used to capture Source Domain Only.,domain.src,domain.src,Text,None,,,,source.domain,,0,network,domain_src,keyword
+1,Miscellaneous,Employer identification number,Employee Identification Numbers only,ein.number,ein.number,Int32,Transient,,,,rsa.misc.ein_number,,0,misc,ein_number,integer
+1,Reserved,Entropy Request,"This key is only used by the Entropy Parser, the Meta Type can be either UInt16 or Float32 based on the configuration",entropy.req,entropy.req,UInt16,Transient,,,,rsa.internal.entropy_req,,0,internal,entropy_req,integer
+1,Reserved,Entropy Response,"This key is only used by the Entropy Parser, the Meta Type can be either UInt16 or Float32 based on the configuration",entropy.res,entropy.res,UInt16,Transient,,,,rsa.internal.entropy_res,,0,internal,entropy_res,integer
+1,Investigations,Enablers of Compromise,This is used to capture Enablers of Compromise,eoc,eoc,Text,None,,,,rsa.investigations.eoc,,0,investigations,eoc,keyword
+1,,,,event.cat,event.cat,UInt32,Transient,,,,rsa.investigations.event_cat,,0,investigations,event_cat,integer
+1,,,,event.cat.name,event.cat.name,Text,None,,,,rsa.investigations.event_cat_name,,0,investigations,event_cat_name,keyword
+1,,,Deprecated key defined only in table map.,event_name,event.name,Text,None,,,,rsa.internal.event_name,,0,internal,event_name,keyword
+1,Time,Expiration time string,This key is used to capture incomplete timestamp that explicitly refers to an expiration.,expiration_time_string,expire.time.str,Text,Transient,,,,rsa.time.expire_time_str,,0,time,expire_time_str,keyword
+1,Reserved,Feed Category,"This is used to capture the category of the feed. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",feed.category,feed.category,Text,Transient,,,,rsa.internal.feed_category,,0,internal,feed_category,keyword
+1,,,,file.attributes,file.attributes,Text,None,,,,file.attributes,,0,file,file_attributes,keyword
+1,File,File Entropy,This is used to capture entropy vale of a file,file_entropy,file.entropy,Float32,None,,,,rsa.file.file_entropy,,0,file,file_entropy,float
+1,File,File Vendor,This is used to capture Company name of file located in version_info,file_vendor,file.vendor,Text,None,,,,rsa.file.file_vendor,,0,file,file_vendor,keyword
+1,Reserved,Event Relay IPv4 Address,This key should be used to capture the IPV4 address of a relay system which forwarded the events from the original system to NetWitness.,forward.ip,forward.ip,IPv4,None,,,,rsa.internal.forward_ip,,0,internal,forward_ip,ip
+1,Reserved,Event Relay IPv6 Address,"This key is used to capture the IPV6 address of a relay system which forwarded the events from the original system to NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",forward.ipv6,forward.ipv6,IPv6,None,,,,rsa.internal.forward_ipv6,,0,internal,forward_ipv6,ip
+1,Miscellaneous,Found Search,This is used to capture the results of regex match,found,found,Text,Transient,,,,rsa.misc.found,,0,misc,found,keyword
+1,Reserved,Header ID,"This is the Header ID value that identifies the exact log parser header definition that parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",header.id,header.id,Text,None,,,,rsa.internal.header_id,,0,internal,header_id,keyword
+1,Network,Hostname Originating,This is used to capture the original hostname in case of a Forwarding Agent or a Proxy in between.,host.orig,host.orig,Text,None,,,,rsa.network.host_orig,,0,network,host_orig,keyword
+1,Identity,Host Role,This key should only be used to capture the role of a Host Machine,host_role,host.role,Text,None,,,,rsa.identity.host_role,,0,identity,host_role,keyword
+1,Endpoint,Machine State,"This key is used to capture the current state of the machine, such as <strong>blacklisted</strong>, <strong>infected</strong>, <strong>firewall disabled</strong> and so on",host.state,host.state,Text,None,,,,rsa.endpoint.host_state,,0,endpoint,host_state,keyword
+1,Investigations,Investigation Category,This used to capture investigation category,inv.category,inv.category,Text,None,,,,rsa.investigations.inv_category,,0,investigations,inv_category,keyword
+1,Investigations,Investigation Context,This used to capture investigation context,inv.context,inv.context,Text,None,,,,rsa.investigations.inv_context,,0,investigations,inv_context,keyword
+1,Investigations,Indicators of Compromise,This is key capture indicator of compromise,ioc,ioc,Text,None,,,,rsa.investigations.ioc,,0,investigations,ioc,keyword
+1,Network,IP Address v4 Translated Destination,This key should only be used when it’s a Destination Translated IP Address,ip.trans.dst,ip.trans.dst,IPv4,None,,,,destination.nat.ip,,0,network,ip_trans_dst,ip
+1,Network,IP Address v4 Translated Source,This key should only be used when it’s a Source Translated IP Address,ip.trans.src,ip.trans.src,IPv4,None,,,,source.nat.ip,,0,network,ip_trans_src,ip
+1,Network,IP Address v6 Originating,This is used to capture the original systems IPv6 address in case of a Forwarding Agent or a Proxy in between.,ipv6.orig,ipv6.orig,IPv6,None,,host.orig,host.orig,network.forwarded_ip,,0,network,ipv6_orig,ip
+1,Miscellaneous,Languages,This is used to capture list of languages the client support and what it prefers,language,language,Text,Transient,,,,rsa.misc.language,,0,misc,language,keyword
+1,Reserved,Collector ID,"This is a unique Identifier of a Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",lc.cid,lc.cid,Text,None,,,,rsa.internal.lc_cid,,0,internal,lc_cid,keyword
+1,Reserved,Log Collector Time,"This is the time at which a log is collected in a NetWitness Log Collector. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",lc.ctime,lc.ctime,TimeT,None,,,,rsa.internal.lc_ctime,,0,internal,lc_ctime,keyword
+1,Identity,Ldap Generic,This key is for Uninterpreted LDAP values. Ldap Values that don’t have a clear query or response context,ldap,ldap,Text,Transient,,,,rsa.identity.ldap,,0,identity,ldap,keyword
+1,Identity,Ldap search criteria,This key is the Search criteria from an LDAP search,ldap.query,ldap.query,Text,Transient,,,,rsa.identity.ldap_query,,0,identity,ldap_query,keyword
+1,Identity,Ldap Responses,This key is to capture Results from an LDAP search,ldap.response,ldap.response,Text,Transient,,,,rsa.identity.ldap_response,,0,identity,ldap_response,keyword
+1,Miscellaneous,LifeTime,This key is used to capture the session lifetime in seconds.,lifetime,lifetime,UInt16,Transient,,,,rsa.misc.lifetime,,0,misc,lifetime,integer
+1,Miscellaneous,Link to Data,"This key is used to link the sessions together. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",link,link,Text,Transient,,,,rsa.misc.link,,0,misc,link,keyword
+1,Physical,Destination Longitude,This is used to capture the destination Longitude based on the GEOPIP Maxmind database.,longdec_dst,longdec.dst,Float32,None,,,,destination.geo.location.lon,,0,physical,longdec_dst,float
+1,Miscellaneous,Match Search Item,This key is for regex match name from search.ini,match,match,Text,Transient,,,,rsa.misc.match,,0,misc,match,keyword
+1,Reserved,Most Common Byte Request,"This key is only used by the Entropy Parser, the most common byte request is simply which byte for each side (0 thru 255) was seen the most",mcb.req,mcb.req,UInt8,Transient,,,,rsa.internal.mcb_req,,0,internal,mcb_req,integer
+1,Reserved,Most Common Byte Response,"This key is only used by the Entropy Parser, the most common byte response is simply which byte for each side (0 thru 255) was seen the most",mcb.res,mcb.res,UInt8,Transient,,,,rsa.internal.mcb_res,,0,internal,mcb_res,integer
+1,Reserved,Most Common Byte Count Request,"This key is only used by the Entropy Parser, the most common byte count is the number of times the most common byte (above) was seen in the session streams",mcbc.req,mcbc.req,UInt32,Transient,,,,rsa.internal.mcbc_req,,0,internal,mcbc_req,integer
+1,Reserved,Most Common Byte Count Response,"This key is only used by the Entropy Parser, the most common byte count is the number of times the most common byte (above) was seen in the session streams",mcbc.res,mcbc.res,UInt32,Transient,,,,rsa.internal.mcbc_res,,0,internal,mcbc_res,integer
+1,Reserved,Medium,"This key is used to identify if it’s a log/packet session or Layer 2 Encapsulation Type. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness. 32 = log, 33 = correlation session, &lt; 32 is packet session",medium,medium,UInt8,Transient,,,,rsa.internal.medium,,0,internal,medium,integer
+1,,,Deprecated key defined only in table map.,nodename,node.name,Text,Transient,,,,rsa.internal.node_name,,0,internal,node_name,keyword
+1,Reserved,NWE Callback Id,This key denotes that event is endpoint related,nwe.callback_id,nwe.callback_id,Text,None,,,,rsa.internal.nwe_callback_id,,0,internal,nwe_callback_id,keyword
+1,,,,org.dst,org.dst,Text,None,,,,rsa.physical.org_dst,,0,physical,org_dst,keyword
+1,Physical,Source Organization,This is used to capture the source organization based on the GEOPIP Maxmind database.,org.src,org.src,Text,None,,,,rsa.physical.org_src,,0,physical,org_src,keyword
+1,Identity,Owner,"This is used to capture username the process or service is running as, the author of the task",original_owner,owner,Text,None,,,,rsa.identity.owner,,0,identity,owner,keyword
+1,Miscellaneous,Target Parameter,This key captures the command line/launch argument of the target process or file,param.dst,param.dst,Text,None,,,,rsa.misc.param_dst,,0,misc,param_dst,keyword
+1,Miscellaneous,Source Parameter,This key captures source parameter,param.src,param.src,Text,None,,,,rsa.misc.param_src,,0,misc,param_src,keyword
+1,,,Deprecated key defined only in table map.,parent_pid_val,parent.pid.val,Text,Transient,,,,process.parent.title,,0,misc,parent_pid_val,keyword
+1,Reserved,Parse Error,"This is a special key that stores any Meta key validation error found while parsing a log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",parse.error,parse.error,Text,None,,,,rsa.internal.parse_error,,0,internal,parse_error,keyword
+1,Reserved,Payload Request,"This key is only used by the Entropy Parser, the payload size metrics are the payload sizes of each session side at the time of parsing. However, in order to keep",payload.req,payload.req,UInt16,Transient,,,,rsa.internal.payload_req,,0,internal,payload_req,integer
+1,Reserved,Payload Response,"This key is only used by the Entropy Parser, the payload size metrics are the payload sizes of each session side at the time of parsing. However, in order to keep",payload.res,payload.res,UInt16,Transient,,,,rsa.internal.payload_res,,0,internal,payload_res,integer
+1,Network,Non-Protocol Specific Destination Port,This key should only be used when it’s a Destination Port.,port.dst,port.dst,UInt16,None,,,,destination.port,,0,network,port_dst,long
+1,Network,Non-Protocol Specific Source Port,This key should only be used when it’s a Source Port.,port.src,port.src,UInt16,None,,,,source.port,,0,network,port_src,long
+1,Network,Port Translated Destination,This key should only be used when it’s a Destination Translated Port Number,port.trans.dst,port.trans.dst,UInt16,None,,,,destination.nat.port,,0,network,port_trans_dst,long
+1,Network,Port Translated Source,This key should only be used when it’s a Source Translated Port Number,port.trans.src,port.trans.src,UInt16,None,,,,source.nat.port,,0,network,port_trans_src,long
+1,Reserved,Endpoint Target Process ID,Endpoint generates and uses a unique virtual ID to identify any similar group of process. This ID represents the target process.,process.vid.dst,process.vid.dst,Text,None,,,,rsa.internal.process_vid_dst,,0,internal,process_vid_dst,keyword
+1,Reserved,Endpoint Source Process ID,Endpoint generates and uses a unique virtual ID to identify any similar group of process. This ID represents the source process.,process.vid.src,process.vid.src,Text,None,,,,rsa.internal.process_vid_src,,0,internal,process_vid_src,keyword
+1,Web,Querystring,This key is used to capture the Query portion of the URL.,query,query,Text,None,,,,url.query,,0,web,query,keyword
+1,Endpoint,Registry Key,This key captures the path to the registry key,registry.key,registry.key,Text,None,,,,rsa.endpoint.registry_key,,0,endpoint,registry_key,keyword
+1,Endpoint,Registry Value,This key captures values or decorators used within a registry entry,registry.value,registry.value,Text,None,,,,rsa.endpoint.registry_value,,0,endpoint,registry_value,keyword
+1,Reserved,Remote Session ID,"This is a special ID of the Remote Session created by NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",rid,rid,UInt64,Transient,,,,rsa.internal.rid,,0,internal,rid,long
+1,Network,Payload bytes in retransmitted packets,This key is used to capture the total number of payload bytes seen in the retransmitted packets.,rpayload,rpayload,Text,Transient,,,,rsa.network.rpayload,,0,network,rpayload,keyword
+1,Miscellaneous,Search Engine Queries,This key captures the Search Text used,search.text,search.text,Text,Transient,,,,rsa.misc.search_text,,0,misc,search_text,keyword
+1,Identity,Service Account,"This key is a windows specific key, used for capturing name of the account a service (referenced in the event) is running under. Legacy Usage",service.account,service.account,Text,None,none|-,,,rsa.identity.service_account,,0,identity,service_account,keyword
+1,Reserved,Split Sessions,"This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",session.split,session.split,Text,Transient,,,,rsa.internal.session_split,,0,internal,session_split,keyword
+1,Miscellaneous,Signature Name,This key is used to capture the Signature Name only.,sig.name,sig.name,Text,None,,,,rsa.misc.sig_name,,0,misc,sig_name,keyword
+1,,,Deprecated key defined only in table map.,site,site,Text,Transient,,,,rsa.internal.site,,0,internal,site,keyword
+1,Reserved,Session Size,"This is the size of the session as seen by the NetWitness Decoder. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",size,size,UInt32,Transient,,,,rsa.internal.size,,0,internal,size,integer
+1,Web,Second Level Domain,Second Level Domains extracted from a URL,sld,sld,Text,Transient,,,,url.registered_domain,,0,web,sld,keyword
+1,Miscellaneous,SNMP Value,SNMP set request value,snmp.value,snmp.value,Text,Transient,,,,rsa.misc.snmp_value,,0,misc,snmp_value,keyword
+1,Reserved,Source Filename,"This is the name of the log file or PCAPs that can be imported into NetWitness. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",sourcefile,sourcefile,Text,Transient,,,,rsa.internal.sourcefile,,0,internal,sourcefile,keyword
+1,,,Deprecated key defined only in table map.,stamp,stamp,TimeT,Transient,,,,rsa.time.stamp,,0,time,stamp,keyword
+1,Miscellaneous,Stream Info,This key captures number of streams in session,streams,streams,UInt8,Transient,,,,rsa.misc.streams,,0,misc,streams,integer
+1,File,Task Name,This is used to capture name of the task,task_name,task.name,Text,None,,,,rsa.file.task_name,,0,file,task_name,keyword
+1,Network,TCP Destination Port,"Deprecated, use port.dst.",tcp.dstport,tcp.dstport,UInt16,Transient,,,,destination.port,,0,network,tcp_dstport,long
+1,Network,TCP Source Port,"Deprecated, use port.src.",tcp.srcport,tcp.srcport,UInt16,Transient,,,,source.port,,0,network,tcp_srcport,long
+1,Web,Top Level Domains,Top Level Domains extracted from a URL,tld,tld,Text,Transient,,,,url.top_level_domain,,0,web,tld,keyword
+1,Reserved,Unique Byte Count Request,"This key is only used by the Entropy Parser, Unique byte count is the number of unique bytes seen in each stream. 256 would mean all byte values of 0 thru 255 were seen at least once",ubc.req,ubc.req,UInt32,Transient,,,,rsa.internal.ubc_req,,0,internal,ubc_req,integer
+1,Reserved,Unique Byte Count Response,"This key is only used by the Entropy Parser, Unique byte count is the number of unique bytes seen in each stream. 256 would mean all byte values of 0 thru 255 were seen at least once",ubc.res,ubc.res,UInt32,Transient,,,,rsa.internal.ubc_res,,0,internal,ubc_res,integer
+1,Network,UDP Target Port,"Deprecated, use port.dst.",udp.dstport,udp.dstport,UInt16,Transient,,,,destination.port,,0,network,udp_dstport,long
+1,Network,UDP Source Port,"Deprecated, use port.src.",udp.srcport,udp.srcport,UInt16,Transient,,,,source.port,,0,network,udp_srcport,long
+1,Network,Vlan Name,This key should only be used to capture the name of the Virtual LAN,vlan.name,vlan.name,Text,Transient,,,,rsa.network.vlan_name,,0,network,vlan_name,keyword
+1,Reserved,Text Token,This is used by the Word Parsing technology to capture the first 5 character of every word in an unparsed log,word,word,Text,Transient,,,,rsa.internal.word,,0,internal,word,keyword

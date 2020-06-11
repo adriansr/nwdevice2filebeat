@@ -39,21 +39,23 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 	p.Description = dev.Description
 	p.Version = dev.Version
 
+	var unsupported []string
 	if len(dev.TagValMaps) > 0 {
-		//return p, errors.Errorf("TAGVALMAP is not implemented (at %s)", dev.TagValMaps[0].Pos())
-		warnings.Add(dev.TagValMaps[0].Pos(), "TAGVALMAP is not implemented")
+		unsupported = append(unsupported, "TAGVALMAP")
 	}
 
 	if len(dev.Regexs) > 0 {
-		p.warnings.Add(dev.Regexs[0].Pos(), "unsupported REGX transform: will be ignored.")
+		unsupported = append(unsupported, "REGEX")
 	}
 	if len(dev.SumDatas) > 0 {
-		p.warnings.Add(dev.SumDatas[0].Pos(), "unsupported SUMDATA transform: will be ignored.")
+		unsupported = append(unsupported, "SUMDATA")
 	}
 	if len(dev.VarTypes) > 0 {
-		p.warnings.Add(dev.VarTypes[0].Pos(), "unsupported VARTYPE transform: will be ignored.")
+		unsupported = append(unsupported, "VARTYPE")
 	}
-
+	if len(unsupported) > 0 {
+		return p, errors.Errorf("found unsupported features: %v", unsupported)
+	}
 	if p.ValueMaps, p.ValueMapsByName, err = p.processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
 	}

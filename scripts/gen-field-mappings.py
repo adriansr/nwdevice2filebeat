@@ -1,90 +1,160 @@
 import csv
 import sys
 
-SRC=4
-TYPE=6
-MAP=11
-ALT=12
+# Columns
+SRC = 4
+TYPE = 6
+MAP = 11
+ALT = 12
+
+# Conversions
+type_to_es = {
+    '': None,
+    'Text': None,  # Default -- keyword
+    'TimeT': 'date',
+    'IPv4': 'ip',
+    'IPv6': 'ip',
+    'UInt64': 'long',
+    'UInt32': 'long',
+    'UInt16': 'long',
+    'UInt8': 'long',
+    'Int64': 'long',
+    'Int32': 'long',
+    'Int16': 'long',
+    'Float64': 'double',
+    'Float32': 'double',
+    'MAC': 'mac',
+}
+
 
 def is_rsa_field(path):
     return path.startswith('rsa.')
 
+
 def is_ecs_field(path):
     return not is_rsa_field(path)
 
-class GoFormat:
-    def format(self, fld):
-        if is_rsa_field(fld):
-            parts = fld.split('.')
-            assert len(parts) == 3, fld
-            return 'custom{{\"{}\", \"{}\"}}'.format(parts[1], parts[2])
-        return 'ecs{{\"{}\"}}'.format(fld)
 
-    def output(self, row):
-        lst = []
-        for idx in [MAP, ALT]:
-            if row[idx] != '':
-                lst.append(self.format(row[idx]))
-        
-        typ = row[TYPE]
-        print '\"{}\": {{Type: {}, Map: []mapper{{{}}}}},'.format(row[SRC], typ, ', '.join(lst))
+class Setter:
+    def __init__(self, src, dst, mode, conv=None, prio=None):
+        self.src = src
+        self.dst = dst
+        self.mode = mode
+        self.conv = conv
+        self.prio = prio
+
+    def __str__(self):
+        if self.mode == 'prio':
+            return '{{field: \'{}\', mode: fld_{}, prio: {}}}'.format(self.dst, self.mode, self.prio)
+        return '{{field: \'{}\', mode: fld_{}}}'.format(self.dst, self.mode)
 
 
-class JSFormat:
-    conv = {
-        '': None,
-        'Text': None, # Default -- keyword
-        'TimeT': 'date',
-        'IPv4': 'ip',
-        'IPv6': 'ip',
-        'UInt64': 'long',
-        'UInt32': 'long',
-        'UInt16': 'long',
-        'UInt8': 'long',
-        'Int64': 'long',
-        'Int32': 'long',
-        'Int16': 'long',
-        'Float64': 'double',
-        'Float32': 'double',
-        'MAC': 'mac',
-        
+# From highest priority to lowest priority
+def by_prio(lst):
+    return {
+        'mode': 'prio',
+        'priorities': {x[1]: x[0] for x in enumerate(lst)}
     }
 
-    def output(self, row):
-        lst = filter(str.__len__, [ row[idx] for idx in [MAP, ALT] ])
-        ecs = filter(is_ecs_field, lst)
-        rsa = filter(is_rsa_field, lst)
 
-        typ = row[TYPE]
-        if typ not in self.conv:
-            raise Exception('unsupported type: {}'.format(typ))
-        parts = []
-        conv = self.conv[typ]
-        if conv is not None:
-            parts.append('convert: to_{}'.format(conv))
-        if len(ecs):
-            parts.append('ecs: [{}]'.format(', '.join(map(str.__repr__, ecs))))
-        if len(rsa):
-            parts.append('rsa: [{}]'.format(', '.join(map(str.__repr__, rsa))))
-
-        print '{}: {{{}}},'.format(row[SRC].__repr__(), ', '.join(parts))
+append = {'mode': 'append'}
 
 
-if len(sys.argv) != 3 or (sys.argv[1]!='go' and sys.argv[1]!='js'):
-    print 'Usage: {} {{go|js}} file.csv'.format(sys.argv[0])
+def process_row(row):
+    global type_to_es
+    lst = filter(str.__len__, [row[idx] for idx in [MAP, ALT]])
+    typ = row[TYPE]
+    if typ not in type_to_es:
+        raise Exception('unsupported type: {}'.format(typ))
+    conv = type_to_es[typ]
+    return row[SRC], [Setter(row[SRC], field, 'set', conv) for field in lst]
+
+
+xsetters = {
+    'go': lambda x: x.as_go,
+    'js': lambda x: x.as_js,
+}
+
+if len(sys.argv) < 3 or len(sys.argv) > 4 or sys.argv[1] not in xsetters:
+    print('Usage: {} {{go|js}} file.csv [overrides.csv]'.format(sys.argv[0]))
     sys.exit(1)
 
+xsetter = xsetters[sys.argv[1]]
 
-fmt = GoFormat()
-if sys.argv[1] == 'js':
-    fmt = JSFormat()
+overrides = {}
+if len(sys.argv) == 4:
+    with open(sys.argv[3]) as f:
+        r = csv.reader(f, dialect=csv.excel)
+        for row in r:
+            if row[0] in overrides:
+                raise('Repeated override entry: {}'.format(row[0]))
+            if row[1] == 'append':
+                if len(row) > 2:
+                    raise('Excess data after append override: {}'.format(row[2:]))
+                overrides[row[0]] = append
+            elif row[1] == 'by_prio':
+                if len(row) < 4:
+                    raise('Need at least 2 fields for by_prio override: {}'.format(row[2:]))
+                overrides[row[0]] = by_prio(row[2:])
 
 f = open(sys.argv[2], 'r')
 r = csv.reader(f, dialect=csv.excel)
 first = True
+by_dst = {}
+by_src = {}
 for row in r:
     if first and row[0] == 'revision':
         # skip header
         first = False
         continue
-    fmt.output(row)
+    fld, mappings = process_row(row)
+    if fld in by_src:
+        raise Exception('Repeated field: {}'.format(fld))
+    by_src[fld] = mappings
+    for m in mappings:
+        if m.dst in overrides:
+            o = overrides[m.dst]
+            m.mode = o['mode']
+            if m.mode == 'prio':
+                if m.src not in o['priorities']:
+                    raise Exception('No priority for src:{} dst:{}'.format(m.src, m.dst))
+                m.prio = o['priorities'][m.src]
+        if m.dst not in by_dst:
+            by_dst[m.dst] = []
+        by_dst[m.dst].append(m)
+
+for dst, setters in by_dst.items():
+    modes = set([s.mode for s in setters])
+    if len(modes) != 1:
+        raise Exception('Field {} is set in different modes: {}'.format(dst, modes))
+    convs = set([s.conv for s in setters])
+    if len(convs) != 1:
+        raise Exception('Field {} is set from different types: {}'.format(dst, convs))
+    if len(setters) > 1 and setters[0].mode == 'set':
+        raise Exception('Field {} is set multiple times. Must override mode (sources=[{}])'.format(
+            dst,
+            ', '.join(['\''+x.src+'\'' for x in setters])))
+
+for src, setters in by_src.items():
+    convs = set([s.conv for s in setters])
+    if len(convs) != 1:
+        raise Exception('Field {} is converted to different types: {}'.format(src, convs))
+
+def dump_setters(by_src, filter_fn):
+    for src, setters in by_src.items():
+        setters = list(filter(lambda x: filter_fn(x.dst), setters))
+        if len(setters) == 0:
+            continue
+        conv = ''
+        if setters[0].conv is not None:
+            conv = 'convert: to_{}, '.format(setters[0].conv)
+        print('\'{}\': {{{}to:[{}]}},'.format(src, conv, ','.join(map(str, setters))))
+
+
+print('var ecs_mappings = {')
+dump_setters(by_src, is_ecs_field)
+print('}')
+print('')
+print('var rsa_mappings = {')
+dump_setters(by_src, is_rsa_field)
+print('}')

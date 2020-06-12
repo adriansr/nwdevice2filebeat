@@ -93,7 +93,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Event Hostname,"This key is a windows only concept, where this key is used to capture fully qualified domain name in a windows log.",event_computer,event.computer,Text,None,,,,rsa.misc.event_computer,,33,misc,event_computer,keyword
 1,Email,Source E-mail Address,"This key is used to capture the source email address only, when the source context is not clear use email",from,email.src,Text,None,,,,rsa.email.email_src,,32,email,email_src,keyword
 1,Miscellaneous,Reference Id1,"This key is for Linked ID to be used as an addition to ""reference.id""",id1,reference.id1,Text,Transient,,,,rsa.misc.reference_id1,,32,misc,reference_id1,keyword
-1,,Translated Source Address,"Deprecated, use ip.trans.src",stransaddr,stransaddr,Text,Transient,,,,source.nat.ip,,32,network,stransaddr,ip
+1,,Translated Source Address,"Deprecated, use ip.trans.src",stransaddr,stransaddr,IPv4,Transient,,,,source.nat.ip,,32,network,stransaddr,ip
 1,Reserved,Message ID1,"This is the Message ID2 value that identifies the exact log parser definition which parses a particular log session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",vid,msg.vid,Text,Transient,,,,rsa.internal.msg_vid,,31,internal,msg_vid,keyword
 1,,Privilege,"Deprecated, use permissions",privilege,privilege,Text,Transient,,,,rsa.file.privilege,,31,file,privilege,keyword
 1,Identity,User Role,This key is used to capture the Role of a user only,user_role,user.role,Text,Transient,,,,rsa.identity.user_role,,31,identity,user_role,keyword
@@ -119,7 +119,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,,,,date,,,,,,,rsa.time.date,,25,time,date,keyword
 1,Identity,Logon Type,This key is used to capture the type of logon method used.,logon_type,logon.type,Text,None,,,,rsa.identity.logon_type,,24,identity,logon_type,keyword
 1,Web,Referer,This is used to capture the Web Referrer URL address specifically.,web_referer,referer,Text,None,None|-,,,http.request.referrer,,24,web,referer,keyword
-1,,Translated Destination Address,"Deprecated, use ip.trans.dst",dtransaddr,dtransaddr,Text,Transient,,,,destination.nat.ip,,23,network,dtransaddr,ip
+1,,Translated Destination Address,"Deprecated, use ip.trans.dst",dtransaddr,dtransaddr,IPv4,Transient,,,,destination.nat.ip,,23,network,dtransaddr,ip
 1,Threat,Threat Category,This key captures Threat Name/Threat Category/Categorization of alert,threat_name,threat.category,Text,None,,,,rsa.threat.threat_category,,23,threat,threat_category,keyword
 1,Network,Vlan Number,This key should only be used to capture the ID of the Virtual LAN,vlan,vlan,UInt16,Transient,,vlan.name,vlan.name,rsa.network.vlan,,23,network,vlan,integer
 1,Miscellaneous,Checksum,This key is used to capture the checksum or hash of the entity such as a file or process. Checksum should be used over checksum.src or checksum.dst when it is unclear whether the entity is a source or target of an action.,checksum,checksum,Text,None,,,,rsa.misc.checksum,,22,misc,checksum,keyword
@@ -410,7 +410,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Physical,Source Longitude,This is used to capture the source Longitude based on the GEOPIP Maxmind database.,longdec_src,longdec.src,Float32,None,,,,source.geo.location.lon,,1,physical,longdec_src,float
 1,Identity,Middle name of a Person,"This key is for Middle Names only, this is used for Healthcare predominantly to capture Patients information",user_mname,middlename,Text,Transient,,,,rsa.identity.middlename,,1,identity,middlename,keyword
 1,Physical,Destination Organization,This is used to capture the destination organization based on the GEOPIP Maxmind database.,org_dst,org.dst,Text,None,,,,rsa.physical.org_dst,,1,physical,org_dst,keyword
-1,,Originating IP Address,"Deprecated, use ip.orig, ipv6.orig or host.orig based on value type",orig_ip,orig_ip,Text,None,,,,network.forwarded_ip,,1,network,orig_ip,ip
+1,,Originating IP Address,"Deprecated, use ip.orig, ipv6.orig or host.orig based on value type",orig_ip,orig_ip,IPv4,None,,,,network.forwarded_ip,,1,network,orig_ip,ip
 1,Identity,Password,"This key is for Passwords seen in any session, plain text or encrypted",password,password,Text,Transient,,,,rsa.identity.password,,1,identity,password,keyword
 1,Healthcare,Patient's First Name,"This key is for First Names only, this is used for Healthcare predominantly to capture Patients information",patient_fname,patient.fname,Text,Transient,,,,rsa.healthcare.patient_fname,,1,healthcare,patient_fname,keyword
 1,Healthcare,Patient Identifier,This key captures the unique ID for a patient,patient_id,patient.id,Text,Transient,,,,rsa.healthcare.patient_id,,1,healthcare,patient_id,keyword

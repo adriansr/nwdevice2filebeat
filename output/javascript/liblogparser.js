@@ -1566,6 +1566,7 @@ function do_populate(evt, base, targets) {
 
 function test() {
     test_conversions();
+    test_mappings();
 }
 
 function test_conversions() {
@@ -1645,4 +1646,40 @@ function test_fn_call(fn, cases) {
         }
     });
     if (debug) console.warn("test " + fn.name + " PASS.");
+}
+
+function test_mappings() {
+    var test_mappings = {
+        'a': {to: [{field: 'raw.a', setter: fld_set}, {field: 'list', setter: fld_append}]},
+        'b': {to: [{field: 'list', setter: fld_append}]},
+        'c': {to: [{field: 'raw.c', setter: fld_set}, {field: 'list', setter: fld_append}]},
+        'd': {to: [{field: 'unique', setter: fld_prio, prio: 2}]},
+        'e': {to: [{field: 'unique', setter: fld_prio, prio: 1}]},
+        'f': {to: [{field: 'unique', setter: fld_prio, prio: 3}]}
+    }
+    var values = {
+        'a': 'value1',
+        'b': 'value2',
+        'c': 'value1',
+        'd': 'value3',
+        'e': 'value4',
+        'f': 'value5'
+    }
+    var expected = {
+        'raw.a': 'value1',
+        'raw.c': 'value1',
+        'list': ['value1', 'value2'],
+        'unique': 'value4'
+    };
+    var evt = new Event({});
+    do_populate(evt, values, test_mappings);
+    for (var key in expected) {
+        var got = JSON.stringify(evt.Get(key));
+        var exp = JSON.stringify(expected[key]);
+        if (got !== exp) {
+            throw "test test_mappings failed for key " + key
+                + ". Expected:" + exp
+                + " Got:" + got;
+        }
+    }
 }

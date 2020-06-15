@@ -206,7 +206,7 @@ function URL(evt, args) {
 }
 
 function CALC(evt, args) {
-    if (args.length != 3) {
+    if (args.length !== 3) {
         console.warn("skipped call to CALC with " + args.length + " arguments.");
         return;
     }
@@ -245,11 +245,9 @@ function UTC(evt, args) {
 }
 
 function call(opts) {
+    var args = new Array(opts.args.length);
     return function (evt) {
-        // TODO: Optimize this
-        var args = new Array(opts.args.length);
-        var i;
-        for (i = 0; i < opts.args.length; i++) {
+        for (var i = 0; i < opts.args.length; i++) {
             args[i] = opts.args[i](evt);
         }
         var result = opts.fn(evt, args);
@@ -324,18 +322,33 @@ function date_time_join_args(evt, arglist) {
     return str;
 }
 
-function date_time_try_pattern(evt, opts, fmt, str) {
+function date_time_try_pattern(fmt, str) {
     var date = new Date();
-    var pos = 0;
+    // Zero the date as much as possible.
+    // date.setTime(0); <- not doing this to avoid dates defaulting to 1970.
+    // Better to just clean the time part incl. milliseconds.
+    // TODO: Timezones.
+    date.setHours(0, 0, 0, 0);
+    // Using current year so logs default to this year.
+    // Must use 1st Jan instead of current day to avoid problems when the
+    // day of the month is defined before the month. For example:
+    // Current date: 1 Nov
+    // Logs: "31/Oct".
+    // It will try to set day=31 to a date object with mon=Nov, which is not
+    // valid.
+    date.setFullYear(date.getFullYear(), 0, 1);
+    var pos = date_time_try_pattern_at_pos(fmt, str, 0, date);
+    return pos !== undefined? date : undefined;
+}
+
+function date_time_try_pattern_at_pos(fmt, str, pos, date) {
     var len = str.length;
     for (var proc = 0; pos !== undefined && pos < len && proc < fmt.length; proc++) {
-        //console.warn("in date_time: enter proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
+        //console.warn("in date_time: enter proc["+proc+"] parsed='" + str.substr(0, pos) + "' unparsed='" +  str.substr(pos) + "' pos=" + pos + " date="+date);
         pos = fmt[proc](str, pos, date);
         //console.warn("in date_time: leave proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
     }
-    var done = pos !== undefined;
-    if (done) evt.Put(FIELDS_PREFIX + opts.dest, date);
-    return done;
+    return pos;
 }
 
 function date_times(opts) {
@@ -343,7 +356,9 @@ function date_times(opts) {
         var str = date_time_join_args(evt, opts.args);
         var i;
         for (i = 0; i < opts.fmts.length; i++) {
-            if (date_time_try_pattern(evt, opts, opts.fmts[i], str)) {
+            var date = date_time_try_pattern(opts.fmts[i], str);
+            if (date !== undefined) {
+                evt.Put(FIELDS_PREFIX + opts.dest, date);
                 if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
                 return;
             }
@@ -355,7 +370,10 @@ function date_times(opts) {
 function date_time(opts) {
     return function (evt) {
         var str = date_time_join_args(evt, opts.args);
-        if (!date_time_try_pattern(evt, opts, opts.fmt, str)) {
+        var date = date_time_try_pattern(opts.fmt, str);
+        if (date !== undefined) {
+            evt.Put(FIELDS_PREFIX + opts.dest, date);
+        } else {
             if (debug) console.warn("in date_time: id=" + opts.id + " FAILED: " + str);
         }
     }
@@ -380,15 +398,22 @@ function remove(fields) {
 }
 
 function dc(ct) {
-    return function (str, pos, date) {
+    var match = function (ct, str, pos) {
         var n = str.length;
         if (n - pos < ct.length) return;
         var part = str.substr(pos, ct.length);
-        if (part != ct) {
-            //console.warn("parsing date_time '" + str + "' at " + pos + ": '" + part + "' is not '" + ct + "'");
+        if (part !== ct) {
             return;
         }
         return pos + ct.length;
+    }
+    return function (str, pos, date) {
+        var outPos = match(ct, str, pos);
+        if (outPos === undefined) {
+            // Try again, trimming leading space at str[pos:] and ct
+            outPos = match(ct.substr(skipws(ct, 0)), str, skipws(str, pos));
+        }
+        return outPos;
     }
 }
 
@@ -433,6 +458,19 @@ var unixSetter = {
     }
 }
 
+
+// Make two-digit dates 00-69 interpreted as 2000-2069
+// and dates 70-99 translated to 1970-1999.
+// This is to support unix epoch.
+var twoDigitYearEpoch = 70;
+var twoDigitYearCentury = 2000;
+
+var year2DigitSetter = {
+    call: function(date, value) {
+        date.setFullYear(value < twoDigitYearEpoch? twoDigitYearCentury + value : twoDigitYearCentury + value - 100);
+    }
+}
+
 // var dC = undefined;
 var dR = dateMonthName(true);
 var dB = dateMonthName(false);
@@ -441,20 +479,67 @@ var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);
 var dD = dateFixedWidthNumber('D', 2, 1, 31, Date.prototype.setDate);
 var dF = dateVariableWidthNumber('F', 1, 31, Date.prototype.setDate);
 var dH = dateFixedWidthNumber('H', 2, 0, 24, Date.prototype.setHours);
-// TODO: var dI = ...
+var dI = dateVariableWidthNumber('I', 0, 24, Date.prototype.setHours); // Accept hours >12
 var dN = dateVariableWidthNumber('N', 0, 24, Date.prototype.setHours);
 var dT = dateFixedWidthNumber('T', 2, 0, 59, Date.prototype.setMinutes);
 var dU = dateVariableWidthNumber('U', 0, 59, Date.prototype.setMinutes);
-// TODO: var dJ = ...Julian day...
-// TODO: var dP = ...AM|PM...
-// TODO: var dQ = ...A.M.|P.M....
+// TODO: var dJ = ...Julian day... Not used for datetimes but for durations.
+var dP = parseAMPM; // AM|PM
+var dQ = parseAMPM; // A.M.|P.M
 var dS = dateFixedWidthNumber('S', 2, 0, 60, Date.prototype.setSeconds);
 var dO = dateVariableWidthNumber('O', 0, 60, Date.prototype.setSeconds);
-// TODO: var dY = ...YY...
+var dY = dateFixedWidthNumber('Y', 2, 0, 99, year2DigitSetter);
 var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setFullYear);
-// TODO: var dZ = ...
-// TODO: var dA = ...
+var dZ = parseHMS;
+// TODO: var dA = ... This one is not used for datetimes but for durations.
 var dX = dateVariableWidthNumber('X', 0, 0x10000000000, unixSetter);
+
+// parseAMPM parses "A.M", "AM", "P.M", "PM" from logs.
+// Only works if this modifier appears after the hour has been read from logs
+// which is always the case in the 300 devices.
+function parseAMPM(str, pos, date) {
+    var n = str.length;
+    var start = skipws(str, pos);
+    if (start + 2 > n) return;
+    var head = str.substr(start, 2).toUpperCase();
+    var isPM = false;
+    var skip = false;
+    switch (head) {
+        case "A.":
+            skip = true;
+        case "AM":
+            break;
+        case "P.":
+            skip = true;
+        case "PM":
+            isPM = true;
+            break;
+        default:
+            if (debug) console.warn("can't parse pos " + start + " as AM/PM: " + str + "(head:" + head + ")");
+            return;
+    }
+    pos = start + 2;
+    if (skip) {
+        if (pos+2 > n || str.substr(pos, 2).toUpperCase() !== 'M.') {
+            if (debug) console.warn("can't parse pos " + start + " as AM/PM: " + str + "(tail)");
+            return;
+        }
+        pos += 2;
+    }
+    var hh = date.getHours();
+    if (isPM) {
+        // Accept existing hour in 24h format.
+        if (hh < 12) hh += 12;
+    } else {
+        if (hh === 12) hh = 0;
+    }
+    date.setHours(hh);
+    return pos;
+}
+
+function parseHMS(str, pos, date) {
+    return date_time_try_pattern_at_pos([dN, dc(':'), dU, dc(':'), dO], str, pos, date);
+}
 
 function skipws(str, pos) {
     for (var n = str.length
@@ -483,7 +568,6 @@ function dateVariableWidthNumber(fmtChar, min, max, setter) {
             setter.call(date, value);
             return pos;
         }
-        //console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
         return;
     }
 }
@@ -1565,55 +1649,110 @@ function do_populate(evt, base, targets) {
 }
 
 function test() {
+    test_date_times();
     test_conversions();
     test_mappings();
 }
 
+var pass_test = function (input, output) {
+    return {input: input, expected: output !== undefined ? output : input}
+}
+var fail_test = function (input) {
+    return {input: input}
+}
+
+function test_date_times() {
+
+// var dC = undefined;
+// TODO: var dI = ...
+// TODO: var dJ = ...Julian day...
+// TODO: var dY = ...YY...
+// TODO: var dZ = ...
+// TODO: var dA = ...
+    /*
+    var dB = dateMonthName(false);
+    var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);
+    var dN = dateVariableWidthNumber('N', 0, 24, Date.prototype.setHours);
+    var dP = parseAMPM; // AM|PM
+    var dX = dateVariableWidthNumber('X', 0, 0x10000000000, unixSetter);
+    */
+
+    var date_time = function(input) {
+        var res = date_time_try_pattern(input.fmt, input.str);
+        return res !== undefined? res.toISOString() : res;
+    }
+    test_fn_call(date_time, [
+        pass_test(
+            {
+                fmt: [dW,dc('-'),dM,dc('-'),dD,dc('T'),dH,dc(':'),dT,dc(':'),dS],
+                str: "2017-10-16T15:23:42"
+            },
+            "2017-10-16T13:23:42.000Z"),
+        pass_test(
+            {
+                fmt: [dR, dF, dc('th'), dY, dc(','), dI, dQ, dU, dc('min'), dO, dc('secs')],
+                str: "October 7th 22, 3 P.M. 5 min 12 secs"
+            },
+            "2022-10-07T13:05:12.000Z"),
+        pass_test(
+            {
+                fmt: [dF, dc('/'), dB, dY, dc(','), dI, dP],
+                str: "31/OCT 70, 12am"
+            },
+            "1970-10-30T23:00:00.000Z"),
+        pass_test(
+            {
+                fmt: [dX],
+                str: "1592241213"
+            },
+            "2020-06-15T17:13:33.000Z"),
+        pass_test(
+            {
+                fmt: [dW, dG, dF, dZ],
+                str: "20314 12 3:5:42"
+            }, "2031-04-12T01:05:42.000Z")
+    ]);
+}
+
 function test_conversions() {
-    var accept = function (input, output) {
-        return {input: input, expected: output !== undefined ? output : input}
-    }
-    var drop = function (input) {
-        return {input: input}
-    }
     test_fn_call(to_ip, [
-        accept("127.0.0.1"),
-        accept("255.255.255.255"),
-        accept("008.189.239.199"),
-        drop(""),
-        drop("not an IP"),
-        drop("42"),
-        drop("127.0.0.1."),
-        drop("127.0.0."),
-        drop("10.100.1000.1"),
-        accept("fd00:1111:2222:3333:4444:5555:6666:7777"),
-        accept("fd00::7777%eth0", "fd00::7777"),
-        accept("[fd00::7777]", "fd00::7777"),
-        accept("[fd00::7777%enp0s3]", "fd00::7777"),
-        accept("::1"),
-        accept("::"),
-        drop(":::"),
-        drop("fff::1::3"),
-        accept("ffff::ffff"),
-        drop("::1ffff"),
-        drop(":1234:"),
-        drop("::1234z"),
-        accept("1::3:4:5:6:7:8"),
-        accept("::255.255.255.255"),
-        accept("64:ff9b::192.0.2.33"),
-        drop("::255.255.255.255:8"),
+        pass_test("127.0.0.1"),
+        pass_test("255.255.255.255"),
+        pass_test("008.189.239.199"),
+        fail_test(""),
+        fail_test("not an IP"),
+        fail_test("42"),
+        fail_test("127.0.0.1."),
+        fail_test("127.0.0."),
+        fail_test("10.100.1000.1"),
+        pass_test("fd00:1111:2222:3333:4444:5555:6666:7777"),
+        pass_test("fd00::7777%eth0", "fd00::7777"),
+        pass_test("[fd00::7777]", "fd00::7777"),
+        pass_test("[fd00::7777%enp0s3]", "fd00::7777"),
+        pass_test("::1"),
+        pass_test("::"),
+        fail_test(":::"),
+        fail_test("fff::1::3"),
+        pass_test("ffff::ffff"),
+        fail_test("::1ffff"),
+        fail_test(":1234:"),
+        fail_test("::1234z"),
+        pass_test("1::3:4:5:6:7:8"),
+        pass_test("::255.255.255.255"),
+        pass_test("64:ff9b::192.0.2.33"),
+        fail_test("::255.255.255.255:8"),
     ]);
     test_fn_call(to_long, [
-        accept("1234", 1234),
-        accept("0x2a", 42),
-        drop("9007199254740992"),
-        drop("9223372036854775808"),
-        drop("NaN"),
-        accept("-0x1fffffffffffff", -9007199254740991),
-        accept("+9007199254740991", 9007199254740991),
-        drop("-0x20000000000000"),
-        drop("+9007199254740992"),
-        accept(42),
+        pass_test("1234", 1234),
+        pass_test("0x2a", 42),
+        fail_test("9007199254740992"),
+        fail_test("9223372036854775808"),
+        fail_test("NaN"),
+        pass_test("-0x1fffffffffffff", -9007199254740991),
+        pass_test("+9007199254740991", 9007199254740991),
+        fail_test("-0x20000000000000"),
+        fail_test("+9007199254740992"),
+        pass_test(42),
     ]);
     test_fn_call(to_date, [
         {
@@ -1626,12 +1765,12 @@ function test_conversions() {
             expected: new Date("2017-10-16T08:30:42Z").toISOString(),
             convert: Date.prototype.toISOString,
         },
-        drop("Not really a date."),
+        fail_test("Not really a date."),
     ]);
     test_fn_call(to_lowercase, [
-        accept("Hello", "hello"),
-        accept(45),
-        accept(Date.now()),
+        pass_test("Hello", "hello"),
+        pass_test(45),
+        pass_test(Date.now()),
     ]);
 }
 

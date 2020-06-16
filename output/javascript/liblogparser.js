@@ -32,7 +32,6 @@ function register(params) {
     map_rsa = params.rsa !== undefined ? params.rsa : defaults.rsa;
     keep_raw = params.keep_raw !== undefined ? params.keep_raw : defaults.keep_raw;
     tz_offset = parse_tz_offset(params.tz_offset !== undefined? params.tz_offset : defaults.tz_offset);
-    console.debug("XXX USING OFFSET = " + tz_offset);
     device = new DeviceProcessor();
 }
 
@@ -41,7 +40,6 @@ function parse_tz_offset(offset) {
         // local uses the tz offset from the JS VM.
         case 'local':
             var date = new Date();
-            console.debug("XXX LOCAL OFFSET = " + date.getTimezoneOffset());
             // Reversing the sign as we the offset from UTC, not to UTC.
             return parse_local_tz_offset(-date.getTimezoneOffset());
         // event uses the tz offset from event.timezone (add_locale processor).
@@ -352,7 +350,7 @@ function date_time_join_args(evt, arglist) {
         var fname = FIELDS_PREFIX + arglist[i];
         var val = evt.Get(fname);
         if (val != null) {
-            if (str != "") str += " ";
+            if (str !== "") str += " ";
             str += val;
         } else {
             if (debug) console.warn("in date_time: input arg " + fname + " is not set");
@@ -376,11 +374,9 @@ function date_time_try_pattern(fmt, str, tzOffset) {
     // valid.
     date.setUTCFullYear(date.getFullYear(), 0, 1);
     var pos = date_time_try_pattern_at_pos(fmt, str, 0, date);
-    console.debug("XXX date XXX newdate=" + date.toUTCString());
     if (tzOffset !== undefined && tzOffset !== "") {
         var dateString = date.toISOString().replace("Z", tzOffset);
         var newdate = new Date(dateString);
-        console.debug("XXX date XXX newdate=" + newdate + " (" + dateString + ")");
         if (!isNaN(newdate)) {
             date = newdate;
         } else {
@@ -419,9 +415,54 @@ function date_time(opts) {
     }
 }
 
+var uA = 60 * 60 * 24;
+var uD = 60 * 60 * 24;
+var uF = 60 * 60;
+var uG = 60 * 60 * 24 * 30;
+var uH = 60 * 60;
+var uI = 60 * 60;
+var uJ = 60 * 60 * 24;
+var uM = 60 * 60 * 24 * 30;
+var uN = 60 * 60;
+var uO = 1;
+var uS = 1;
+var uT = 60;
+var uU = 60;
+var uc = dc;
+
 function duration(opts) {
-    // TODO: Duration
-    return nop;
+    return function(evt) {
+        var str = date_time_join_args(evt, opts.args);
+        for (var i = 0; i < opts.fmts.length; i++) {
+            var seconds = duration_try_pattern(opts.fmts[i], str);
+            if (seconds !== undefined) {
+                evt.Put(FIELDS_PREFIX + opts.dest, seconds);
+                if (debug) console.warn("in duration: succeeded: " + seconds);
+                return;
+            }
+        }
+        if (debug) console.warn("in duration: id=" + opts.id + " (s) FAILED: " + str);
+    };
+}
+
+function duration_try_pattern(fmt, str) {
+    var secs = 0;
+    var pos = 0;
+    for (var i=0; i<fmt.length; i++) {
+        if (fmt[i] instanceof Function) {
+            if ((pos = fmt[i](str, pos)) === undefined) return;
+            continue;
+        }
+        var start = skipws(str, pos);
+        var end = skipdigits(str, start);
+        if (end === start) return;
+        var s = str.substr(start, end - start);
+        var value = parseInt(s, 10);
+        if (isNaN(value)) return;
+        secs += value * fmt[i];
+        pos = end;
+    }
+    return secs;
 }
 
 function remove(fields) {
@@ -674,28 +715,6 @@ function query(dst, src) {
 function root(dst, src) {
     return nop;
 }
-
-var uR = nop;
-var uB = nop;
-var uM = nop;
-var uG = nop;
-var uD = nop;
-var uF = nop;
-var uH = nop;
-var uI = nop;
-var uN = nop;
-var uT = nop;
-var uU = nop;
-var uJ = nop;
-var uP = nop;
-var uQ = nop;
-var uS = nop;
-var uO = nop;
-var uY = nop;
-var uW = nop;
-var uZ = nop;
-var uA = nop;
-var uX = nop;
 
 var ecs_mappings = {
     'msg': {to:[{field: 'log.original', setter: fld_set}]},
@@ -1833,7 +1852,7 @@ function test_fn_call(fn, cases) {
             throw "test " + fn.name + "#" + idx + " failed. Input:'" + JSON.stringify(test.input) + "' Expected:'" + test.expected + "' Got:'" + result + "'";
         }
     });
-    if (debug) console.warn("test " + fn.name + " PASS.");
+    if (debug) console.debug("test " + fn.name + " PASS.");
 }
 
 function test_mappings() {

@@ -321,9 +321,9 @@ func writeDateTimeLike(dt parser.DateTime, name, fnPrefix string, out *output.Co
 				out.Write(",")
 			}
 			if spec := fmt.Spec(); spec != parser.DateTimeConstant {
-				out.Writef("d%c", spec)
+				out.Writef("%s%c", fnPrefix, spec)
 			} else {
-				out.Write("dc(").JS(fmt.Value()).Write(")")
+				out.Writef("%sc(", fnPrefix).JS(fmt.Value()).Write(")")
 			}
 		}
 		out.Write("],").Newline()

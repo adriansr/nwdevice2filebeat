@@ -14,13 +14,16 @@ var defaults = {
     ecs: true,
     rsa: false,
     keep_raw: false,
+    tz: 'local',
 }
+
 var saved_flags = null;
 var debug;
 var map_ecs;
 var map_rsa;
 var keep_raw;
 var device;
+var tz;
 
 // Register params from configuration.
 function register(params) {
@@ -28,7 +31,38 @@ function register(params) {
     map_ecs = params.ecs !== undefined ? params.ecs : defaults.ecs;
     map_rsa = params.rsa !== undefined ? params.rsa : defaults.rsa;
     keep_raw = params.keep_raw !== undefined ? params.keep_raw : defaults.keep_raw;
+    tz = parse_tz_offset(params.tz !== undefined? params.tz : defaults.tz);
     device = new DeviceProcessor();
+}
+
+function parse_tz_offset(offset) {
+    switch(offset) {
+        // local uses the tz offset from the JS VM.
+        case 'local':
+            var date = new Date();
+            return parse_local_tz_offset(date.getTimezoneOffset());
+        // event uses the tz offset from event.timezone (add_locale processor).
+        case 'event':
+            // TODO
+        // Otherwise a tz offset in the form "[+-][0-9]{4}" is required.
+        default:
+
+    }
+}
+
+function parse_local_tz_offset(minutes) {
+    var neg = minutes < 0;
+    minutes = Math.abs(minutes);
+    var min = minutes % 60;
+    var hours = Math.floor(minutes / 60);
+    if (hours > 12) {
+        throw("Bad timezone offset: "+minutes);
+    }
+    var pad2digit = function(n) {
+        if (n < 10) { return "0" + n}
+        return "" + n;
+    }
+    return (neg? "-" : "+") + pad2digit(hours) + ":" + pad2digit(min);
 }
 
 function process(evt) {
@@ -240,6 +274,7 @@ function RMQ(evt, args) {
 
 }
 
+// TODO: Replace with datetime call.
 function UTC(evt, args) {
 
 }
@@ -322,13 +357,13 @@ function date_time_join_args(evt, arglist) {
     return str;
 }
 
-function date_time_try_pattern(fmt, str) {
+function date_time_try_pattern(fmt, str, tzOffset) {
     var date = new Date();
     // Zero the date as much as possible.
     // date.setTime(0); <- not doing this to avoid dates defaulting to 1970.
     // Better to just clean the time part incl. milliseconds.
     // TODO: Timezones.
-    date.setHours(0, 0, 0, 0);
+    date.setUTCHours(0, 0, 0, 0);
     // Using current year so logs default to this year.
     // Must use 1st Jan instead of current day to avoid problems when the
     // day of the month is defined before the month. For example:
@@ -336,8 +371,22 @@ function date_time_try_pattern(fmt, str) {
     // Logs: "31/Oct".
     // It will try to set day=31 to a date object with mon=Nov, which is not
     // valid.
-    date.setFullYear(date.getFullYear(), 0, 1);
+    date.setUTCFullYear(date.getFullYear(), 0, 1);
     var pos = date_time_try_pattern_at_pos(fmt, str, 0, date);
+    console.debug("XXX date XXX newdate=" + date.toUTCString());
+    if (tzOffset !== undefined && tzOffset !== "") {
+        var dateString = date.toISOString().replace("Z", tzOffset);
+        var newdate = new Date(dateString);
+        //console.debug("XXX date XXX newdate=" + newdate);
+        if (!isNaN(newdate)) {
+            date = newdate;
+        } else {
+            console.warn("Failed parsing date in given offset: " + dateString);
+        }
+        //var special = date.toUTCString().replace("GMT", "CET");
+        //newdate = new Date(Date.parse(special));
+        //console.error("XXX Got special: " + newdate.toISOString());
+    }
     return pos !== undefined? date : undefined;
 }
 
@@ -354,8 +403,7 @@ function date_time_try_pattern_at_pos(fmt, str, pos, date) {
 function date_times(opts) {
     return function (evt) {
         var str = date_time_join_args(evt, opts.args);
-        var i;
-        for (i = 0; i < opts.fmts.length; i++) {
+        for (var i = 0; i < opts.fmts.length; i++) {
             var date = date_time_try_pattern(opts.fmts[i], str);
             if (date !== undefined) {
                 evt.Put(FIELDS_PREFIX + opts.dest, date);
@@ -448,7 +496,7 @@ var shortMonths = {
 
 var monthSetter = {
     call: function (date, value) {
-        date.setMonth(value - 1);
+        date.setUTCMonth(value - 1);
     }
 };
 
@@ -467,7 +515,7 @@ var twoDigitYearCentury = 2000;
 
 var year2DigitSetter = {
     call: function(date, value) {
-        date.setFullYear(value < twoDigitYearEpoch? twoDigitYearCentury + value : twoDigitYearCentury + value - 100);
+        date.setUTCFullYear(value < twoDigitYearEpoch? twoDigitYearCentury + value : twoDigitYearCentury + value - 100);
     }
 }
 
@@ -476,20 +524,20 @@ var dR = dateMonthName(true);
 var dB = dateMonthName(false);
 var dM = dateFixedWidthNumber('M', 2, 1, 12, monthSetter);
 var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);
-var dD = dateFixedWidthNumber('D', 2, 1, 31, Date.prototype.setDate);
-var dF = dateVariableWidthNumber('F', 1, 31, Date.prototype.setDate);
-var dH = dateFixedWidthNumber('H', 2, 0, 24, Date.prototype.setHours);
-var dI = dateVariableWidthNumber('I', 0, 24, Date.prototype.setHours); // Accept hours >12
-var dN = dateVariableWidthNumber('N', 0, 24, Date.prototype.setHours);
-var dT = dateFixedWidthNumber('T', 2, 0, 59, Date.prototype.setMinutes);
-var dU = dateVariableWidthNumber('U', 0, 59, Date.prototype.setMinutes);
+var dD = dateFixedWidthNumber('D', 2, 1, 31, Date.prototype.setUTCDate);
+var dF = dateVariableWidthNumber('F', 1, 31, Date.prototype.setUTCDate);
+var dH = dateFixedWidthNumber('H', 2, 0, 24, Date.prototype.setUTCHours);
+var dI = dateVariableWidthNumber('I', 0, 24, Date.prototype.setUTCHours); // Accept hours >12
+var dN = dateVariableWidthNumber('N', 0, 24, Date.prototype.setUTCHours);
+var dT = dateFixedWidthNumber('T', 2, 0, 59, Date.prototype.setUTCMinutes);
+var dU = dateVariableWidthNumber('U', 0, 59, Date.prototype.setUTCMinutes);
 // TODO: var dJ = ...Julian day... Not used for datetimes but for durations.
 var dP = parseAMPM; // AM|PM
 var dQ = parseAMPM; // A.M.|P.M
-var dS = dateFixedWidthNumber('S', 2, 0, 60, Date.prototype.setSeconds);
-var dO = dateVariableWidthNumber('O', 0, 60, Date.prototype.setSeconds);
+var dS = dateFixedWidthNumber('S', 2, 0, 60, Date.prototype.setUTCSeconds);
+var dO = dateVariableWidthNumber('O', 0, 60, Date.prototype.setUTCSeconds);
 var dY = dateFixedWidthNumber('Y', 2, 0, 99, year2DigitSetter);
-var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setFullYear);
+var dW = dateFixedWidthNumber('W', 4, 1000, 9999, Date.prototype.setUTCFullYear);
 var dZ = parseHMS;
 // TODO: var dA = ... This one is not used for datetimes but for durations.
 var dX = dateVariableWidthNumber('X', 0, 0x10000000000, unixSetter);
@@ -526,14 +574,14 @@ function parseAMPM(str, pos, date) {
         }
         pos += 2;
     }
-    var hh = date.getHours();
+    var hh = date.getUTCHours();
     if (isPM) {
         // Accept existing hour in 24h format.
         if (hh < 12) hh += 12;
     } else {
         if (hh === 12) hh = 0;
     }
-    date.setHours(hh);
+    date.setUTCHours(hh);
     return pos;
 }
 
@@ -603,7 +651,7 @@ function dateMonthName(long) {
             //console.warn("parsing date_time: '" + mon + "' is not a valid short month (%B)");
             return;
         }
-        date.setMonth(idx[0]);
+        date.setUTCMonth(idx[0]);
         return pos + 3 + (long ? idx[1] : 0);
     }
 }
@@ -1650,6 +1698,7 @@ function do_populate(evt, base, targets) {
 
 function test() {
     test_date_times();
+    test_tz();
     test_conversions();
     test_mappings();
 }
@@ -1662,23 +1711,8 @@ var fail_test = function (input) {
 }
 
 function test_date_times() {
-
-// var dC = undefined;
-// TODO: var dI = ...
-// TODO: var dJ = ...Julian day...
-// TODO: var dY = ...YY...
-// TODO: var dZ = ...
-// TODO: var dA = ...
-    /*
-    var dB = dateMonthName(false);
-    var dG = dateVariableWidthNumber('G', 1, 12, monthSetter);
-    var dN = dateVariableWidthNumber('N', 0, 24, Date.prototype.setHours);
-    var dP = parseAMPM; // AM|PM
-    var dX = dateVariableWidthNumber('X', 0, 0x10000000000, unixSetter);
-    */
-
     var date_time = function(input) {
-        var res = date_time_try_pattern(input.fmt, input.str);
+        var res = date_time_try_pattern(input.fmt, input.str, input.tz);
         return res !== undefined? res.toISOString() : res;
     }
     test_fn_call(date_time, [
@@ -1687,30 +1721,58 @@ function test_date_times() {
                 fmt: [dW,dc('-'),dM,dc('-'),dD,dc('T'),dH,dc(':'),dT,dc(':'),dS],
                 str: "2017-10-16T15:23:42"
             },
-            "2017-10-16T13:23:42.000Z"),
+            "2017-10-16T15:23:42.000Z"),
         pass_test(
             {
                 fmt: [dR, dF, dc('th'), dY, dc(','), dI, dQ, dU, dc('min'), dO, dc('secs')],
                 str: "October 7th 22, 3 P.M. 5 min 12 secs"
             },
-            "2022-10-07T13:05:12.000Z"),
+            "2022-10-07T15:05:12.000Z"),
         pass_test(
             {
                 fmt: [dF, dc('/'), dB, dY, dc(','), dI, dP],
                 str: "31/OCT 70, 12am"
             },
-            "1970-10-30T23:00:00.000Z"),
+            "1970-10-31T00:00:00.000Z"),
         pass_test(
             {
                 fmt: [dX],
-                str: "1592241213"
+                str: "1592241213",
+                tz: "+00:00"
             },
             "2020-06-15T17:13:33.000Z"),
         pass_test(
             {
                 fmt: [dW, dG, dF, dZ],
-                str: "20314 12 3:5:42"
-            }, "2031-04-12T01:05:42.000Z")
+                str: "20314 12 3:5:42",
+                tz: "+02:00"
+            }, "2031-04-12T01:05:42.000Z"),
+        pass_test(
+            {
+                fmt: [dW, dG, dF, dZ],
+                str: "20314 12 3:5:42",
+                tz: "-07:30",
+            }, "2031-04-12T10:35:42.000Z"),
+        pass_test(
+            {
+                fmt: [dW, dG, dF, dZ],
+                str: "20314 12 3:5:42",
+                tz: "+0500",
+            }, "2031-04-11T22:05:42.000Z")
+    ]);
+}
+
+function test_tz() {
+    test_fn_call(parse_local_tz_offset, [
+        pass_test(0, "+00:00"),
+        pass_test(59, "+00:59"),
+        pass_test(60, "+01:00"),
+        pass_test(61, "+01:01"),
+        pass_test(-1, "-00:01"),
+        pass_test(-59, "-00:59"),
+        pass_test(-60, "-01:00"),
+        pass_test(705, "+11:45"),
+        pass_test(-705, "-11:45"),
     ]);
 }
 
@@ -1781,7 +1843,7 @@ function test_fn_call(fn, cases) {
             result = test.convert.call(result);
         }
         if (result !== test.expected) {
-            throw "test " + fn.name + "#" + idx + " failed. Input:'" + test.input + "' Expected:'" + test.expected + "' Got:'" + result + "'";
+            throw "test " + fn.name + "#" + idx + " failed. Input:'" + JSON.stringify(test.input) + "' Expected:'" + test.expected + "' Got:'" + result + "'";
         }
     });
     if (debug) console.warn("test " + fn.name + " PASS.");

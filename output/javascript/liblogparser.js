@@ -400,7 +400,7 @@ function date_time_try_pattern_at_pos(fmt, str, pos, date) {
     return pos;
 }
 
-function date_times(opts) {
+function date_time(opts) {
     return function (evt) {
         var tzOffset = tz_offset;
         if (tz_offset === 'event') {
@@ -419,29 +419,8 @@ function date_times(opts) {
     }
 }
 
-function date_time(opts) {
-    return function (evt) {
-        var tzOffset = tz_offset;
-        if (tz_offset === 'event') {
-            tzOffset = evt.Get("event.timezone");
-        }
-        var str = date_time_join_args(evt, opts.args);
-        var date = date_time_try_pattern(opts.fmt, str, tzOffset);
-        if (date !== undefined) {
-            evt.Put(FIELDS_PREFIX + opts.dest, date);
-        } else {
-            if (debug) console.warn("in date_time: id=" + opts.id + " FAILED: " + str);
-        }
-    }
-}
-
 function duration(opts) {
     // TODO: Duration
-    return nop;
-}
-
-function durations(opts) {
-    // TODO: Durations
     return nop;
 }
 

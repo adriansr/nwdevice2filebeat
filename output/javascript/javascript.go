@@ -310,43 +310,25 @@ func writeMapString(m map[string]string, out *output.CodeWriter) {
 }
 
 func writeDateTimeLike(dt parser.DateTime, name, fnPrefix string, out *output.CodeWriter) {
-	if len(dt.Formats) == 1 {
-		out.Write(name).Write("({").Newline().Indent().
-			Write("dest: ").JS(dt.Target).Write(",").Newline().
-			Write("args: ").JS(dt.Fields).Write(",").Newline().
-			Write("fmt: [")
-		for idx, fmt := range dt.Formats[0] {
+	out.Write(name).Write("({").Newline().Indent().
+		Write("dest: ").JS(dt.Target).Write(",").Newline().
+		Write("args: ").JS(dt.Fields).Write(",").Newline().
+		Write("fmts: [").Newline().Indent()
+	for fmtIdx := range dt.Formats {
+		out.Write("[")
+		for idx, fmt := range dt.Formats[fmtIdx] {
 			if idx > 0 {
 				out.Write(",")
 			}
 			if spec := fmt.Spec(); spec != parser.DateTimeConstant {
-				out.Writef("%s%c", fnPrefix, spec)
+				out.Writef("d%c", spec)
 			} else {
 				out.Write("dc(").JS(fmt.Value()).Write(")")
 			}
 		}
-		out.Write("],").Newline().Unindent().Write("})")
-	} else {
-		out.Write(name).Write("s({").Newline().Indent().
-			Write("dest: ").JS(dt.Target).Write(",").Newline().
-			Write("args: ").JS(dt.Fields).Write(",").Newline().
-			Write("fmts: [").Newline().Indent()
-		for fmtIdx := range dt.Formats {
-			out.Write("[")
-			for idx, fmt := range dt.Formats[fmtIdx] {
-				if idx > 0 {
-					out.Write(",")
-				}
-				if spec := fmt.Spec(); spec != parser.DateTimeConstant {
-					out.Writef("d%c", spec)
-				} else {
-					out.Write("dc(").JS(fmt.Value()).Write(")")
-				}
-			}
-			out.Write("],").Newline()
-		}
-		out.Unindent().Write("],").Newline().Unindent().Write("})")
+		out.Write("],").Newline()
 	}
+	out.Unindent().Write("],").Newline().Unindent().Write("})")
 }
 
 var urlComponentToJSFn = map[parser.URLComponent]string{

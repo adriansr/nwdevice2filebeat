@@ -14,7 +14,7 @@ var defaults = {
     ecs: true,
     rsa: false,
     keep_raw: false,
-    tz: 'local',
+    tz_offset: 'local',
 }
 
 var saved_flags = null;
@@ -23,7 +23,7 @@ var map_ecs;
 var map_rsa;
 var keep_raw;
 var device;
-var tz;
+var tz_offset;
 
 // Register params from configuration.
 function register(params) {
@@ -31,7 +31,8 @@ function register(params) {
     map_ecs = params.ecs !== undefined ? params.ecs : defaults.ecs;
     map_rsa = params.rsa !== undefined ? params.rsa : defaults.rsa;
     keep_raw = params.keep_raw !== undefined ? params.keep_raw : defaults.keep_raw;
-    tz = parse_tz_offset(params.tz !== undefined? params.tz : defaults.tz);
+    tz_offset = parse_tz_offset(params.tz_offset !== undefined? params.tz_offset : defaults.tz_offset);
+    console.debug("XXX USING OFFSET = " + tz_offset);
     device = new DeviceProcessor();
 }
 
@@ -40,13 +41,19 @@ function parse_tz_offset(offset) {
         // local uses the tz offset from the JS VM.
         case 'local':
             var date = new Date();
-            return parse_local_tz_offset(date.getTimezoneOffset());
+            console.debug("XXX LOCAL OFFSET = " + date.getTimezoneOffset());
+            // Reversing the sign as we the offset from UTC, not to UTC.
+            return parse_local_tz_offset(-date.getTimezoneOffset());
         // event uses the tz offset from event.timezone (add_locale processor).
         case 'event':
-            // TODO
+            return offset;
         // Otherwise a tz offset in the form "[+-][0-9]{4}" is required.
         default:
-
+            var m = offset.match(/^[+-][0-9]{2}:?[0-9]{2}$/);
+            if (m == null) {
+                throw("bad timezone offset: '" + offset + "'. Must have the form +HH:MM");
+            }
+            return offset;
     }
 }
 
@@ -55,9 +62,6 @@ function parse_local_tz_offset(minutes) {
     minutes = Math.abs(minutes);
     var min = minutes % 60;
     var hours = Math.floor(minutes / 60);
-    if (hours > 12) {
-        throw("Bad timezone offset: "+minutes);
-    }
     var pad2digit = function(n) {
         if (n < 10) { return "0" + n}
         return "" + n;
@@ -362,7 +366,6 @@ function date_time_try_pattern(fmt, str, tzOffset) {
     // Zero the date as much as possible.
     // date.setTime(0); <- not doing this to avoid dates defaulting to 1970.
     // Better to just clean the time part incl. milliseconds.
-    // TODO: Timezones.
     date.setUTCHours(0, 0, 0, 0);
     // Using current year so logs default to this year.
     // Must use 1st Jan instead of current day to avoid problems when the
@@ -377,15 +380,12 @@ function date_time_try_pattern(fmt, str, tzOffset) {
     if (tzOffset !== undefined && tzOffset !== "") {
         var dateString = date.toISOString().replace("Z", tzOffset);
         var newdate = new Date(dateString);
-        //console.debug("XXX date XXX newdate=" + newdate);
+        console.debug("XXX date XXX newdate=" + newdate + " (" + dateString + ")");
         if (!isNaN(newdate)) {
             date = newdate;
         } else {
             console.warn("Failed parsing date in given offset: " + dateString);
         }
-        //var special = date.toUTCString().replace("GMT", "CET");
-        //newdate = new Date(Date.parse(special));
-        //console.error("XXX Got special: " + newdate.toISOString());
     }
     return pos !== undefined? date : undefined;
 }
@@ -402,9 +402,13 @@ function date_time_try_pattern_at_pos(fmt, str, pos, date) {
 
 function date_times(opts) {
     return function (evt) {
+        var tzOffset = tz_offset;
+        if (tz_offset === 'event') {
+            tzOffset = evt.Get("event.timezone");
+        }
         var str = date_time_join_args(evt, opts.args);
         for (var i = 0; i < opts.fmts.length; i++) {
-            var date = date_time_try_pattern(opts.fmts[i], str);
+            var date = date_time_try_pattern(opts.fmts[i], str, tzOffset);
             if (date !== undefined) {
                 evt.Put(FIELDS_PREFIX + opts.dest, date);
                 if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
@@ -417,8 +421,12 @@ function date_times(opts) {
 
 function date_time(opts) {
     return function (evt) {
+        var tzOffset = tz_offset;
+        if (tz_offset === 'event') {
+            tzOffset = evt.Get("event.timezone");
+        }
         var str = date_time_join_args(evt, opts.args);
-        var date = date_time_try_pattern(opts.fmt, str);
+        var date = date_time_try_pattern(opts.fmt, str, tzOffset);
         if (date !== undefined) {
             evt.Put(FIELDS_PREFIX + opts.dest, date);
         } else {
@@ -1587,7 +1595,7 @@ function to_ipv4(value) {
 function to_ipv6(value) {
     var sqEnd = value.indexOf("]");
     if (sqEnd > -1) {
-        if (value.charAt(0) != '[') return;
+        if (value.charAt(0) !== '[') return;
         value = value.substr(1, sqEnd - 1);
     }
     var zoneOffset = value.indexOf('%');

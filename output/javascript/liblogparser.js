@@ -1990,7 +1990,16 @@ function test_mappings() {
 }
 
 function test_url() {
-    test_fn_call(extract_domain, [
+    function test(fn) {
+        return function (input) {
+            var evt = new Event({});
+            evt.Put(FIELDS_PREFIX + "src", input);
+            fn("dst", "src")(evt);
+            var result = evt.Get(FIELDS_PREFIX + "dst");
+            return result? result : undefined;
+        }
+    }
+    test_fn_call(test(domain), [
         pass_test("http://example.com", "example.com"),
         pass_test("http://example.com/", "example.com"),
         pass_test("ftp+ssh://example.com/path", "example.com"),
@@ -2004,7 +2013,7 @@ function test_url() {
         fail_test("/my/path"),
         fail_test(""),
     ]);
-    test_fn_call(extract_path, [
+    test_fn_call(test(path), [
         pass_test("http://example.net/a/b/d?x=z", "/a/b/d"),
         pass_test("root:pass@www.example.net:80/a/b/d?x=z", "/a/b/d"),
         pass_test("/a/b/d?x=z#frag", "/a/b/d"),
@@ -2013,7 +2022,7 @@ function test_url() {
         fail_test(""),
         fail_test(" "),
     ]);
-    test_fn_call(extract_page, [
+    test_fn_call(test(page), [
        pass_test("http://example.net/index.html", "index.html"),
         pass_test("http://localhost/index.html", "index.html"),
         pass_test("example.com/a/b/c", "c"),
@@ -2022,21 +2031,21 @@ function test_url() {
         pass_test("ftp://example.com/0#fragment", "0"),
         fail_test(""),
     ]);
-    test_fn_call(extract_port, [
+    test_fn_call(test(port), [
         pass_test("http://0.0.0.0:1234", '1234'),
         pass_test("https://0.0.0.0", '443'),
         pass_test("https://[::abcd:1234]:4443/a?b#c", '4443'),
         fail_test("www.example.net"),
         fail_test(""),
     ]);
-    test_fn_call(extract_query, [
+    test_fn_call(test(query), [
         pass_test("http://localhost/post?request=1234&user=root", "request=1234&user=root"),
         pass_test("http://localhost/post?request=1234&user=root#m1234", "request=1234&user=root"),
         fail_test("http://localhost/post"),
         fail_test("http://localhost/post?"),
         fail_test(""),
     ]);
-    test_fn_call(extract_root, [
+    test_fn_call(test(root), [
         pass_test("http://localhost/post?request=1234&user=root", "http://localhost"),
         pass_test("https://[::abcd:1234]:4443/a?b#c", 'https://[::abcd:1234]:4443'),
         pass_test("localhost"),
@@ -2044,7 +2053,7 @@ function test_url() {
         fail_test(""),
         pass_test("http://user:pass@example.net", "http://example.net"),
     ]);
-    test_fn_call(extract_ext, [
+    test_fn_call(test(ext), [
         pass_test("http://example.net/index.html", ".html"),
         pass_test("http://localhost/index.html?a=b#c", ".html"),
         fail_test("example.com/a/b/c"),

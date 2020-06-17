@@ -47,11 +47,11 @@ function parse_tz_offset(offset) {
             return offset;
         // Otherwise a tz offset in the form "[+-][0-9]{4}" is required.
         default:
-            var m = offset.match(/^[+-][0-9]{2}:?[0-9]{2}$/);
-            if (m == null) {
+            var m = offset.match(/^([+-])([0-9]{2}):?([0-9]{2})?$/);
+            if (m == null || m.length != 4) {
                 throw("bad timezone offset: '" + offset + "'. Must have the form +HH:MM");
             }
-            return offset;
+            return m[1] + m[2] + ":" + (m[3]!==undefined? m[3] : "00");
     }
 }
 
@@ -216,29 +216,9 @@ function STRCAT(evt, args) {
     return s;
 }
 
-/*
-    call({dest: "nwparser.", fn: SYSVAL, args: [ field("$MSGID"),field("$ID1")]}),
-
-    TODO:
-
-    The above seems to indicate that in order to select MESSAGES from a header
-    The value attribute "id1" must be used as key.
- */
-function SYSVAL(evt, args) {
-}
-
-// TODO: Prune this from the tree.
-function HDR(evt, args) {
-}
-
 // TODO: Implement?
 function DIRCHK(evt, args) {
-}
-
-function DUR(evt, args) {
-}
-
-function URL(evt, args) {
+    unimplemented(evt, "DIRCHK");
 }
 
 function CALC(evt, args) {
@@ -273,12 +253,7 @@ function CALC(evt, args) {
 }
 
 function RMQ(evt, args) {
-
-}
-
-// TODO: Replace with datetime call.
-function UTC(evt, args) {
-
+    unimplemented(evt, "RMQ");
 }
 
 function call(opts) {
@@ -295,6 +270,22 @@ function call(opts) {
 }
 
 function nop(evt) {
+}
+
+function appendErrorMsg(evt, msg) {
+    var value = evt.Get("error.message");
+    if (value == null) {
+        value = [msg];
+    } else if (msg instanceof Array) {
+        value.push(msg);
+    } else {
+        value = [value, msg];
+    }
+    evt.Put("error.message", value);
+}
+
+function unimplemented(evt, name) {
+    appendErrorMsg("unimplemented feature: " + name);
 }
 
 function lookup(opts) {
@@ -407,7 +398,7 @@ function date_time(opts) {
             var date = date_time_try_pattern(opts.fmts[i], str, tzOffset);
             if (date !== undefined) {
                 evt.Put(FIELDS_PREFIX + opts.dest, date);
-                if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
+                //if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
                 return;
             }
         }
@@ -437,7 +428,6 @@ function duration(opts) {
             var seconds = duration_try_pattern(opts.fmts[i], str);
             if (seconds !== undefined) {
                 evt.Put(FIELDS_PREFIX + opts.dest, seconds);
-                if (debug) console.warn("in duration: succeeded: " + seconds);
                 return;
             }
         }
@@ -684,36 +674,131 @@ function dateMonthName(long) {
     }
 }
 
+function url_wrapper(dst, src, fn) {
+    return function(evt) {
+        var value = evt.Get(FIELDS_PREFIX + src), result;
+        if (value != null && (result = fn(value))!== undefined) {
+            evt.Put(FIELDS_PREFIX + dst, result);
+        } else {
+            console.error(fn.name + " failed for '" + value + "'");
+        }
+    }
+}
+
+// The following regular expression for parsing URLs from:
+// https://github.com/wizard04wsu/URI_Parsing
+//
+// Copyright (c) 2014 Andrew Harrison
+// Licensed under the MIT License (MIT)
+var uriRegExp = /^([a-z][a-z0-9+.-]*):(?:\/\/((?:(?=((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*))(\3)@)?(?=(\[[0-9A-F:.]{2,}\]|(?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*))\5(?::(?=(\d*))\6)?)(\/(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\8)?|(\/?(?!\/)(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\10)?)(?:\?(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\11)?(?:#(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\12)?$/i;
+var uriScheme = 1;
+var uriDomain = 5;
+var uriPort = 6;
+var uriPath = 7;
+var uriPathAlt = 9;
+var uriQuery = 11;
+
 function domain(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_domain);
+}
+
+function split_url(value) {
+    var m = value.match(uriRegExp);
+    if (m && m[uriDomain]) return m;
+    // Support input in the form "www.example.net/path", but not "/path".
+    m = ("null://" + value).match(uriRegExp);
+    if (m) return m;
+}
+
+function extract_domain(value) {
+    var m = split_url(value);
+    if (m && m[uriDomain]) return m[uriDomain];
+}
+
+var extFromPage = /\.[^.]+$/;
+function extract_ext(value) {
+    var page = extract_page(value);
+    if (page) {
+        var m = page.match(extFromPage);
+        if (m) return m[0];
+    }
 }
 
 function ext(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_ext);
 }
 
 function fqdn(dst, src) {
-    return nop;
+    // TODO: fqdn and domain(eTLD+1) are currently the same.
+    return domain(dst, src);
+}
+
+var pageFromPathRegExp = /\/([^\/]+)$/;
+var pageName = 1;
+
+function extract_page(value) {
+    var value = extract_path(value);
+    if (!value) return undefined;
+    var m = value.match(pageFromPathRegExp);
+    if (m) return m[pageName];
 }
 
 function page(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_page);
+}
+
+function extract_path(value) {
+    var m = split_url(value);
+    return m? m[uriPath] || m[uriPathAlt] : undefined;
 }
 
 function path(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_path);
+}
+
+// Map common schemes to their default port.
+// port has to be a string (will be converted at a later stage).
+var schemePort = {
+    'ftp': '21',
+    'ssh': '22',
+    'http': '80',
+    'https': '443',
+}
+
+function extract_port(value) {
+    var m = split_url(value);
+    if (!m) return undefined;
+    if (m[uriPort]) return m[uriPort];
+    if (m[uriScheme]) {
+        return schemePort[m[uriScheme]];
+    }
 }
 
 function port(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_port);
+}
+
+function extract_query(value) {
+    var m = split_url(value);
+    if (m && m[uriQuery]) return m[uriQuery];
 }
 
 function query(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_query);
+}
+
+function extract_root(value) {
+    var m = split_url(value);
+    if (m && m[uriDomain] && m[uriDomain]) {
+        var scheme = m[uriScheme] && m[uriScheme] !== 'null'?
+            m[uriScheme] + "://" : "";
+        var port = m[uriPort]? ":" + m[uriPort] : "";
+        return scheme + m[uriDomain] + port;
+    }
 }
 
 function root(dst, src) {
-    return nop;
+    return url_wrapper(dst, src, extract_root);
 }
 
 var ecs_mappings = {
@@ -1707,6 +1792,7 @@ function test() {
     test_tz();
     test_conversions();
     test_mappings();
+    test_url();
 }
 
 var pass_test = function (input, output) {
@@ -1780,6 +1866,15 @@ function test_tz() {
         pass_test(705, "+11:45"),
         pass_test(-705, "-11:45"),
     ]);
+    var date = new Date();
+    var localOff = parse_local_tz_offset(-date.getTimezoneOffset());
+    test_fn_call(parse_tz_offset, [
+        pass_test('local', localOff),
+        pass_test('event', 'event'),
+        pass_test('-07:00', '-07:00'),
+        pass_test('-1145', '-11:45'),
+        pass_test('+02', '+02:00'),
+    ]);
 }
 
 function test_conversions() {
@@ -1849,7 +1944,10 @@ function test_fn_call(fn, cases) {
             result = test.convert.call(result);
         }
         if (result !== test.expected) {
-            throw "test " + fn.name + "#" + idx + " failed. Input:'" + JSON.stringify(test.input) + "' Expected:'" + test.expected + "' Got:'" + result + "'";
+            throw "test " + fn.name + "#" + idx + " failed."
+                + " Input:" + JSON.stringify(test.input)
+                + " Expected:" + JSON.stringify(test.expected)
+                + " Got:" + JSON.stringify(result);
         }
     });
     if (debug) console.debug("test " + fn.name + " PASS.");
@@ -1889,4 +1987,70 @@ function test_mappings() {
                 + " Got:" + got;
         }
     }
+}
+
+function test_url() {
+    test_fn_call(extract_domain, [
+        pass_test("http://example.com", "example.com"),
+        pass_test("http://example.com/", "example.com"),
+        pass_test("ftp+ssh://example.com/path", "example.com"),
+        pass_test("https://example.com:4443/path", "example.com"),
+        pass_test("www.example.net/foo/bar", "www.example.net"),
+        pass_test("http://127.0.0.1:8080", "127.0.0.1"),
+        pass_test("http://[::1]", "[::1]"),
+        pass_test("http://[::1]:8080", "[::1]"),
+        pass_test("https://root:pass@example.org:80/foo/bar", "example.org"),
+        pass_test("root:pass@example.org:80/foo/bar", "example.org"),
+        fail_test("/my/path"),
+        fail_test(""),
+    ]);
+    test_fn_call(extract_path, [
+        pass_test("http://example.net/a/b/d?x=z", "/a/b/d"),
+        pass_test("root:pass@www.example.net:80/a/b/d?x=z", "/a/b/d"),
+        pass_test("/a/b/d?x=z#frag", "/a/b/d"),
+        pass_test("localhost/", "/"),
+        fail_test("domain"),
+        fail_test(""),
+        fail_test(" "),
+    ]);
+    test_fn_call(extract_page, [
+       pass_test("http://example.net/index.html", "index.html"),
+        pass_test("http://localhost/index.html", "index.html"),
+        pass_test("example.com/a/b/c", "c"),
+        fail_test("ftp://example.com/"),
+        pass_test("ftp://example.com/main#fragment", "main"),
+        pass_test("ftp://example.com/0#fragment", "0"),
+        fail_test(""),
+    ]);
+    test_fn_call(extract_port, [
+        pass_test("http://0.0.0.0:1234", '1234'),
+        pass_test("https://0.0.0.0", '443'),
+        pass_test("https://[::abcd:1234]:4443/a?b#c", '4443'),
+        fail_test("www.example.net"),
+        fail_test(""),
+    ]);
+    test_fn_call(extract_query, [
+        pass_test("http://localhost/post?request=1234&user=root", "request=1234&user=root"),
+        pass_test("http://localhost/post?request=1234&user=root#m1234", "request=1234&user=root"),
+        fail_test("http://localhost/post"),
+        fail_test("http://localhost/post?"),
+        fail_test(""),
+    ]);
+    test_fn_call(extract_root, [
+        pass_test("http://localhost/post?request=1234&user=root", "http://localhost"),
+        pass_test("https://[::abcd:1234]:4443/a?b#c", 'https://[::abcd:1234]:4443'),
+        pass_test("localhost"),
+        fail_test("/a/b/c"),
+        fail_test(""),
+        pass_test("http://user:pass@example.net", "http://example.net"),
+    ]);
+    test_fn_call(extract_ext, [
+        pass_test("http://example.net/index.html", ".html"),
+        pass_test("http://localhost/index.html?a=b#c", ".html"),
+        fail_test("example.com/a/b/c"),
+        fail_test("ftp://example.com/"),
+        pass_test("ftp://example.com/main.txt#fragment", ".txt"),
+        fail_test("ftp://example.com/0#fragment"),
+        fail_test(""),
+    ]);
 }

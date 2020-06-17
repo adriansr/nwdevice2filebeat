@@ -1806,7 +1806,7 @@ function test() {
     test_conversions();
     test_mappings();
     test_url();
-    test_functions();
+    test_calls();
 }
 
 var pass_test = function (input, output) {
@@ -2078,7 +2078,7 @@ function test_url() {
     ]);
 }
 
-function test_functions() {
+function test_calls() {
     test_fn_call(RMQ, [
         fail_test(["a", "b"]),
         fail_test([]),
@@ -2090,5 +2090,21 @@ function test_functions() {
         pass_test(['" "'], " "),
         pass_test(['``'], ""),
         pass_test(["`woot'"], "`woot'"),
+    ]);
+    test_fn_call(CALC, [
+        fail_test([]),
+        fail_test(["1"]),
+        fail_test(["01", "+"]),
+        pass_test(["2","+","2"], "4"),
+        pass_test(["012","*","2"], "24"),
+        pass_test(["0x10","+","1"], "17"),
+        pass_test(["0","-","1"], "-1"),
+        fail_test(["15","/","3"]),
+    ]);
+    test_fn_call(STRCAT, [
+        pass_test([], ""),
+        pass_test(["1"], "1"),
+        pass_test(["01", "+"], "01+"),
+        pass_test(["hell", "oW", "ORLD"], "helloWORLD"),
     ]);
 }

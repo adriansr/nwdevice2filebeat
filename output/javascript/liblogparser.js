@@ -207,7 +207,8 @@ function field(name) {
     }
 }
 
-function STRCAT(evt, args) {
+// TODO: Do CALL'ed functions need the `evt` argument?
+function STRCAT(args) {
     var s = "";
     var i;
     for (i = 0; i < args.length; i++) {
@@ -217,11 +218,11 @@ function STRCAT(evt, args) {
 }
 
 // TODO: Implement?
-function DIRCHK(evt, args) {
-    unimplemented(evt, "DIRCHK");
+function DIRCHK(args) {
+    unimplemented("DIRCHK");
 }
 
-function CALC(evt, args) {
+function CALC(args) {
     if (args.length !== 3) {
         console.warn("skipped call to CALC with " + args.length + " arguments.");
         return;
@@ -252,8 +253,20 @@ function CALC(evt, args) {
     return result !== undefined ? "" + result : result;
 }
 
-function RMQ(evt, args) {
-    unimplemented(evt, "RMQ");
+var quoteChars = "\"'`";
+function RMQ(args) {
+    if(args.length !== 1) {
+        console.warn("RMQ: only one argument expected");
+        return;
+    }
+    var value = args[0].trim();
+    var n = value.length;
+    var char;
+    return n > 1
+        && (char=value.charAt(0)) === value.charAt(n-1)
+        && quoteChars.indexOf(char) !== -1?
+            value.substr(1, n-2)
+            : value;
 }
 
 function call(opts) {
@@ -262,7 +275,7 @@ function call(opts) {
         for (var i = 0; i < opts.args.length; i++) {
             args[i] = opts.args[i](evt);
         }
-        var result = opts.fn(evt, args);
+        var result = opts.fn(args);
         if (result != null) {
             evt.Put(opts.dest, result);
         }
@@ -284,7 +297,7 @@ function appendErrorMsg(evt, msg) {
     evt.Put("error.message", value);
 }
 
-function unimplemented(evt, name) {
+function unimplemented(name) {
     appendErrorMsg("unimplemented feature: " + name);
 }
 
@@ -1793,6 +1806,7 @@ function test() {
     test_conversions();
     test_mappings();
     test_url();
+    test_functions();
 }
 
 var pass_test = function (input, output) {
@@ -2061,5 +2075,20 @@ function test_url() {
         pass_test("ftp://example.com/main.txt#fragment", ".txt"),
         fail_test("ftp://example.com/0#fragment"),
         fail_test(""),
+    ]);
+}
+
+function test_functions() {
+    test_fn_call(RMQ, [
+        fail_test(["a", "b"]),
+        fail_test([]),
+        pass_test(["unquoted"], "unquoted"),
+        pass_test([""], ""),
+        pass_test(["''"], ""),
+        pass_test(["'hello'"], "hello"),
+        pass_test([" 'world'  "], "world"),
+        pass_test(['" "'], " "),
+        pass_test(['``'], ""),
+        pass_test(["`woot'"], "`woot'"),
     ]);
 }

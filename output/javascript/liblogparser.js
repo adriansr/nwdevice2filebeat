@@ -15,6 +15,7 @@ var defaults = {
     rsa: false,
     keep_raw: false,
     tz_offset: 'local',
+    strip_priority: true,
 }
 
 var saved_flags = null;
@@ -24,6 +25,7 @@ var map_rsa;
 var keep_raw;
 var device;
 var tz_offset;
+var strip_priority;
 
 // Register params from configuration.
 function register(params) {
@@ -32,6 +34,7 @@ function register(params) {
     map_rsa = params.rsa !== undefined ? params.rsa : defaults.rsa;
     keep_raw = params.keep_raw !== undefined ? params.keep_raw : defaults.keep_raw;
     tz_offset = parse_tz_offset(params.tz_offset !== undefined? params.tz_offset : defaults.tz_offset);
+    strip_priority = params.strip_priority !== undefined? params.strip_priority : defaults.strip_priority;
     device = new DeviceProcessor();
 }
 
@@ -109,6 +112,51 @@ function linear_select(subprocessors) {
     }
 }
 
+function conditional(opt) {
+    return function(evt) {
+        if (opt.if(evt)) {
+            opt.then(evt);
+        } else if (opt.else) {
+            opt.else(evt);
+        }
+    }
+}
+
+var strip_syslog_priority = (function() {
+    var isEnabled = function() { return strip_priority === true; };
+    var fetchPRI = field('_pri');
+    var fetchPayload = field('payload');
+    var removePayload = remove(['payload']);
+    var cleanup = remove(['_pri', 'payload']);
+    var onMatch = function(evt) {
+        var pri, priStr = fetchPRI(evt);
+        if (priStr != null
+            && 0 < priStr.length && priStr.length < 4
+            && !isNaN((pri = Number(priStr)))
+        && 0 <= pri && pri < 192) {
+            var severity = pri & 7,
+                facility = pri >> 3;
+            setc("_severity", "" + severity)(evt);
+            setc("_facility", "" + facility)(evt);
+            // Replace message with priority stripped.
+            evt.Put("message", fetchPayload(evt));
+            removePayload(evt);
+        } else {
+            // not a valid syslog PRI, cleanup.
+            cleanup(evt);
+        }
+    }
+    return conditional({
+        if: isEnabled,
+        then: cleanup_flags(match(
+            "STRIP_PRI",
+            "message",
+            "<%{_pri}>%{payload}",
+            onMatch
+        ))
+    });
+})();
+
 function match(id, src, pattern, on_success) {
     var dissect = new processor.Dissect({
         field: src,
@@ -133,6 +181,13 @@ function match(id, src, pattern, on_success) {
         if (on_success != null && !failed) {
             on_success(evt);
         }
+    }
+}
+
+function cleanup_flags(processor) {
+    return function(evt) {
+        processor(evt);
+        evt.Delete(FLAG_FIELD);
     }
 }
 
@@ -192,6 +247,7 @@ function restore_flags(evt) {
     if (saved_flags !== null) {
         evt.Put(FLAG_FIELD, saved_flags);
     }
+    evt.Delete("message");
 }
 
 function constant(value) {
@@ -222,13 +278,17 @@ function DIRCHK(args) {
     unimplemented("DIRCHK");
 }
 
+function strictToInt(str) {
+    return str * 1;
+}
+
 function CALC(args) {
     if (args.length !== 3) {
         console.warn("skipped call to CALC with " + args.length + " arguments.");
         return;
     }
-    var a = parseInt(args[0]);
-    var b = parseInt(args[2]);
+    var a = strictToInt(args[0]);
+    var b = strictToInt(args[2]);
     if (isNaN(a) || isNaN(b)) {
         console.warn("failed evaluating CALC arguments a='" + args[0] + "' b='" + args[2] + "'.");
         return;
@@ -272,9 +332,8 @@ function RMQ(args) {
 function call(opts) {
     var args = new Array(opts.args.length);
     return function (evt) {
-        for (var i = 0; i < opts.args.length; i++) {
-            args[i] = opts.args[i](evt);
-        }
+        for (var i = 0; i < opts.args.length; i++)
+            if ((args[i] = opts.args[i](evt)) == null) return;
         var result = opts.fn(args);
         if (result != null) {
             evt.Put(opts.dest, result);
@@ -701,9 +760,28 @@ function url_wrapper(dst, src, fn) {
 // The following regular expression for parsing URLs from:
 // https://github.com/wizard04wsu/URI_Parsing
 //
+// The MIT License (MIT)
+//
 // Copyright (c) 2014 Andrew Harrison
-// Licensed under the MIT License (MIT)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 var uriRegExp = /^([a-z][a-z0-9+.-]*):(?:\/\/((?:(?=((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*))(\3)@)?(?=(\[[0-9A-F:.]{2,}\]|(?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*))\5(?::(?=(\d*))\6)?)(\/(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\8)?|(\/?(?!\/)(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\10)?)(?:\?(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\11)?(?:#(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\12)?$/i;
+
 var uriScheme = 1;
 var uriDomain = 5;
 var uriPort = 6;
@@ -947,6 +1025,9 @@ var ecs_mappings = {
     'tld': {to:[{field: 'url.top_level_domain', setter: fld_prio, prio: 0}]},
     'udp.dstport': {convert: to_long, to:[{field: 'destination.port', setter: fld_prio, prio: 3}]},
     'udp.srcport': {convert: to_long, to:[{field: 'source.port', setter: fld_prio, prio: 3}]},
+    '_pri': {convert: to_long, to:[{field:'log.syslog.priority', setter: fld_set}]},
+    '_severity': {convert: to_long, to:[{field:'log.syslog.severity.code', setter: fld_set}]},
+    '_facility': {convert: to_long, to:[{field:'log.syslog.facility.code', setter: fld_set}]},
 }
 
 var rsa_mappings = {
@@ -1682,7 +1763,7 @@ function to_ipv4(value) {
     var result = ipv4_regex.exec(value);
     if (result == null || result.length !== 5) return;
     for (var i = 1; i < 5; i++) {
-        var num = parseInt(result[i]);
+        var num = strictToInt(result[i]);
         if (isNaN(num) || num < 0 || num > 255) return;
     }
     return value;
@@ -1807,6 +1888,7 @@ function test() {
     test_mappings();
     test_url();
     test_calls();
+    test_assumptions();
 }
 
 var pass_test = function (input, output) {
@@ -2003,15 +2085,20 @@ function test_mappings() {
     }
 }
 
+function copy_name(dst, src) {
+    Object.defineProperty(dst, "name", { value: src.name });
+    return dst;
+}
+
 function test_url() {
     function test(fn) {
-        return function (input) {
+        return copy_name(function (input) {
             var evt = new Event({});
             evt.Put(FIELDS_PREFIX + "src", input);
             fn("dst", "src")(evt);
             var result = evt.Get(FIELDS_PREFIX + "dst");
             return result? result : undefined;
-        }
+        }, fn);
     }
     test_fn_call(test(domain), [
         pass_test("http://example.com", "example.com"),
@@ -2107,4 +2194,55 @@ function test_calls() {
         pass_test(["01", "+"], "01+"),
         pass_test(["hell", "oW", "ORLD"], "helloWORLD"),
     ]);
+    var evt = new Event({});
+    evt.Put(FIELDS_PREFIX + "a", "7");
+    evt.Put(FIELDS_PREFIX + "b", "'hello'");
+    evt.Put(FIELDS_PREFIX + "c", "11");
+    var call_test = function(fn) {
+        return function(input) {
+            call({
+                args: input,
+                'fn': fn,
+                dest: FIELDS_PREFIX+"z",
+            })(evt);
+            var result = evt.Get(FIELDS_PREFIX + "z");
+            evt.Delete(FIELDS_PREFIX + "z");
+            return result != null? result : undefined;
+        }
+    }
+    test_fn_call(call_test(RMQ), [
+        pass_test([field('b')], 'hello'),
+        pass_test([constant("'world'")], 'world'),
+    ]);
+    test_fn_call(call_test(CALC), [
+        pass_test([field("a"), constant('-'), field("c")], '-4'),
+        pass_test([field("a"), constant('*'), constant('7')], '49'),
+        fail_test([field("a"), constant('*'), constant('7a')]),
+    ]);
+    test_fn_call(call_test(STRCAT), [
+        pass_test([field("a"), constant('-'), field("c")], '7-11'),
+    ]);
+}
+
+function test_assumptions() {
+    var str = "011";
+    if (strictToInt(str) !== 11) {
+        throw("string conversion interprets leading zeros as octal");
+    }
+    if (parseInt(str) !== 11) {
+        throw("parseInt interprets leading zeros as octal");
+    }
+    if (Number(str) !== 11) {
+        throw("Number conversion interprets leading zeros as octal");
+    }
+    str = "17a";
+    if (!isNaN(strictToInt(str))) {
+        throw("string conversion accepts extra chars");
+    }
+    if (isNaN(parseInt(str))) {
+        throw("parseInt doesn't accept extra chars");
+    }
+    if (!isNaN(Number(str))) {
+        throw("Number conversion accepts extra chars");
+    }
 }

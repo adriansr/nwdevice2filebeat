@@ -112,6 +112,7 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Write("function DeviceProcessor() {").Newline().Indent().
 			Write("var builder = new processor.Chain();").Newline().
 			Write("builder.Add(save_flags);").Newline().
+			Write("builder.Add(strip_syslog_priority);").Newline().
 			Write("builder.Add(")
 		generate(v.inner[0], out)
 		out.Write(");").Newline().

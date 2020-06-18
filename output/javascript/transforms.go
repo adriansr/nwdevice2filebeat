@@ -163,6 +163,7 @@ func adjustFieldNames(p *parser.Parser) (err error) {
 				v.Input = "nwparser." + v.Input
 				return parser.WalkReplace, v
 			}
+			// TODO: Why prefix with nwparser in all these?
 		case parser.Call:
 			v.Target = "nwparser." + v.Target
 			return parser.WalkReplace, v

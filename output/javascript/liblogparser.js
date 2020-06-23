@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+/* jshint -W014,-W016,-W097,-W116 */
+
 var processor = require("processor");
 var console = require("console");
 
@@ -53,7 +55,7 @@ function parse_tz_offset(offset) {
         // Otherwise a tz offset in the form "[+-][0-9]{4}" is required.
         default:
             m = offset.match(/^([+\-])([0-9]{2}):?([0-9]{2})?$/);
-            if (m == null || m.length !== 4) {
+            if (m === null || m.length !== 4) {
                 throw("bad timezone offset: '" + offset + "'. Must have the form +HH:MM");
             }
             return m[1] + m[2] + ":" + (m[3]!==undefined? m[3] : "00");
@@ -109,7 +111,7 @@ function linear_select(subprocessors) {
                 console.warn("linear_select didn't match");
             }
         }
-    }
+    };
 }
 
 function conditional(opt) {
@@ -119,7 +121,7 @@ function conditional(opt) {
         } else if (opt.else) {
             opt.else(evt);
         }
-    }
+    };
 }
 
 var strip_syslog_priority = (function() {
@@ -133,7 +135,7 @@ var strip_syslog_priority = (function() {
         if (priStr != null
             && 0 < priStr.length && priStr.length < 4
             && !isNaN((pri = Number(priStr)))
-        && 0 <= pri && pri < 192) {
+            && 0 <= pri && pri < 192) {
             var severity = pri & 7,
                 facility = pri >> 3;
             setc("_severity", "" + severity)(evt);
@@ -145,7 +147,7 @@ var strip_syslog_priority = (function() {
             // not a valid syslog PRI, cleanup.
             cleanup(evt);
         }
-    }
+    };
     return conditional({
         if: isEnabled,
         then: cleanup_flags(match(
@@ -181,14 +183,14 @@ function match(id, src, pattern, on_success) {
         if (on_success != null && !failed) {
             on_success(evt);
         }
-    }
+    };
 }
 
 function cleanup_flags(processor) {
     return function(evt) {
         processor(evt);
         evt.Delete(FLAG_FIELD);
-    }
+    };
 }
 
 function all_match(opts) {
@@ -206,14 +208,14 @@ function all_match(opts) {
             if (debug) console.warn("all_match success at " + i);
         }
         if (opts.on_success != null) opts.on_success(evt);
-    }
+    };
 }
 
 function msgid_select(mapping) {
     return function (evt) {
         var msgid = evt.Get(FIELDS_PREFIX + "messageid");
         if (msgid == null) {
-            if (debug) console.warn("msgid_select: no messageid captured!")
+            if (debug) console.warn("msgid_select: no messageid captured!");
             return;
         }
         var next = mapping[msgid];
@@ -223,7 +225,7 @@ function msgid_select(mapping) {
         }
         if (debug) console.info("msgid_select: matched key=" + msgid);
         return next(evt);
-    }
+    };
 }
 
 function msg(msg_id, match) {
@@ -232,7 +234,7 @@ function msg(msg_id, match) {
         if (evt.Get(FLAG_FIELD) == null) {
             evt.Put(FIELDS_PREFIX + "msg_id1", msg_id);
         }
-    }
+    };
 }
 
 var start;
@@ -252,14 +254,14 @@ function restore_flags(evt) {
 function constant(value) {
     return function (evt) {
         return value;
-    }
+    };
 }
 
 function field(name) {
     var fullname = FIELDS_PREFIX + name;
     return function (evt) {
         return evt.Get(fullname);
-    }
+    };
 }
 
 function STRCAT(args) {
@@ -336,7 +338,7 @@ function call(opts) {
         if (result != null) {
             evt.Put(opts.dest, result);
         }
-    }
+    };
 }
 
 function nop(evt) {
@@ -369,7 +371,7 @@ function lookup(opts) {
         if (value !== undefined) {
             evt.Put(opts.dest, value(evt));
         }
-    }
+    };
 }
 
 function set(fields) {
@@ -383,26 +385,26 @@ function setf(dst, src) {
     return function (evt) {
         var val = evt.Get(FIELDS_PREFIX + src);
         if (val != null) evt.Put(FIELDS_PREFIX + dst, val);
-    }
+    };
 }
 
 function setc(dst, value) {
     return function (evt) {
         evt.Put(FIELDS_PREFIX + dst, value);
-    }
+    };
 }
 
 function set_field(opts) {
     return function (evt) {
         var val = opts.value(evt);
         if (val != null) evt.Put(opts.dest, val);
-    }
+    };
 }
 
 function dump(label) {
     return function (evt) {
-        console.log("Dump of event at " + label + ": " + JSON.stringify(evt, null, "\t"))
-    }
+        console.log("Dump of event at " + label + ": " + JSON.stringify(evt, null, "\t"));
+    };
 }
 
 function date_time_join_args(evt, arglist) {
@@ -473,7 +475,7 @@ function date_time(opts) {
             }
         }
         if (debug) console.warn("in date_time: id=" + opts.id + " (s) FAILED: " + str);
-    }
+    };
 }
 
 var uA = 60 * 60 * 24;
@@ -530,7 +532,7 @@ function remove(fields) {
         for (var i = 0; i < fields.length; i++) {
             evt.Delete(FIELDS_PREFIX + fields[i]);
         }
-    }
+    };
 }
 
 function dc(ct) {
@@ -542,7 +544,7 @@ function dc(ct) {
             return;
         }
         return pos + ct.length;
-    }
+    };
     return function (str, pos, date) {
         var outPos = match(ct, str, pos);
         if (outPos === undefined) {
@@ -550,7 +552,7 @@ function dc(ct) {
             outPos = match(ct.substr(skipws(ct, 0)), str, skipws(str, pos));
         }
         return outPos;
-    }
+    };
 }
 
 
@@ -592,7 +594,7 @@ var unixSetter = {
     call: function (date, value) {
         date.setTime(value * 1000);
     }
-}
+};
 
 
 // Make two-digit dates 00-69 interpreted as 2000-2069
@@ -605,7 +607,7 @@ var year2DigitSetter = {
     call: function(date, value) {
         date.setUTCFullYear(value < twoDigitYearEpoch? twoDigitYearCentury + value : twoDigitYearCentury + value - 100);
     }
-}
+};
 
 // var dC = undefined;
 var dR = dateMonthName(true);
@@ -641,10 +643,12 @@ function parseAMPM(str, pos, date) {
     switch (head) {
         case "A.":
             skip = true;
+        /* falls through */
         case "AM":
             break;
         case "P.":
             skip = true;
+        /* falls through */
         case "PM":
             isPM = true;
             break;
@@ -676,18 +680,18 @@ function parseHMS(str, pos, date) {
 }
 
 function skipws(str, pos) {
-    for (var n = str.length
-        ; pos < n && str.charAt(pos) === " "
-        ; pos++)
+    for ( var n = str.length;
+          pos < n && str.charAt(pos) === " ";
+          pos++)
         ;
     return pos;
 }
 
 function skipdigits(str, pos) {
     var c;
-    for (var n = str.length
-        ; pos < n && (c = str.charAt(pos)) >= "0" && c <= "9"
-        ; pos++)
+    for (var n = str.length;
+         pos < n && (c = str.charAt(pos)) >= "0" && c <= "9";
+         pos++)
         ;
     return pos;
 }
@@ -703,7 +707,7 @@ function dateVariableWidthNumber(fmtChar, min, max, setter) {
             return pos;
         }
         return;
-    }
+    };
 }
 
 function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
@@ -719,7 +723,7 @@ function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
         }
         //console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
         return;
-    }
+    };
 }
 
 // Short month name (Jan..Dec).
@@ -739,7 +743,7 @@ function dateMonthName(long) {
         }
         date.setUTCMonth(idx[0]);
         return pos + 3 + (long ? idx[1] : 0);
-    }
+    };
 }
 
 function url_wrapper(dst, src, fn) {
@@ -750,7 +754,7 @@ function url_wrapper(dst, src, fn) {
         } else {
             console.error(fn.name + " failed for '" + value + "'");
         }
-    }
+    };
 }
 
 // The following regular expression for parsing URLs from:
@@ -824,7 +828,7 @@ var pageFromPathRegExp = /\/([^\/]+)$/;
 var pageName = 1;
 
 function extract_page(value) {
-    var value = extract_path(value);
+    value = extract_path(value);
     if (!value) return undefined;
     var m = value.match(pageFromPathRegExp);
     if (m) return m[pageName];
@@ -850,7 +854,7 @@ var schemePort = {
     "ssh": "22",
     "http": "80",
     "https": "443",
-}
+};
 
 function extract_port(value) {
     var m = split_url(value);
@@ -1024,7 +1028,7 @@ var ecs_mappings = {
     "_pri": {convert: to_long, to:[{field:"log.syslog.priority", setter: fld_set}]},
     "_severity": {convert: to_long, to:[{field:"log.syslog.severity.code", setter: fld_set}]},
     "_facility": {convert: to_long, to:[{field:"log.syslog.facility.code", setter: fld_set}]},
-}
+};
 
 var rsa_mappings = {
     "msg": {to:[{field: "rsa.internal.msg", setter: fld_set}]},
@@ -1721,7 +1725,7 @@ var rsa_mappings = {
     "ubc.res": {convert: to_long, to:[{field: "rsa.internal.ubc_res", setter: fld_set}]},
     "vlan.name": {to:[{field: "rsa.network.vlan_name", setter: fld_set}]},
     "word": {to:[{field: "rsa.internal.word", setter: fld_set}]},
-}
+};
 
 function to_date(value) {
     switch (typeof (value)) {
@@ -1786,7 +1790,7 @@ function to_ipv6(value) {
         } else if (!parts[i].match(ipv6_hex_regex) &&
             // Accept an IPv6 with a valid IPv4 at the end.
             ((i + 1 < parts.length) || !to_ipv4(parts[i]))) {
-            return
+            return;
         }
     }
     return innerEmpty === 0 && parts.length === 8 || innerEmpty === 1 ? value : undefined;
@@ -1808,12 +1812,12 @@ function to_lowercase(value) {
 }
 
 function fld_set(dst, value) {
-    dst[this.field] = { v: value }
+    dst[this.field] = { v: value };
 }
 
 function fld_append(dst, value) {
     if (dst[this.field] === undefined) {
-        dst[this.field] = { v: [value] }
+        dst[this.field] = { v: [value] };
     } else {
         var base = dst[this.field];
         if (base.v.indexOf(value)===-1) base.v.push(value);
@@ -1822,10 +1826,10 @@ function fld_append(dst, value) {
 
 function fld_prio(dst, value) {
     if (dst[this.field] === undefined) {
-        dst[this.field] = { v: value, prio: this.prio}
+        dst[this.field] = { v: value, prio: this.prio};
     } else if(this.prio < dst[this.field].prio) {
-        dst[this.field].v = value
-        dst[this.field].prio = this.prio
+        dst[this.field].v = value;
+        dst[this.field].prio = this.prio;
     }
 }
 
@@ -1851,8 +1855,9 @@ function populate_fields(evt) {
 }
 
 function do_populate(evt, base, targets) {
-    var result = {}
-    for (var key in base) {
+    var result = {};
+    var key;
+    for (key in base) {
         if (!base.hasOwnProperty(key)) continue;
         var mapping = targets[key];
         if (mapping === undefined) continue;
@@ -1871,7 +1876,7 @@ function do_populate(evt, base, targets) {
             tgt.setter(result, value);
         }
     }
-    for (var key in result) {
+    for (key in result) {
         if (!result.hasOwnProperty(key)) continue;
         evt.Put(key, result[key].v);
     }
@@ -1887,18 +1892,19 @@ function test() {
     test_assumptions();
 }
 
-var pass_test = function (input, output) {
-    return {input: input, expected: output !== undefined ? output : input}
+function pass_test(input, output) {
+    return {input: input, expected: output !== undefined ? output : input};
 }
-var fail_test = function (input) {
-    return {input: input}
+
+function fail_test(input) {
+    return {input: input};
 }
 
 function test_date_times() {
     var date_time = function(input) {
         var res = date_time_try_pattern(input.fmt, input.str, input.tz);
         return res !== undefined? res.toISOString() : res;
-    }
+    };
     test_fn_call(date_time, [
         pass_test(
             {
@@ -2053,7 +2059,7 @@ function test_mappings() {
         "d": {to: [{field: "unique", setter: fld_prio, prio: 2}]},
         "e": {to: [{field: "unique", setter: fld_prio, prio: 1}]},
         "f": {to: [{field: "unique", setter: fld_prio, prio: 3}]}
-    }
+    };
     var values = {
         "a": "value1",
         "b": "value2",
@@ -2061,7 +2067,7 @@ function test_mappings() {
         "d": "value3",
         "e": "value4",
         "f": "value5"
-    }
+    };
     var expected = {
         "raw.a": "value1",
         "raw.c": "value1",
@@ -2070,7 +2076,8 @@ function test_mappings() {
     };
     var evt = new Event({});
     do_populate(evt, values, test_mappings);
-    for (var key in expected) {
+    var key;
+    for (key in expected) {
         var got = JSON.stringify(evt.Get(key));
         var exp = JSON.stringify(expected[key]);
         if (got !== exp) {

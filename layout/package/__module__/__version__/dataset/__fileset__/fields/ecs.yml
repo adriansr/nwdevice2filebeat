@@ -55,7 +55,7 @@
   type: date
   description: The date when the event started or when the activity was first observed.
 - name: event.end
-  type: keyword
+  type: date
   description: The date when the event ended or when the activity was last observed.
 - name: event.duration
   type: long

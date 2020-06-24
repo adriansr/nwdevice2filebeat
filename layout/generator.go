@@ -5,6 +5,7 @@
 package layout
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -42,6 +43,7 @@ type Generator struct {
 	vars    Vars
 	dynVars map[string]string
 	files   map[string]FileWriter
+	inlines map[string]FileWriter
 	dirs    map[string]string
 	repl    pathReplacements
 	funcs   template.FuncMap
@@ -118,6 +120,18 @@ func (g *Generator) doSet(name, value string) (empty string, err error) {
 	return empty, nil
 }
 
+func (g *Generator) doInline(file string) (result string, err error) {
+	writer, found := g.inlines[file]
+	if !found {
+		return "", errors.Errorf("inline file '%s' not found", file)
+	}
+	buffer := bytes.NewBuffer(nil)
+	if err := writer.WriteFile(buffer); err != nil {
+		return "", errors.Wrapf(err, "error inlining file '%s'", file)
+	}
+	return buffer.String(), nil
+}
+
 func (g *Generator) doRelPath(base, subpath string) (result string, err error) {
 	basedir, err := g.doDir(base)
 	if err != nil {
@@ -125,6 +139,11 @@ func (g *Generator) doRelPath(base, subpath string) (result string, err error) {
 	}
 	subdir, err := g.doDir(subpath)
 	return filepath.Rel(basedir, subdir)
+}
+
+func (g *Generator) doIndent(indent string, times int, value string) (result string, err error) {
+	prefix := strings.Repeat(indent, times)
+	return prefix + strings.Replace(value, "\n", "\n"+prefix, -1), nil
 }
 
 func New(layout string, vars Vars) (*Generator, error) {
@@ -144,6 +163,8 @@ func New(layout string, vars Vars) (*Generator, error) {
 		"getvar":  gen.doVar,
 		"setvar":  gen.doSet,
 		"title":   strings.Title,
+		"inline":  gen.doInline,
+		"indent":  gen.doIndent,
 	}
 	for _, sourcePath := range files {
 		// Strip <templatesDir>/<template> prefix from paths.
@@ -194,6 +215,22 @@ func (g *Generator) AddFile(path string, gen FileWriter) error {
 	return nil
 }
 
+func (g *Generator) AddInlineFile(path string, gen FileWriter) error {
+	if g.inlines == nil {
+		g.inlines = make(map[string]FileWriter)
+	}
+	if _, exists := g.inlines[path]; exists {
+		return errors.Errorf("output file '%s' is generated more than once", path)
+	}
+	g.inlines[path] = gen
+	return nil
+}
+
+func (g *Generator) HasDir(name string) bool {
+	_, has := g.dirs[name]
+	return has
+}
+
 func (g *Generator) SetVar(name, value string) error {
 	if _, found := g.dynVars[name]; found {
 		return errors.Errorf("output layout variable '%s' redefined", name)
@@ -201,15 +238,6 @@ func (g *Generator) SetVar(name, value string) error {
 	if g.dynVars == nil {
 		g.dynVars = make(map[string]string)
 	}
-	/*tpl, err := g.newTemplate().Parse(value)
-	if err != nil {
-		return err
-	}
-	var sb strings.Builder
-	if err = tpl.Execute(&sb, g.vars); err != nil {
-		return err
-	}
-	g.dynVars[name] = sb.String()*/
 	g.dynVars[name] = value
 	return nil
 }
@@ -288,7 +316,7 @@ type Copy struct {
 func (c Copy) WriteFile(dest io.Writer) error {
 	src, err := os.Open(c.Path)
 	if err != nil {
-		return errors.Wrapf(err, "error opening file '%s' for reading")
+		return errors.Wrapf(err, "error opening file '%s' for reading", c.Path)
 	}
 	defer src.Close()
 	_, err = io.Copy(dest, src)

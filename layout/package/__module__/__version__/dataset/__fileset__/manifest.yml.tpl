@@ -1,5 +1,5 @@
 title: ((.DisplayName)) logs
-release: ga
+release: beta
 type: logs
 streams:
 - input: udp
@@ -56,7 +56,7 @@ streams:
     required: true
     show_user: true
     default: ((.Port))
-- input: logs
+- input: file
   title: ((.DisplayName)) logs
   description: Collect ((.DisplayName)) logs from file
   vars:

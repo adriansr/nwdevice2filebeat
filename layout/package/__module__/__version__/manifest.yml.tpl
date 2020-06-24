@@ -5,7 +5,7 @@ description: ((.DisplayName)) Integration
 version: ((.Version))
 categories:
  - logs
-release: beta # TODO
+release: beta
 removable: true
 license: basic
 type: integration

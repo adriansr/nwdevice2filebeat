@@ -43,29 +43,53 @@ func (js *javascript) Settings() config.PipelineSettings {
 }
 
 func (js *javascript) Populate(lyt *layout.Generator) (err error) {
-	err = lyt.SetVar("extra_processors", fmt.Sprintf(`
+	if lyt.HasDir("config.dir") {
+		err = lyt.SetVar("extra_processors", fmt.Sprintf(`
 - script:
     lang: javascript
     params:
       ecs: true
     files:
     - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/liblogparser.js
-    - ((getvar "basedir"))/((relpath "rel.dir" "helpers.dir"))/pipeline.js
+    - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/pipeline.js
 `))
-	if err != nil {
-		return err
-	}
-	err = lyt.AddFile("__config.dir__/pipeline.js", layout.Move{
-		Path: js.tmpFile.Name(),
-	})
-	if err != nil {
-		return err
-	}
-	err = lyt.AddFile("__helpers.dir__/liblogparser.js", layout.Copy{
-		Path: "output/javascript/liblogparser.js",
-	})
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+		err = lyt.AddFile("__config.dir__/pipeline.js", layout.Move{
+			Path: js.tmpFile.Name(),
+		})
+		if err != nil {
+			return err
+		}
+		err = lyt.AddFile("__config.dir__/liblogparser.js", layout.Copy{
+			Path: "output/javascript/liblogparser.js",
+		})
+		if err != nil {
+			return err
+		}
+	} else {
+		err = lyt.SetVar("extra_processors", fmt.Sprintf(`
+- script:
+    lang: javascript
+    params:
+      ecs: true
+    source: |
+((inline "liblogparser.js" | indent " " 6))
+((inline "pipeline.js" | indent " " 6))
+`))
+		if err != nil {
+			return err
+		}
+		err = lyt.AddInlineFile("pipeline.js", layout.Copy{
+			Path: js.tmpFile.Name(),
+		})
+		if err != nil {
+			return err
+		}
+		err = lyt.AddInlineFile("liblogparser.js", layout.Copy{
+			Path: "output/javascript/liblogparser.js",
+		})
 	}
 	return nil
 }

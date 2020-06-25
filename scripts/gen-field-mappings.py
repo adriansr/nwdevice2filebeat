@@ -45,8 +45,8 @@ class Setter:
 
     def __str__(self):
         if self.mode == 'prio':
-            return '{{field: \'{}\', mode: fld_{}, prio: {}}}'.format(self.dst, self.mode, self.prio)
-        return '{{field: \'{}\', mode: fld_{}}}'.format(self.dst, self.mode)
+            return '{{field: "{}", setter: fld_{}, prio: {}}}'.format(self.dst, self.mode, self.prio)
+        return '{{field: "{}", setter: fld_{}}}'.format(self.dst, self.mode)
 
 
 # From highest priority to lowest priority
@@ -110,6 +110,9 @@ for row in r:
     fld, mappings = process_row(row)
     if fld in by_src:
         raise Exception('Repeated field: {}'.format(fld))
+    # Add ip fields to related.ip if they map to any ECS field.
+    if len(mappings) > 0 and mappings[0].conv == "ip" and any(map(lambda x: is_ecs_field(x.dst), mappings)):
+        mappings.append(Setter(fld, "related.ip", "append", "ip"))
     by_src[fld] = mappings
     for m in mappings:
         if m.dst in overrides:
@@ -133,7 +136,7 @@ for dst, setters in by_dst.items():
     if len(setters) > 1 and setters[0].mode == 'set':
         raise Exception('Field {} is set multiple times. Must override mode (sources=[{}])'.format(
             dst,
-            ', '.join(['\''+x.src+'\'' for x in setters])))
+            ', '.join(['"'+x.src+'"' for x in setters])))
 
 for src, setters in by_src.items():
     convs = set([s.conv for s in setters])
@@ -141,20 +144,22 @@ for src, setters in by_src.items():
         raise Exception('Field {} is converted to different types: {}'.format(src, convs))
 
 def dump_setters(by_src, filter_fn):
-    for src, setters in by_src.items():
+    items = list(by_src.items())
+    items.sort()
+    for src, setters in items:
         setters = list(filter(lambda x: filter_fn(x.dst), setters))
         if len(setters) == 0:
             continue
         conv = ''
         if setters[0].conv is not None:
             conv = 'convert: to_{}, '.format(setters[0].conv)
-        print('\'{}\': {{{}to:[{}]}},'.format(src, conv, ','.join(map(str, setters))))
+        print('    "{}": {{{}to:[{}]}},'.format(src, conv, ','.join(map(str, setters))))
 
 
 print('var ecs_mappings = {')
 dump_setters(by_src, is_ecs_field)
-print('}')
+print('};')
 print('')
 print('var rsa_mappings = {')
 dump_setters(by_src, is_rsa_field)
-print('}')
+print('};')

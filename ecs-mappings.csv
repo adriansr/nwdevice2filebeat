@@ -807,3 +807,6 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Network,UDP Source Port,"Deprecated, use port.src.",udp.srcport,udp.srcport,UInt16,Transient,,,,source.port,,0,network,udp_srcport,long
 1,Network,Vlan Name,This key should only be used to capture the name of the Virtual LAN,vlan.name,vlan.name,Text,Transient,,,,rsa.network.vlan_name,,0,network,vlan_name,keyword
 1,Reserved,Text Token,This is used by the Word Parsing technology to capture the first 5 character of every word in an unparsed log,word,word,Text,Transient,,,,rsa.internal.word,,0,internal,word,keyword
+1,Internal,Syslog facility,This is used internally to map the syslog PRI,_pri,_pri,UInt8,Transient,,,,log.syslog.priority,,0,internal,_pri,long
+1,Internal,Syslog priority,This is used internally to map the syslog PRI,_facility,_facility,UInt8,Transient,,,,log.syslog.facility.code,,0,internal,_facility,long
+1,Internal,Syslog severity,This is used internally to map the syslog PRI,_severity,_severity,UInt8,Transient,,,,log.syslog.severity.code,,0,internal,_severity,long

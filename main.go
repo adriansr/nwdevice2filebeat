@@ -9,6 +9,7 @@ import (
 
 	// Register outputs.
 	_ "github.com/adriansr/nwdevice2filebeat/output/javascript"
+	_ "github.com/adriansr/nwdevice2filebeat/output/logs"
 	_ "github.com/adriansr/nwdevice2filebeat/output/logyml"
 )
 

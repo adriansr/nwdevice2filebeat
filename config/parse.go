@@ -47,6 +47,9 @@ func NewFromCommand(cmd *cobra.Command) (cfg Config, err error) {
 	if verbosity, err := cmd.PersistentFlags().GetCount("verbose"); err == nil {
 		cfg.Verbosity = util.VerbosityLevel(verbosity)
 	}
+
+	cfg.Seed, _ = cmd.PersistentFlags().GetUint64("seed")
+	cfg.NumLines, _ = cmd.PersistentFlags().GetUint("lines")
 	return cfg, nil
 }
 

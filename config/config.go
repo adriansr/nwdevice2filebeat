@@ -45,6 +45,12 @@ type Config struct {
 
 	// Runtime contains configuration for the runtime parser.
 	Runtime Runtime
+
+	// Seed for RNG.
+	Seed uint64
+
+	// NumLines of logs to generate.
+	NumLines uint
 }
 
 type Optimizations struct {

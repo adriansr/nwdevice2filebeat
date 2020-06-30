@@ -51,8 +51,17 @@ var genPipelineCmd = &cobra.Command{
 	},
 }
 
+var genLogsCmd = &cobra.Command{
+	Use:   "logs",
+	Short: "Generate sample logs from a device",
+	Run: func(cmd *cobra.Command, args []string) {
+		generate(cmd, "logs")
+	},
+}
+
 func init() {
-	for _, cmd := range []*cobra.Command{genModuleCmd, genPipelineCmd, genPackageCmd} {
+	// Common flags for all sub-options.
+	for _, cmd := range []*cobra.Command{genModuleCmd, genPipelineCmd, genPackageCmd, genLogsCmd} {
 		cmd.PersistentFlags().String("device", "", "Input device path")
 		cmd.PersistentFlags().StringP("format", "f", defaultPipelineFormat, "Pipeline format (js or yml)")
 		cmd.PersistentFlags().StringSliceP("optimize", "O", nil, "Optimizations")
@@ -78,6 +87,15 @@ func init() {
 	genPipelineCmd.PersistentFlags().String("output", "", "Output directory where pipeline is written to")
 	genPipelineCmd.MarkPersistentFlagFilename("output")
 	genPipelineCmd.MarkPersistentFlagRequired("output")
+
+	genLogsCmd.PersistentFlags().UintP("lines", "n", 100, "Number of lines to output")
+	genLogsCmd.PersistentFlags().Uint64("seed", 0, "Random seed")
+	genLogsCmd.PersistentFlags().String("output", "", "Output file to write logs to")
+	genLogsCmd.MarkPersistentFlagFilename("output")
+	genLogsCmd.MarkPersistentFlagRequired("output")
+	// `generate logs`: Hardcode --format logs
+	genLogsCmd.PersistentFlags().MarkHidden("format")
+	genLogsCmd.PersistentFlags().Set("format", "logs")
 	rootCmd.AddCommand(generateCmd)
 }
 
@@ -127,7 +145,7 @@ func generate(cmd *cobra.Command, targetLayout string) error {
 		countWriter.Count(), dev.Description.DisplayName, dev.Description.Name,
 		size, 100.0*float64(countWriter.Count())/float64(size))*/
 
-	if targetLayout == "pipeline" {
+	if targetLayout == "pipeline" || targetLayout == "logs" {
 		srcName := out.OutputFile()
 		destF, err := os.Create(cfg.OutputPath)
 		if err != nil {

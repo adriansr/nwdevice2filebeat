@@ -6,7 +6,39 @@ function DeviceProcessor() {
 	var builder = new processor.Chain();
 	builder.Add(save_flags);
 	builder.Add(strip_syslog_priority);
-	builder.Add(chain1);
+	builder.Add(processor_chain([
+		linear_select([
+			match("HEADER#0:0001", "message", "%{data}ZSCALERNSS: time=%{hfld2->} %{hmonth->} %{hday->} %{hhour}:%{hmin}:%{hsec->} %{hyear}^^timezone=%{timezone}^^%{payload}", processor_chain([
+				setc("header_id","0001"),
+				setc("messageid","ZSCALERNSS_1"),
+			])),
+		]),
+		msgid_select({
+			"ZSCALERNSS_1": msg("ZSCALERNSS_1", match("MESSAGE#0:ZSCALERNSS_1", "nwparser.payload", "action=%{action}^^reason=%{result}^^hostname=%{hostname}^^protocol=%{protocol}^^serverip=%{daddr}^^url=%{url}^^urlcategory=%{filter}^^urlclass=%{info}^^dlpdictionaries=%{fld3}^^dlpengine=%{fld4}^^filetype=%{filetype}^^threatcategory=%{category}^^threatclass=%{vendor_event_cat}^^pagerisk=%{fld8}^^threatname=%{threat_name}^^clientpublicIP=%{fld9}^^ClientIP=%{saddr}^^location=%{fld11}^^refererURL=%{web_referer}^^useragent=%{user_agent}^^department=%{user_dept}^^user=%{username}^^event_id=%{id}^^clienttranstime=%{fld17}^^requestmethod=%{web_method}^^requestsize=%{sbytes}^^requestversion=%{fld20}^^status=%{resultcode}^^responsesize=%{rbytes}^^responseversion=%{fld23}^^transactionsize=%{bytes}", processor_chain([
+				setc("eventcategory","1605000000"),
+				setf("fqdn","hostname"),
+				setf("msg","$MSG"),
+				date_time({
+					dest: "event_time",
+					args: ["hmonth","hday","hyear","hhour","hmin","hsec"],
+					fmts: [
+						[dB,dF,dW,dN,dU,dO],
+					],
+				}),
+				lookup({
+					dest: "nwparser.ec_activity",
+					map: map_getEventCategoryActivity,
+					key: field("action"),
+				}),
+				setc("ec_theme","Communication"),
+				setc("ec_subject","User"),
+			]))),
+		}),
+		set_field({
+			dest: "@timestamp",
+			value: field("event_time"),
+		}),
+	]));
 	builder.Add(populate_fields);
 	builder.Add(restore_flags);
 	var chain = builder.Build();
@@ -15,100 +47,9 @@ function DeviceProcessor() {
 	}
 }
 
-var map_srcDirName = {
+var map_getEventCategoryActivity = {
 	keyvaluepairs: {
-		"0": dup2,
-		"1": dup1,
+		"Allowed": constant("Permit"),
+		"Blocked": constant("Deny"),
 	},
 };
-
-var map_dstDirName = {
-	keyvaluepairs: {
-		"0": dup1,
-		"1": dup2,
-	},
-};
-
-var map_dir2SumType = {
-	keyvaluepairs: {
-		"0": constant("2"),
-		"1": constant("3"),
-	},
-	"default": constant("0"),
-};
-
-var map_dir2Address = {
-	keyvaluepairs: {
-		"0": field("saddr"),
-		"1": field("daddr"),
-	},
-	"default": field("saddr"),
-};
-
-var map_dir2Port = {
-	keyvaluepairs: {
-		"0": field("sport"),
-		"1": field("dport"),
-	},
-	"default": field("sport"),
-};
-
-var dup1 = constant("INSIDE");
-
-var dup2 = constant("OUTSIDE");
-
-var hdr1 = match("HEADER#0:0033", "message", "%{month->} %{day->} %{year->} %{hhour}:%{hmin}:%{hsec->} %{hostip}: %ASA-%{level}-%{messageid}: %{payload}", processor_chain([
-	setc("header_id","0033"),
-]));
-
-var select1 = linear_select([
-	hdr1,
-]);
-
-var part1 = match("MESSAGE#0:113019:02", "nwparser.payload", "Duration: %{hour}h:%{min}m:%{second}s, Bytes xmt: %{sbytes}, Bytes rcv: %{rbytes}, Reason: %{result->} %{d2}, URL: %{url}", processor_chain([
-	setc("eventcategory","1801030100"),
-	date_time({
-		dest: "event_time",
-		args: ["month","day","year","hhour","hmin","hsec"],
-		fmts: [
-			[dB,dF,dW,dN,dU,dO],
-		],
-	}),
-	call({
-		dest: "nwparser.bytes",
-		fn: CALC,
-		args: [
-			field("sbytes"),
-			constant("+"),
-			field("rbytes"),
-		],
-	}),
-	duration({
-		dest: "duration",
-		args: ["hour","min","second"],
-		fmts: [
-			[uN,uU,uO],
-		],
-	}),
-	duration({
-		dest: "d2",
-		args: ["d2"],
-		fmts: [
-			[uN,uc(":"),uU,uc(":"),uO],
-		],
-	}),
-	page("page","url"),
-]));
-
-var msg1 = msg("113019:02", part1);
-
-var chain1 = processor_chain([
-	select1,
-	msgid_select({
-		"A": msg1,
-	}),
-	set_field({
-		dest: "@timestamp",
-		value: field("event_time"),
-	}),
-]);

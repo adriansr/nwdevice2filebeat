@@ -1,0 +1,1930 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DEVICEMESSAGES>
+<VERSION
+	xml="34"
+	checksum="3b5201ea5d3517e275d5d356eac552a2"
+	revision="134"
+    device="2.0" />
+	
+
+<VALUEMAP
+   name="deviceDirection"
+   default="$NONE"
+   keyvaluepairs="1='outbound'|0='inbound'"/>
+<VALUEMAP
+   name="getProtocol"
+   default="$NONE"
+   keyvaluepairs="0='HOPOPT'|1='ICMP'|2='IGMP'|3='GGP'|4='IP'|5='ST'|6='TCP'|7='CBT'|8='EGP'|9='IGP'|10='BBN-RCC-M'|11='NVP-II'|12='PUP'|13='ARGUS'|14='EMCON'|15='XNET'|16='CHAOS'|17='UDP'|18='MUX'|19='DCN-MEAS'|20='HMP'|21='PRM'|22='XNS-IDP'|23='TRUNK-1'|24='TRUNK-2'|25='LEAF-1'|26='LEAF-2'|27='RDP'|28='IRTP'|29='ISO-TP4'|30='NETBLT'|31='MFE-NSP'|32='MERIT-INP'|33='SEP'|34='3PC'|35='IDPR'|36='XTP'|37='DDP'|38='IDPR-CMTP'|39='TP++'|40='IL'|41='IPv6'|42='SDRP'|43='IPv6-Rout'|44='IPv6-Frag'|45='IDRP'|46='RSVP'|47='GRE'|48='MHRP'|49='BNA'|50='ESP'|51='AH'|52='I-NLSP'|53='SWIPE'|54='NARP'|55='MOBILE'|56='TLSP'|57='SKIP'|58='IPv6-ICMP'|59='IPv6-NoNx'|60='IPv6-Opts'|61='AnyHost'|62='CFTP'|63='AnyNetwork'|64='SAT-EXPAK'|65='KRYPTOLAN'|66='RVD'|67='IPPC'|68='AnyFile'|69='SAT-MON'|70='VISA'|71='IPCV'|72='CPNX'|73='CPHB'|74='WSN'|75='PVP'|76='BR-SAT-MO'|77='SUN-ND'|78='WB-MON'|79='WB-EXPAK'|80='ISO-IP'|81='VMTP'|82='SECURE-VM'|83='VINES'|84='TTP'|85='NSFNET-IG'|86='DGP'|87='TCF'|88='EIGRP'|89='OSPFIGP'|90='Sprite-RP'|91='LARP'|92='MTP'|93='AX.25'|94='IPIP'|95='MICP'|96='SCC-SP'|97='ETHERIP'|98='ENCAP'|99='AnyPrivate'|100='GMTP'|101='IFMP'|102='PNNI'|103='PIM'|104='ARIS'|105='SCPS'|106='QNX'|107='A/N'|108='IPComp'|109='SNP'|110='Compaq-Pe'|111='IPX-in-IP'|112='VRRP'|113='PGM'|114='AnyHop'|115='L2TP'|116='DDX'|117='IATP'|118='STP'|119='SRP'|120='UTI'|121='SMP'|122='SM'|123='PTP'|124='ISIS'|125='FIRE'|126='CRTP'|127='CRUDP'|128='SSCOPMCE'|129='IPLT'|130='SPS'|131='PIPE Pr'|132='SCTP St'|133='FC Fi'|134='RSVP-E2E-'|255='Reserved'"/>
+<HEADER
+	id1="0011"
+	id2="0011"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;hfld1&gt; &lt;hyear&gt;-&lt;hmonth&gt;-&lt;hday&gt;T&lt;htime&gt; &lt;hostname&gt; &lt;process&gt; &lt;process_id&gt; &lt;hfld2&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0003"
+	id2="0003"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;hmonth&gt; &lt;hdate&gt; &lt;htime&gt; &lt;hostname&gt; &lt;process&gt;[&lt;process_id&gt;]: NOCEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0005"
+	id2="0005"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;hmonth&gt; &lt;hdate&gt; &lt;htime&gt; &lt;hostname&gt; &lt;process&gt;[&lt;process_id&gt;]: CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0009"
+	id2="0009"
+	messageid="VENDORMAP(devvendor, product)"
+	content=" CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|Check Point|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0004"
+	id2="0004"
+	messageid="VENDORMAP(devvendor, product)"
+	content=" CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0002"
+	id2="0002"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;hyear&gt;-&lt;hmonth&gt;-&lt;hdate&gt; &lt;htime&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0001"
+	id2="0001"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;event_time_string&gt; &lt;hostname&gt; RTS: CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0006"
+	id2="0006"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;event_time_string&gt; &lt;hostname&gt; mwg: CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0012"
+	id2="0012"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;event_time_string&gt; &lt;hostname&gt; ATA:CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0008"
+	id2="0008"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;event_time_string&gt; &lt;hhost&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|{ azureaudit | azure_ad_signin | azure_ad_audit | vmwareappdefense | netskope |rsasecurid|amazonvpc|ciscoumbrella | azuremonitor | cloudtrail }|&lt;hevent_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0014"
+	id2="0014"
+	messageid="VENDORMAP(devvendor, hproduct)"
+	content="&lt;event_time_string&gt; &lt;hhost&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;hproduct&gt;|&lt;hversion&gt;|{ msazuregraph_security | ciscoamp | qualys_vm_hosts }|&lt;hevent_description&gt;|&lt;hseverity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0013"
+	id2="0013"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;hmonth&gt; &lt;hdate&gt; &lt;hhour&gt;:&lt;hmin&gt;:&lt;hsec&gt; &lt;hostname&gt; &lt;hfld1&gt;: &lt;hseverity&gt; - &lt;hfld3&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0010"
+	id2="0010"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;hmonth&gt; &lt;hdate&gt; &lt;hhour&gt;:&lt;hmin&gt;:&lt;hsec&gt; &lt;hostname&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0007"
+	id2="0007"
+	messageid="VENDORMAP(devvendor, product)"
+	content="&lt;event_time_string&gt; &lt;hostname&gt; CEF:&lt;cefversion&gt;|&lt;devvendor&gt;|&lt;product&gt;|&lt;version&gt;|&lt;event_type&gt;|&lt;event_description&gt;|&lt;severity&gt;|&lt;!payload&gt;"/>
+
+<MESSAGE 
+	id1="rsaecat" 
+	id2="rsaecat" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%G/%F/%W %H:%T:%O',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%G/%F/%W %H:%T:%O',param_starttime)&gt;&lt;@endtime:*EVNTTIME($MSG,'%G/%F/%W %H:%T:%O',param_endtime)&gt;&lt;@bytes:*CALC(sbytes,+,rbytes)&gt;"
+	content="&lt;param_starttime&gt;&lt;param_endtime&gt;&lt;param_event_time&gt;&lt;rbytes&gt;&lt;sbytes&gt;&lt;msghold&gt;" />
+		
+<MESSAGE 
+	id1="rsaflow" 
+	id2="rsaflow" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@direction:*deviceDirection(param_direction)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@bytes:*CALC(sbytes,+,rbytes)&gt;&lt;@packets:*CALC(cn_spackets,+,cn_rpackets)&gt;&lt;@protocol:*getProtocol(ip_proto)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_direction&gt;&lt;rbytes&gt;&lt;sbytes&gt;&lt;cn_spackets&gt;&lt;cn_rpackets&gt;&lt;ip_proto&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="netwitnessspectrum" 
+	id2="netwitnessspectrum" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%K %B %F %N:%U:%O %L %W',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="bit9" 
+	id2="bit9" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@event_time_string:*PARMVAL(param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="mcafeewg" 
+	id2="mcafeewg" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %H:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="securityanalytics" 
+	id2="securityanalytics" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %N:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="awscloudtrail" 
+	id2="awscloudtrail" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%H:%U:%OZ',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="mcafeereconnex" 
+	id2="mcafeereconnex" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time_string:*PARMVAL(param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="azureaudit" 
+	id2="azureaudit" 
+	eventcategory="1612000000" 
+	functions="&lt;@event_name:*HDR(hevent_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="azure_ad_audit" 
+	id2="azure_ad_audit" 
+	eventcategory="1612000000" 
+	functions="&lt;@event_name:*HDR(hevent_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="azure_ad_signin" 
+	id2="azure_ad_signin" 
+	eventcategory="1612000000" 
+	functions="&lt;@event_name:*HDR(hevent_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="msoffice365" 
+	id2="msoffice365" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />  
+<MESSAGE 
+	id1="salesforce" 
+	id2="salesforce" 
+	eventcategory="1901000000"
+    functions="&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="trendmicrocm" 
+	id2="trendmicrocm" 
+	eventcategory="1901000000"
+    functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %H:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="akamaikona" 
+	id2="akamaikona" 
+	eventcategory="1901000000"
+    functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',param_starttime)&gt;"
+	content="&lt;param_starttime&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="impervawaf" 
+	id2="impervawaf" 
+	eventcategory="1901000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %H:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="guardium" 
+	id2="guardium" 
+	eventcategory="1901000000"
+    functions="&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',param_starttime)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_starttime&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="websense" 
+	id2="websense" 
+	eventcategory="1901000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X','%B %F %W %Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="forcepoint_firewall" 
+	id2="forcepoint_firewall" 
+	eventcategory="1901000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X','%B %F %W %Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="msazurensg" 
+	id2="msazurensg" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="vmwareappdefense" 
+	id2="vmwareappdefense" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@recorded_time:*EVNTTIME($MSG,'%X',param_recorded_time)&gt;&lt;@dclass_counter1_string:Alarm Count&gt;&lt;@cert.thumbprint:*PARMVAL(cert_checksum)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_recorded_time&gt;&lt;cert_checksum&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="dropbox" 
+	id2="dropbox" 
+	eventcategory="1612000000"
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="amazonguardduty" 
+	id2="amazonguardduty" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@starttime:*EVNTTIME($MSG,'%W-%G-%FT%H:%U:%O',param_starttime)&gt;&lt;@recorded_time:*EVNTTIME($MSG,'%W-%G-%FT%H:%U:%O',param_recorded_time)&gt;&lt;@dclass_counter1_string:Alert Count&gt;"
+	content="&lt;param_starttime&gt;&lt;param_recorded_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="NetskopeCloudSecurityPlatform" 
+	id2="NetskopeCloudSecurityPlatform" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@recorded_time:*EVNTTIME($MSG,'%X',cs_recorded_time)&gt;&lt;@dclass_counter1_string:Event Count&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',cs_page_starttime)&gt;&lt;@endtime:*EVNTTIME($MSG,'%X',cs_page_endtime)&gt;"
+	content="&lt;param_event_time&gt;&lt;cs_page_starttime&gt;&lt;cs_page_endtime&gt;&lt;cs_recorded_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="rsasecuridaccess" 
+	id2="rsasecuridaccess" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%H:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="checkpointfw1" 
+	id2="checkpointfw1" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@protocol:*getProtocol(ip_proto)&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',param_starttime)&gt;"
+	content="&lt;param_event_time&gt;&lt;ip_proto&gt;&lt;msghold&gt;&lt;param_starttime&gt;" />
+
+<MESSAGE 
+	id1="googlecloud" 
+	id2="googlecloud" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_starttime)&gt;&lt;@endtime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_endtime)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_starttime&gt;&lt;param_endtime&gt;&lt;msghold&gt;" />
+
+ <MESSAGE 
+	id1="amazonvpc" 
+	id2="amazonvpc" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',param_starttime)&gt;&lt;@endtime:*EVNTTIME($MSG,'%X',param_endtime)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;&lt;param_starttime&gt;&lt;param_endtime&gt;" />
+	
+<MESSAGE 
+	id1="azuremonitor" 
+	id2="azuremonitor" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="gsuite" 
+	id2="gsuite" 
+	eventcategory="1612000000"
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+	
+<MESSAGE 
+	id1="ciscoumbrella" 
+	id2="ciscoumbrella" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %H:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+	
+<MESSAGE 
+	id1="aws_cloudwatch" 
+	id2="aws_cloudwatch" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+	
+<MESSAGE
+	id1="ciscoamp" 
+	id2="ciscoamp" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',param_starttime)&gt;&lt;@dclass_counter1_string:scan.malicious_detections&gt;"
+	content="&lt;param_event_time&gt;&lt;param_starttime&gt;&lt;msghold&gt;" />	
+
+	
+<MESSAGE 
+	id1="msata" 
+	id2="msata" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@starttime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_starttime)&gt;&lt;@dclass_counter1_string:count of the number of times the alert happened&gt;"
+	content="&lt;param_starttime&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="rsa_netwitness_audit" 
+	id2="rsa_netwitness_audit" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %N:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+<MESSAGE 
+	id1="enforcive_escpa" 
+	id2="enforcive_escpa" 
+	eventcategory="1901000000" 
+	functions="&lt;@event_name:*HDR(event_description)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %N:%U:%O',param_event_time)&gt;&lt;@endtime:*EVNTTIME($MSG,'%W-%G-%F-%H.%T.%O',param_endtime)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_endtime&gt;&lt;msghold&gt;" />
+
+<MESSAGE
+	id1="symantecatp" 
+	id2="symantecatp" 
+	eventcategory="1001030000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%H:%U:%O',param_event_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;msghold&gt;" />	
+
+<MESSAGE
+	id1="fsecure_client_security" 
+	id2="fsecure_client_security" 
+	eventcategory="1001030000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;"
+	content="&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="msazuregraph_security" 
+	id2="msazuregraph_security" 
+	eventcategory="1609000000" 
+	functions="&lt;@event_name:*HDR(hevent_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_starttime)&gt;&lt;@endtime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_endtime)&gt;&lt;@effective_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_effective_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_starttime&gt;&lt;param_endtime&gt;&lt;param_effective_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE 
+	id1="citrixns" 
+	id2="citrixns" 
+	eventcategory="1801000000" 
+	functions="&lt;@event_name:*HDR(hevent_description)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_event_time)&gt;&lt;@starttime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_starttime)&gt;&lt;@endtime:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_endtime)&gt;&lt;@effective_time:*EVNTTIME($MSG,'%W-%G-%FT%Z',param_effective_time)&gt;"
+	content="&lt;param_event_time&gt;&lt;param_starttime&gt;&lt;param_endtime&gt;&lt;param_effective_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE
+	id1="qualysvmhosts" 
+	id2="qualysvmhosts" 
+	eventcategory="1612000000"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;"
+	content="&lt;msghold&gt;" />	
+
+<MESSAGE
+        id1="nginx"
+        id2="nginx"
+        eventcategory="1901000000"
+        functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%FT%H:%U:%O',param_event_time)&gt;"
+        content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<MESSAGE
+        id1="forcepoint_email_security"
+        id2="forcepoint_email_security"
+        eventcategory="1901000000"
+        functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,'%X',param_event_time)&gt;"
+        content="&lt;param_event_time&gt;&lt;msghold&gt;" />
+
+<VendorProducts>
+	<Vendor2Device vendor="RSA" product="Security Analytics NetFlow Collector" device="rsaflow" group="Switch"/>
+	<Vendor2Device vendor="RSA" product="NetWitness NetFlow Collector" device="rsaflow" group="Switch"/>
+	<Vendor2Device vendor="RSA" product="RSA ECAT" device="rsaecat" group="Anti Virus"/>
+	<Vendor2Device vendor="EMC" product="ECAT ConsoleServer" device="rsaecat" group="Anti Virus"/>
+	<Vendor2Device vendor="NetWitness" product="Spectrum" device="netwitnessspectrum" group="Anti Virus"/>
+	<Vendor2Device vendor="RSA" product="Security Analytics" device="securityanalytics" group="Analysis"/>
+	<Vendor2Device vendor="RSA" product="Security Analytics Malware" device="netwitnessspectrum" group="Anti Virus"/>
+	<Vendor2Device vendor="Trend Micro" product="Deep Security Manager" device="trendmicrods" group="Application Firewall"/>
+	<Vendor2Device vendor="Trend Micro" product="Deep Security Agent" device="trendmicrodsa" group="Application Firewall"/>
+	<Vendor2Device vendor="Bit9" product="Parity" device="bit9" group="Application Firewall"/>
+	<Vendor2Device vendor="Bit9" product="Security Platform" device="bit9" group="Application Firewall"/>
+	<Vendor2Device vendor="BCN" product="Adonis" device="bluecat" group="System"/>
+	<Vendor2Device vendor="Websense" product="Security" device="websense" group="Web Logs"/>
+	<Vendor2Device vendor="Forcepoint" product="Security" device="websense" group="Web Logs"/>
+	<Vendor2Device vendor="FORCEPOINT" product="Firewall" device="forcepoint_firewall" group="Web Logs"/>
+	<Vendor2Device vendor="Websense" product="Data Security" device="websenseds" group="DLP"/>
+	<Vendor2Device vendor="McAfee" product="Web Gateway" device="mcafeewg" group="Web Logs"/>
+	<Vendor2Device vendor="RSA" product="Security Analytics Audit" device="securityanalytics" group="Analysis"/>
+	<Vendor2Device vendor="RSA" product="NetWitness CloudTrail Log Collector" device="awscloudtrail" group="Cloud"/>
+	<Vendor2Device vendor="RSA" product="NetWitness Azure Audit Log Collector" device="azureaudit" group="Cloud"/> 
+	<Vendor2Device vendor="RSA" product="NetWitness Azure AD Signin Log Collector" device="azure_ad_signin" group="Cloud"/> 
+    <Vendor2Device vendor="RSA" product="NetWitness Azure AD Audit Log Collector" device="azure_ad_audit" group="Cloud"/> 
+    <Vendor2Device vendor="McAfee" product="iGuard" device="mcafeereconnex" group="DLP"/>
+	<Vendor2Device vendor="Microsoft" product="Office365" device="msoffice365" group="Cloud"/>
+	<Vendor2Device vendor="Salesforce" product="CRM" device="salesforce" group="Cloud"/>
+	<Vendor2Device vendor="Trend Micro" product="Control Manager" device="trendmicrocm" group="Anti Virus"/>
+	<Vendor2Device vendor="Akamai" product="akamai_siem" device="akamaikona" group="Application Firewall"/>
+	<Vendor2Device vendor="Imperva Inc." product="SecureSphere" device="impervawaf" group="Application Firewall"/>
+	<Vendor2Device vendor="IBM" product="Guardium" device="guardium" group="Firewall"/>
+	<Vendor2Device vendor="Microsoft" product="Azure NSG" device="msazurensg" group="Cloud"/>
+    <Vendor2Device vendor="VMware" product="App Defense" device="vmwareappdefense" group="Cloud"/>
+	<Vendor2Device vendor="Dropbox" product="Dropbox Business" device="dropbox" group="Cloud"/>
+	<Vendor2Device vendor="Amazon" product="GuardDuty" device="amazonguardduty" group="Cloud"/>
+	<Vendor2Device vendor="Check Point" product="SmartDefense" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Anti Malware" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="URL Filtering" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="New Anti Virus" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Application Control" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="VPN-1 &amp; FireWall-1" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Log Update" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Syslog" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Anti Virus" device="checkpointfw1" group="Firewall"/>
+    <Vendor2Device vendor="Check Point" product="Connectra" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Linux OS" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Security Gateway/Management" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="SmartConsole" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="Threat Emulation" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="WEB_API" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="CPMI Client" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="ESOD" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="SmartView" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Check Point" product="System Monitor" device="checkpointfw1" group="Firewall"/>
+	<Vendor2Device vendor="Google" product="Cloud Platform" device="googlecloud" group="Cloud"/>
+	<Vendor2Device vendor="netskope" product="Netskope Cloud Security Platform" device="NetskopeCloudSecurityPlatform" group="Cloud"/>
+	<Vendor2Device vendor="RSA" product="RSA SecurID Access" device="rsasecuridaccess" group="Cloud"/>
+    <Vendor2Device vendor="RSA" product="rsa_netwitness_for_malware_audit_logging" device="rsa_netwitness_malware" group="Anti Virus"/>
+	<Vendor2Device vendor="RSA" product="Netwitness for Malware Audit logging" device="rsa_netwitness_malware" group="Anti Virus"/>
+	<Vendor2Device vendor="RSA" product="NetWitness Audit" device="rsa_netwitness_audit" group="Analysis"/>
+	<Vendor2Device vendor="Amazon" product="Amazon vpc" device="amazonvpc" group="Cloud"/>
+	<Vendor2Device vendor="Microsoft" product="Azure Monitor" device="azuremonitor" group="Cloud"/>
+    <Vendor2Device vendor="Cisco" product="Cisco Umbrella" device="ciscoumbrella" group="Cloud"/>
+	<Vendor2Device vendor="AWS" product="CloudWatch" device="aws_cloudwatch" group="Cloud"/>
+	<Vendor2Device vendor="Google" product="Gsuite" device="gsuite" group="Cloud"/>
+    <Vendor2Device vendor="Cisco" product="Cisco AMP" device="ciscoamp" group="Cloud"/>
+	<Vendor2Device vendor="Microsoft" product="ATA" device="msata" group="IDS"/>
+	<Vendor2Device vendor="Enforcive" product="ES CPA" device="enforcive_escpa" group="Analysis"/>
+    <Vendor2Device vendor="Symantec" product="SEDR" device="symantecatp" group="Anti Virus"/>
+	<Vendor2Device vendor="Symantec" product="ATPU" device="symantecatp" group="Anti Virus"/>
+	<Vendor2Device vendor="F-Secure" product="F-Secure Client Security Premium" device="fsecure_client_security" group="Anti Virus"/>
+	<Vendor2Device vendor="Microsoft" product="Graph Security API" device="msazuregraph_security" group="Cloud"/>
+	<Vendor2Device vendor="Citrix" product="NetScaler" device="citrixns" group="Application Firewall"/>
+	<Vendor2Device vendor="Qualys" product="VM Host Detection" device="qualysvmhosts" group="Cloud"/>
+	<Vendor2Device vendor="Elasticsearch" product="NGINX" device="nginx" group="Web Logs"/>
+	<Vendor2Device vendor="Forcepoint" product="Email Security" device="forcepoint_email_security" group="Anti Virus"/>
+
+
+</VendorProducts>
+
+
+<ExtensionKeys>
+		<ExtensionKey cefName="act" metaName="action"/>
+		<ExtensionKey cefName="app" metaName="application"/>
+		<ExtensionKey cefName="cat" metaName="category"/>
+		<ExtensionKey cefName="cnt" metaName="event_counter">
+			<device2meta device="trendmicrodsa" metaName="dclass_counter1"/>
+			<device2meta device="msata" metaName="dclass_counter1"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cntLabel" metaName="cs_fld" />
+		<ExtensionKey cefName="Culture" metaName="cs_fld"/>
+		<ExtensionKey cefName="destinationDnsDomain" metaName="ddomain"/>
+		<ExtensionKey cefName="destinationServiceName" metaName="service"/>
+		<ExtensionKey cefName="destinationTranslatedAddress" metaName="dtransaddr"/>
+		<ExtensionKey cefName="destinationTranslatedPort" metaName="dtransport"/>
+		<ExtensionKey cefName="deviceCustomDate1" metaName="cs_customdate"/>
+		<ExtensionKey cefName="deviceCustomDate2" metaName="cs_customdate"/>
+		<ExtensionKey cefName="deviceDirection" metaName="direction">
+			<device2meta device="rsaflow" metaName="param_direction"/>
+			<device2meta device="msazurensg" metaName="cs_fld"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="deviceDnsDomain" metaName="domain"/>
+		<ExtensionKey cefName="deviceExternalId" metaName="hardware_id"/>
+		<ExtensionKey cefName="deviceFacility" metaName="cs_devfacility">
+			<device2meta device="websense" metaName="policyname"/>
+			<device2meta device="forcepoint_firewall" metaName="policyname"/>
+			<device2meta device="forcepoint_email_security" metaName="policyname"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="deviceInboundInterface" metaName="sinterface"/>
+		<ExtensionKey cefName="deviceMacAddress" metaName="macaddr"/>
+		<ExtensionKey cefName="dvcmac" metaName="macaddr"/>
+		<ExtensionKey cefName="deviceNtDomain" metaName="domain"/>
+		<ExtensionKey cefName="deviceOutboundInterface" metaName="dinterface"/>
+		<ExtensionKey cefName="devicePayloadId" metaName="cs_fld"/>
+		<ExtensionKey cefName="deviceProcessName" metaName="process">
+			<device2meta device="forcepoint_email_security" metaName="rulename"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="deviceTranslatedAddress" metaName="hostip"/>
+		<ExtensionKey cefName="dhost" metaName="dhost"/>
+		<ExtensionKey cefName="dmac" metaName="dmacaddr"/>
+		<ExtensionKey cefName="dntdom" metaName="ddomain"/>
+		<ExtensionKey cefName="dpid" metaName="cs_fld"/>
+		<ExtensionKey cefName="dpriv" metaName="privilege"/>
+		<ExtensionKey cefName="dproc" metaName="process"/>
+		<ExtensionKey cefName="dpt" metaName="dport"/>
+		<ExtensionKey cefName="dst" metaName="daddr"/>
+		<ExtensionKey cefName="duid" metaName="uid"/>
+		<ExtensionKey cefName="duser" metaName="username"/>
+		<ExtensionKey cefName="dvc" metaName="hostip"/>
+		<ExtensionKey cefName="dvcpid" metaName="process_id"/>
+		<ExtensionKey cefName="dvchost" metaName="hostname"/>
+		<ExtensionKey cefName="dtz" metaName="cs_fld"/>		
+		<ExtensionKey cefName="end" metaName="param_endtime"/>
+		<ExtensionKey cefName="externalId" metaName="hardware_id">
+			<device2meta device="msata" metaName="id"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="fileCreateTime" metaName="cs_filectime"/>
+		<ExtensionKey cefName="fileHash" metaName="checksum"/>
+		<ExtensionKey cefName="fileId" metaName="cs_fileid"/>
+		<ExtensionKey cefName="fileModificationTime" metaName="cs_filemtime"/>
+		<ExtensionKey cefName="filePath" metaName="directory">
+			<device2meta device="trendmicrodsa" metaName="filename"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="filePermission" metaName="cs_fileperm"/>
+		<ExtensionKey cefName="fileType" metaName="filetype"/>
+		<ExtensionKey cefName="fname" metaName="filename">
+			<device2meta device="trendmicrodsa" metaName="obj_name"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="fsize" metaName="filename_size"/>
+		<ExtensionKey cefName="in" metaName="rbytes"/>
+		<ExtensionKey cefName="msg" metaName="msg">
+			<device2meta device="trendmicrodsa" metaName="info"/>
+			<device2meta device="msata" metaName="info"/>
+			<device2meta device="checkpointfw1" metaName="info"/>
+			<device2meta device="enforcive_escpa" metaName="info"/>
+			<device2meta device="websense" metaName="info"/>
+			<device2meta device="fsecure_client_security" metaName="info"/>	
+			<device2meta device="forcepoint_firewall" metaName="info"/>
+			<device2meta device="citrixns" metaName="info"/>
+			<device2meta device="forcepoint_email_security" metaName="subject"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="oldFileCreateTime" metaName="cs_oldfilectime"/>
+		<ExtensionKey cefName="oldFileHash" metaName="cs_oldfilehash"/>
+		<ExtensionKey cefName="oldFileId" metaName="cn_oldfileid"/>
+		<ExtensionKey cefName="oldFileModificationTime" metaName="cs_oldfilemtime"/>
+		<ExtensionKey cefName="oldFileName" metaName="cs_oldfilename"/>
+		<ExtensionKey cefName="oldFilePath" metaName="cs_oldfilepath">
+			<device2meta device="trendmicrodsa" metaName="change_old"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="oldFilePermission" metaName="cs_oldfileperm"/>
+		<ExtensionKey cefName="oldFileSize" metaName="cn_oldfilesize"/>
+		<ExtensionKey cefName="oldFileType" metaName="cs_oldfiletype"/>
+		<ExtensionKey cefName="out" metaName="sbytes"/>
+		<ExtensionKey cefName="outcome" metaName="result">
+			<device2meta device="msoffice365" metaName="disposition"/>
+			<device2meta device="msata" metaName="disposition"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="proto" metaName="protocol">
+			<device2meta device="rsaflow" metaName="ip_proto"/>
+			<device2meta device="checkpointfw1" metaName="ip_proto"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="PublicKeyToken" metaName="cs_fld"/>
+		<ExtensionKey cefName="request" metaName="url"/>
+		<ExtensionKey cefName="requestClientApplication" metaName="user_agent"/>
+		<ExtensionKey cefName="requestCookies" metaName="cs_reqcookies"/>
+		<ExtensionKey cefName="requestMethod" metaName="web_method"/>
+		<ExtensionKey cefName="rt" metaName="param_event_time"/>		
+		<ExtensionKey cefName="shost" metaName="shost"/>		
+		<ExtensionKey cefName="smac" metaName="smacaddr"/>
+		<ExtensionKey cefName="sntdom" metaName="sdomain"/>
+		<ExtensionKey cefName="sourceDnsDomain" metaName="sdomain"/>
+		<ExtensionKey cefName="sourceServiceName" metaName="service"/>
+		<ExtensionKey cefName="sourceTranslatedAddress" metaName="stransaddr"/>
+		<ExtensionKey cefName="sourceTranslatedPort" metaName="stransport"/>
+		<ExtensionKey cefName="spid" metaName="process_id_src"/>
+		<ExtensionKey cefName="sproc" metaName="process_src"/>
+		<ExtensionKey cefName="spriv" metaName="privilege"/>
+		<ExtensionKey cefName="spt" metaName="sport"/>
+		<ExtensionKey cefName="src" metaName="saddr"/>
+		<ExtensionKey cefName="start" metaName="param_starttime"/>
+		<ExtensionKey cefName="suid" metaName="uid"/>
+		<ExtensionKey cefName="suser" metaName="c_username">
+			<device2meta device="trendmicrodsa" metaName="username"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="requestContext" metaName="context"/>
+		<ExtensionKey cefName="type" metaName="cs_fld">
+		    <device2meta device="NetskopeCloudSecurityPlatform" metaName="event_type"/>
+		</ExtensionKey>	
+		
+
+		
+		<ExtensionKey cefName="source" metaName="cs_fld"/>
+		<ExtensionKey cefName="substatus" metaName="result"/>
+		<ExtensionKey cefName="uristem" metaName="webpage"/>
+		<ExtensionKey cefName="ClientIp" metaName="saddr"/>
+		<ExtensionKey cefName="timetaken" metaName="cs_fld"/>
+		<ExtensionKey cefName="uriquery" metaName="cs_fld"/>
+		<ExtensionKey cefName="win32status" metaName="disposition"/>
+		<ExtensionKey cefName="UserAgent" metaName="user_agent"/>
+		<ExtensionKey cefName="serverIp" metaName="daddr"/>
+		
+
+		<ExtensionKey cefName="domain" metaName="domain"/>
+		<ExtensionKey cefName="event.desc" metaName="event_description"/>
+		<ExtensionKey cefName="ec.activity" metaName="ec_activity"/>
+		<ExtensionKey cefName="ec.outcome" metaName="ec_outcome"/>
+		<ExtensionKey cefName="ec.subject" metaName="ec_subject"/>
+		<ExtensionKey cefName="ec.theme" metaName="ec_theme"/>
+		<ExtensionKey cefName="esa.time" metaName="cs_fld"/>
+		<ExtensionKey cefName="event.cat" metaName="event_cat"/>
+		<ExtensionKey cefName="event.cat.name" metaName="event_cat_name"/>
+		<ExtensionKey cefName="event.computer" metaName="event_computer"/>
+		<ExtensionKey cefName="event.log" metaName="event_log"/>
+		<ExtensionKey cefName="event.source.id" metaName="cs_fld"/>
+		<ExtensionKey cefName="event.time" metaName="cs_fld"/>
+		<ExtensionKey cefName="forward.ip" metaName="cs_fld"/>
+		<ExtensionKey cefName="header.id" metaName="cs_fld"/>
+		<ExtensionKey cefName="inv.category" metaName="inv.category"/>
+		<ExtensionKey cefName="inv.context" metaName="inv.context"/>
+		<ExtensionKey cefName="lc.cid" metaName="cs_fld"/>
+		<ExtensionKey cefName="log.session.id" metaName="sessionid"/>
+		<ExtensionKey cefName="msg.id" metaName="id1"/>
+		<ExtensionKey cefName="msg.vid" metaName="cs_fld"/>
+		<ExtensionKey cefName="privilege" metaName="privilege"/>
+		<ExtensionKey cefName="reference.id" metaName="id"/>
+		<ExtensionKey cefName="sdomain" metaName="sdomain"/>
+		<ExtensionKey cefName="user.dst" metaName="username"/>
+		<ExtensionKey cefName="user.sid.dst" metaName="sid"/>
+		<ExtensionKey cefName="user.src" metaName="c_username"/>		
+		
+
+		
+		<ExtensionKey cefName="loginID" metaName="username"/>
+		<ExtensionKey cefName="requestURL" metaName="url"/>
+		
+
+		
+		<ExtensionKey cefName="spfResult" metaName="event_state"/>
+
+		<ExtensionKey cefName="domainTreePath" metaName="directory"/>
+
+		<ExtensionKey cefName="ifname" metaName="interface"/>
+		<ExtensionKey cefName="loguid" metaName="cs_fld"/>
+		<ExtensionKey cefName="origin" metaName="orig_ip"/>
+		<ExtensionKey cefName="chassis_bladed_system" metaName="cs_fld"/>
+		<ExtensionKey cefName="version" metaName="version"/>
+		<ExtensionKey cefName="inzone" metaName="src_zone"/>
+		<ExtensionKey cefName="outzone" metaName="dst_zone"/>
+		<ExtensionKey cefName="rule" metaName="rule"/>
+		<ExtensionKey cefName="rule_uid" metaName="rule_uid"/>
+		<ExtensionKey cefName="cp_severity" metaName="severity"/>
+		<ExtensionKey cefName="session_id" metaName="sessionid"/>
+		<ExtensionKey cefName="bytes" metaName="bytes"/>
+		<ExtensionKey cefName="referrer_self_uid" metaName="cs_fld"/>
+		<ExtensionKey cefName="app_id" metaName="cs_fld"/>
+		<ExtensionKey cefName="app_desc" metaName="info"/>
+		<ExtensionKey cefName="browse_time" metaName="cs_fld"/>
+		<ExtensionKey cefName="log_id" metaName="id"/>
+		<ExtensionKey cefName="flexNumber1" metaName="reputation_num"/>
+		<ExtensionKey cefName="flexNumber1Label" metaName="cs_fld"/>
+		<ExtensionKey cefName="flexNumber2" metaName="cn_fld"/>
+		<ExtensionKey cefName="flexNumber2Label" metaName="cs_fld"/>
+		<ExtensionKey cefName="sequencenum" metaName="cs_fld"/>
+		<ExtensionKey cefName="default_device_message" metaName="info"/>
+		<ExtensionKey cefName="facility" metaName="cs_fld"/>
+		<ExtensionKey cefName="syslog_severity" metaName="severity"/>
+		<ExtensionKey cefName="originsicname" metaName="cs_fld"/>
+		<ExtensionKey cefName="client_build" metaName="cs_fld"/>
+		<ExtensionKey cefName="cvpn_category" metaName="category"/>
+		<ExtensionKey cefName="device_identification" metaName="cs_fld"/>
+		<ExtensionKey cefName="product_category" metaName="category"/>
+		<ExtensionKey cefName="update_service" metaName="cs_fld"/>
+		<ExtensionKey cefName="administrator" metaName="user"/>
+		<ExtensionKey cefName="machine" metaName="hostname"/>
+		<ExtensionKey cefName="additional_info" metaName="context"/>
+		<ExtensionKey cefName="operation_number" metaName="operation_id"/>
+		<ExtensionKey cefName="control_log_type" metaName="cs_fld"/>
+		<ExtensionKey cefName="logid" metaName="id1"/>
+		<ExtensionKey cefName="cu_detected_by" metaName="dhost"/>
+		<ExtensionKey cefName="cu_detection_time" metaName="cs_fld"/>
+		<ExtensionKey cefName="cu_log_count" metaName="cs_fld"/>
+		<ExtensionKey cefName="cu_rule_category" metaName="rule_group"/>
+		<ExtensionKey cefName="cu_rule_id" metaName="rule_uid"/>
+		<ExtensionKey cefName="event_name" metaName="event_description"/>
+		<ExtensionKey cefName="event_start_time" metaName="param_starttime"/>
+		<ExtensionKey cefName="hostname" metaName="shost"/>
+		<ExtensionKey cefName="is_correlated" metaName="cs_fld"/>
+		<ExtensionKey cefName="is_last" metaName="cs_fld"/>
+		<ExtensionKey cefName="max_num_count_detected" metaName="cs_fld"/>
+		<ExtensionKey cefName="num_of_updates" metaName="dclass_counter1"/>
+		<ExtensionKey cefName="origin_repetitions" metaName="cs_fld"/>
+		<ExtensionKey cefName="source_repetitions" metaName="cs_fld"/>
+		<ExtensionKey cefName="users_repetitions" metaName="cs_fld"/>
+		<ExtensionKey cefName="time_interval" metaName="duration_string"/>
+		<ExtensionKey cefName="subject" metaName="info"/>
+		<ExtensionKey cefName="sys_message:" metaName="info"/>
+		<ExtensionKey cefName="deviceCustomDate2Label" metaName="cs_label"/>
+		<ExtensionKey cefName="update_src" metaName="cs_fld"/>
+		<ExtensionKey cefName="sensor_alert_blade" metaName="cs_fld"/>
+		<ExtensionKey cefName="sensor_alert_category" metaName="category"/>
+		<ExtensionKey cefName="sensor_alert_duration" metaName="duration_string"/>
+		<ExtensionKey cefName="sensor_alert_id" metaName="cs_fld"/>
+		<ExtensionKey cefName="sensor_alert_source" metaName="event_source"/>
+		<ExtensionKey cefName="sensor_alert_message" metaName="context"/>
+		<ExtensionKey cefName="sensor_alert_module" metaName="process"/>
+		<ExtensionKey cefName="sensor_alert_title" metaName="info"/>
+		<ExtensionKey cefName="sensor_alert_type" metaName="event_type"/>
+		<ExtensionKey cefName="sensor_test_name" metaName="cs_fld"/>
+
+		
+
+		
+		<ExtensionKey cefName="SQLID" metaName="cs_fld"/>
+		<ExtensionKey cefName="PROG" metaName="info"/>
+		<ExtensionKey cefName="DB_NAME" metaName="db_name"/>
+	
+
+		<ExtensionKey cefName="deviceService" metaName="cs_devservice"/>
+		<ExtensionKey cefName="operation" metaName="cs_operation">
+			<device2meta device="checkpointfw1" metaName="action"/>		
+		</ExtensionKey>
+		<ExtensionKey cefName="parameters" metaName="info"/>
+		<ExtensionKey cefName="paramKey" metaName="cs_paramkey">
+				<device2meta device="rsa_netwitness_audit" metaName="obj_name"/>		
+		</ExtensionKey>
+		<ExtensionKey cefName="paramValue" metaName="cs_paramvalue"/>
+		<ExtensionKey cefName="userGroup" metaName="group"/>
+		<ExtensionKey cefName="referrerURL" metaName="url">
+				<device2meta device="rsa_netwitness_audit" metaName="referer"/>
+		</ExtensionKey>		
+		<ExtensionKey cefName="sessionId" metaName="sessionid"/>
+
+	
+		<ExtensionKey cefName="username" metaName="username"/>
+		<ExtensionKey cefName="recepientaccountid" metaName="id2"/>	
+		<ExtensionKey cefName="eventsource" metaName="event_source"/>
+		<ExtensionKey cefName="eventid" metaName="id"/>
+		<ExtensionKey cefName="eventversion" metaName="cn_eventver"/>
+		<ExtensionKey cefName="awsregion" metaName="group"/>
+		<ExtensionKey cefName="principalid" metaName="uid"/>
+		<ExtensionKey cefName="accesskeyid" metaName="cs_accesskeyid"/>
+		<ExtensionKey cefName="accountid" metaName="id1"/>
+		<ExtensionKey cefName="identitytype" metaName="user_role"/>
+		<ExtensionKey cefName="identityarn" metaName="cs_identityarn"/>
+		<ExtensionKey cefName="transactiontype" metaName="cs_transaction"/>	
+		<ExtensionKey cefName="req.instanceid" metaName="agent.id"/>
+		<ExtensionKey cefName="requestid" metaName="cs_reqid">
+			<device2meta device="salesforce" metaName="trans_id"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="errorcode" metaName="resultcode"/>
+		<ExtensionKey cefName="resource" metaName="directory"/>
+		<ExtensionKey cefName="requestParameters.instancesSet.items.instanceId" metaName="agent.id"/>
+		<ExtensionKey cefName="responseElements.instancesSet.items.instanceId" metaName="agent.id"/>
+		<ExtensionKey cefName="userIdentity.sessionContext.sessionIssuer.userName" metaName="username"/>
+		<ExtensionKey cefName="nw.dstip" metaName="daddr"/>
+		<ExtensionKey cefName="requestParameters.computerName" metaName="hostname"/>
+		<ExtensionKey cefName="eventname" metaName="event_description"/>
+		<ExtensionKey cefName="nw.computername" metaName="hostname"/>
+		<ExtensionKey cefName="nw.instanceid" metaName="agent.id"/>
+		<ExtensionKey cefName="responseElements.requestId" metaName="cs_fld"/>
+		<ExtensionKey cefName="responseElements.keyName" metaName="cs_fld"/>
+		<ExtensionKey cefName="responseElements.keyFingerPrint" metaName="cs_fld"/>
+		<ExtensionKey cefName="responseElements.keyMaterial" metaName="cs_fld"/>
+		<ExtensionKey cefName="responseElements._return" metaName="cs_fld"/>
+		<ExtensionKey cefName="responseElements.groupId" metaName="groupid"/>
+		<ExtensionKey cefName="requestParameters.networkAclId" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.ruleNumber" metaName="rule"/>
+		<ExtensionKey cefName="requestParameters.egress" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.ruleAction" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.icmpTypeCode" metaName="icmpcode"/>
+		<ExtensionKey cefName="requestParameters.portRange.from" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.portRange.to" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.aclProtocol" metaName="ip_proto"/>
+		<ExtensionKey cefName="requestParameters.cidrBlock" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.groupId" metaName="groupid"/>
+		<ExtensionKey cefName="requestParameters.ipPermissions.items.ipProtocol" metaName="ip_proto"/>
+		<ExtensionKey cefName="requestParameters.ipPermissions.items.groups.items.groupId" metaName="groupid"/>
+		<ExtensionKey cefName="requestParameters.ipPermissions.items.ipRanges.items.cidrIp" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.ipPermissions.items.groups.items.description" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.ipPermissions.items.fromPort" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.ipPermissions.items.toPort" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.groupName" metaName="group"/>
+		<ExtensionKey cefName="requestParameters.groupDescription" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.vpcId" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestParameters.keyName" metaName="cs_fld"/>
+
+
+	
+		
+		<ExtensionKey cefName="port" metaName="dport"/>
+		<ExtensionKey cefName="remoteip" metaName="stransaddr"/>
+		<ExtensionKey cefName="totalsent" metaName="sbytes"/>
+		<ExtensionKey cefName="agentid" metaName="agent"/>
+		<ExtensionKey cefName="gatewayip" metaName="gateway"/>
+		<ExtensionKey cefName="instantIOCLevel" metaName="threat_val"/>
+		<ExtensionKey cefName="instantIOCName" metaName="threat_name"/>
+		<ExtensionKey cefName="machineOU" metaName="dn"/>
+		<ExtensionKey cefName="machineScore" metaName="risk_num"/>
+		<ExtensionKey cefName="md5sum" metaName="checksum"/>
+		<ExtensionKey cefName="os" metaName="os"/>
+		<ExtensionKey cefName="protocol" metaName="protocol"/>
+		<ExtensionKey cefName="sha256sum" metaName="checksum"/>
+		<ExtensionKey cefName="totalreceived" metaName="rbytes"/>
+		<ExtensionKey cefName="useragent" metaName="user_agent"/>
+		<ExtensionKey cefName="userOU" metaName="user_org"/>
+		<ExtensionKey cefName="timezone" metaName="timezone"/>
+		
+	
+			
+		<ExtensionKey cefName="Bit9Status" metaName="cs_bit9status"/>
+		<ExtensionKey cefName="YARAResult" metaName="cs_yararesult"/>
+		<ExtensionKey cefName="sourceModule" metaName="cs_sourcemodule"/>
+		<ExtensionKey cefName="targetModule" metaName="cs_targetmodule"/>
+		<ExtensionKey cefName="moduleScore" metaName="cs_modulescore"/>
+		<ExtensionKey cefName="moduleSignature" metaName="cs_modulesign"/>
+		<ExtensionKey cefName="OPSWATResult" metaName="cs_opswatresult"/>
+		<ExtensionKey cefName="ReputationResult" metaName="cs_represult"/>
+		
+
+	
+	
+	
+		<ExtensionKey cefName="Ipv6SrcMask" metaName="smask"/>
+		<ExtensionKey cefName="Ipv6DstMask" metaName="dmask"/>
+		<ExtensionKey cefName="SrcMask" metaName="smask"/>
+		<ExtensionKey cefName="DstMask" metaName="dmask"/>
+		<ExtensionKey cefName="IcmpType" metaName="icmptype"/>
+		<ExtensionKey cefName="OctetsInFlow" metaName="bytes"/>
+		<ExtensionKey cefName="Version" metaName="version"/>
+		<ExtensionKey cefName="InputSnmp" metaName="dinterface"/>
+		<ExtensionKey cefName="OutputSnmp" metaName="sinterface"/>
+		<ExtensionKey cefName="TcpFlags" metaName="tcp_flags"/>
+	
+		
+		<ExtensionKey cefName="Invalid" metaName="cn_invalid"/>
+		<ExtensionKey cefName="InPackets" metaName="cn_rpackets"/>
+		<ExtensionKey cefName="Ipv4NextHop" metaName="cs_ip_next_hop"/>
+		<ExtensionKey cefName="SrcAs" metaName="cn_asn_src"/>
+		<ExtensionKey cefName="DstAs" metaName="cn_asn_dst"/>
+		<ExtensionKey cefName="BgpIpv4NextHop" metaName="cn_bgpv4nxthop"/>
+		<ExtensionKey cefName="MulDstPkts" metaName="cn_mul_dst_pks"/>
+		<ExtensionKey cefName="MulDstBytes" metaName="cn_mul_dst_byt"/>
+		<ExtensionKey cefName="FirstSwitched" metaName="cn_f_switch"/>
+		<ExtensionKey cefName="LastSwitched" metaName="cn_l_switch"/>
+		<ExtensionKey cefName="Ipv6FlowLabel" metaName="cn_v6flowlabel"/>
+		<ExtensionKey cefName="MinPacketLen" metaName="cn_minpcktlen"/>
+		<ExtensionKey cefName="MaxPacketLen" metaName="cn_maxpcktlen"/>
+		<ExtensionKey cefName="MulIgmpType" metaName="cn_muligmptype"/>
+		<ExtensionKey cefName="SamplingInterval" metaName="cn_sampint"/>
+		<ExtensionKey cefName="SamplingAlgorithm" metaName="cn_sampalgo"/>
+		<ExtensionKey cefName="FlowActiveTimeout" metaName="cn_acttimeout"/>
+		<ExtensionKey cefName="FlowInactiveTimeout" metaName="cn_inacttimeout"/>
+		<ExtensionKey cefName="EngineType" metaName="cn_engine_type"/>
+		<ExtensionKey cefName="EngineId" metaName="cn_engine_id"/>
+		<ExtensionKey cefName="TotalBytesExp" metaName="cn_totbytsexp"/>
+		<ExtensionKey cefName="TotalPacketsExp" metaName="cn_totpcktsexp"/>
+		<ExtensionKey cefName="TotalFlowsExp" metaName="cn_totflowexp"/>
+		<ExtensionKey cefName="Ipv4SrcPrefix" metaName="cs_ipv4srcpre"/>
+		<ExtensionKey cefName="Ipv4DstPrefix" metaName="cs_ipv4dstpre"/>
+		<ExtensionKey cefName="MplsTopLabelType" metaName="cn_mplstoplabel"/>
+		<ExtensionKey cefName="MplsTopLabelIpAddr" metaName="cn_mplstoplabip"/>
+		<ExtensionKey cefName="FlowSamplerId" metaName="cn_flowsampid"/>
+		<ExtensionKey cefName="FlowSamplerMode" metaName="cn_flowsampmode"/>
+		<ExtensionKey cefName="FlowSamplerRandIntv" metaName="cn_flowsampintv"/>
+		<ExtensionKey cefName="MinTtl" metaName="cn_min_ttl"/>
+		<ExtensionKey cefName="MaxTtl" metaName="cn_max_ttl"/>
+		<ExtensionKey cefName="Ipv4Ident" metaName="cn_ipv4_ident"/>
+		<ExtensionKey cefName="IpProtoVersion" metaName="cn_ip_proto_ver"/>
+		<ExtensionKey cefName="Ipv6NextHop" metaName="cs_v6nxthop"/>
+		<ExtensionKey cefName="BgpIpv6NextHop" metaName="cs_bgpv6nxthop"/>
+		<ExtensionKey cefName="Ipv6OptionHeaders" metaName="cn_v6optheaders"/>
+		<ExtensionKey cefName="IfDesc" metaName="cs_if_desc"/>
+		<ExtensionKey cefName="SamplerName" metaName="cs_sampler_name"/>
+		<ExtensionKey cefName="InPermBytes" metaName="cn_inpermbyts"/>
+		<ExtensionKey cefName="InPermPackets" metaName="cn_inpermpckts"/>
+		<ExtensionKey cefName="UnixNSeconds" metaName="cn_unixnanosecs"/>
+		<ExtensionKey cefName="SequenceCounter" metaName="cn_seqctr"/>
+		<ExtensionKey cefName="SystemUpTime" metaName="cn_sysuptime"/>
+		<ExtensionKey cefName="TemplateId" metaName="cn_template_id"/>
+		<ExtensionKey cefName="OutPackets" metaName="cn_spackets"/>
+		<ExtensionKey cefName="DstTos" metaName="cn_dst_tos"/>
+		<ExtensionKey cefName="SrcTos" metaName="cn_src_tos"/>
+		<ExtensionKey cefName="PacketsInFlow" metaName="packets"/>
+		<ExtensionKey cefName="SrcVlan" metaName="cn_src_vlan"/>
+		<ExtensionKey cefName="DstVlan" metaName="cn_dst_vlan"/>
+		<ExtensionKey cefName="IfName" metaName="cs_if_name"/>
+		<ExtensionKey cefName="MplsLabel1" metaName="cn_mpls_lbl_1"/>
+		<ExtensionKey cefName="MplsLabel2" metaName="cn_mpls_lbl_2"/>
+		<ExtensionKey cefName="MplsLabel3" metaName="cn_mpls_lbl_3"/>
+		<ExtensionKey cefName="MplsLabel4" metaName="cn_mpls_lbl_4"/>
+		<ExtensionKey cefName="MplsLabel5" metaName="cn_mpls_lbl_5"/>
+		<ExtensionKey cefName="MplsLabel6" metaName="cn_mpls_lbl_6"/>
+		<ExtensionKey cefName="MplsLabel7" metaName="cn_mpls_lbl_7"/>
+		<ExtensionKey cefName="MplsLabel8" metaName="cn_mpls_lbl_8"/>
+		<ExtensionKey cefName="MplsLabel9" metaName="cn_mpls_lbl_9"/>
+		<ExtensionKey cefName="MplsLabel10" metaName="cn_mpls_lbl_10"/>
+
+	
+		
+		<ExtensionKey cefName="alias.host" metaName="hostname"/>
+		<ExtensionKey cefName="ad.domain.dst" metaName="ddomain"/>
+		<ExtensionKey cefName="ad.domain.src" metaName="sdomain"/>
+		<ExtensionKey cefName="ad.username.dst" metaName="username"/>
+		<ExtensionKey cefName="ad.username.src" metaName="c_username"/>
+		<ExtensionKey cefName="directory" metaName="directory"/>
+		<ExtensionKey cefName="domain.dst" metaName="ddomain"/>
+		<ExtensionKey cefName="eth.dst" metaName="dmacaddr"/>
+		<ExtensionKey cefName="eth.src" metaName="smacaddr"/>
+		<ExtensionKey cefName="community" metaName="risk_num_comm"/>
+		<ExtensionKey cefName="nextgen" metaName="risk_num_next"/>
+		<ExtensionKey cefName="sandbox" metaName="risk_num_sand"/>
+		<ExtensionKey cefName="static" metaName="risk_num_static"/>
+		<ExtensionKey cefName="high.confidence.ioc.hit" metaName="threat_name"/>
+		<ExtensionKey cefName="malware.nextgen.source" metaName="event_source"/>
+		<ExtensionKey cefName="event.id" metaName="id"/>
+		<ExtensionKey cefName="event.source" metaName="event_source"/>
+		<ExtensionKey cefName="event.type" metaName="event_type"/>
+		<ExtensionKey cefName="file.md5.hash" metaName="checksum"/>
+		<ExtensionKey cefName="file.name" metaName="filename"/>
+		<ExtensionKey cefName="file.size" metaName="filename_size"/>
+		<ExtensionKey cefName="filename" metaName="filename"/>
+		<ExtensionKey cefName="filetype" metaName="filetype"/>
+		<ExtensionKey cefName="ip.dst" metaName="daddr"/>
+		<ExtensionKey cefName="ip.proto" metaName="protocol"/>
+		<ExtensionKey cefName="ip.src" metaName="saddr"/>
+		<ExtensionKey cefName="packets" metaName="packets"/>
+		<ExtensionKey cefName="server" metaName="application"/>
+		<ExtensionKey cefName="service" metaName="service"/>
+		<ExtensionKey cefName="size" metaName="bytes"/>
+		<ExtensionKey cefName="tcp.dstport" metaName="dport"/>
+		<ExtensionKey cefName="tcp.srcport" metaName="sport"/>
+		<ExtensionKey cefName="tcp.srcpport" metaName="sport"/>
+		<ExtensionKey cefName="threat.category" metaName="threat_name"/>
+		<ExtensionKey cefName="threat.description" metaName="threat_val"/>
+		<ExtensionKey cefName="udp.dstport" metaName="dport"/>
+		<ExtensionKey cefName="udp.srcport" metaName="sport"/>
+		<ExtensionKey cefName="sessionid" metaName="sessionid"/>
+		<ExtensionKey cefName="tcp.flags" metaName="tcp_flags"/>
+		<ExtensionKey cefName="client" metaName="agent"/>
+		<ExtensionKey cefName="content" metaName="content_type"/>
+		<ExtensionKey cefName="country.dst" metaName="location_dst"/>
+		<ExtensionKey cefName="country.src" metaName="location_src"/>
+		<ExtensionKey cefName="city.dst" metaName="location_city"/>
+		<ExtensionKey cefName="ad.computer.dst" metaName="ad_computer_dst"/>
+		<ExtensionKey cefName="alert.id" metaName="alert_id"/>
+		<ExtensionKey cefName="attachment" metaName="attachment"/>				
+		<ExtensionKey cefName="extension" metaName="extension"/>
+		<ExtensionKey cefName="eth.type" metaName="eth_type"/>
+		<ExtensionKey cefName="feed.description" metaName="feed_desc"/>
+		<ExtensionKey cefName="feed.name" metaName="feed_name"/>
+		<ExtensionKey cefName="latdec.dst" metaName="latdec_dst"/>
+		<ExtensionKey cefName="latdec.src" metaName="latdec_src"/>
+		<ExtensionKey cefName="longdec.src" metaName="longdec_src"/>
+		<ExtensionKey cefName="org.dst" metaName="org_dst"/>
+		<ExtensionKey cefName="referer" metaName="referer"/>
+		<ExtensionKey cefName="risk.info" metaName="risk_info"/>
+		<ExtensionKey cefName="risk.suspicious" metaName="risk_suspicious"/>
+		<ExtensionKey cefName="risk.warning" metaName="risk_warning"/>
+		<ExtensionKey cefName="threat.source" metaName="threat_source"/>
+		
+	
+	
+		<ExtensionKey cefName="agency.dst" metaName="cs_agency_dst"/>
+		<ExtensionKey cefName="antivirus.other.detected" metaName="cs_av_other"/>
+		<ExtensionKey cefName="antivirus.primary.detected" metaName="cs_av_primary"/>
+		<ExtensionKey cefName="antivirus.secondary.detected" metaName="cs_av_secondary"/>
+		<ExtensionKey cefName="country.dst.code" metaName="cn_ctr_dst_code"/>
+		<ExtensionKey cefName="dest.tld" metaName="cs_dst_tld"/>
+		<ExtensionKey cefName="eth.dst.vendor" metaName="cs_eth_dst_ven"/>
+		<ExtensionKey cefName="eth.src.vendor" metaName="cs_eth_src_ven"/>
+		<ExtensionKey cefName="event.uuid" metaName="cs_event_uuid"/>		
+		<ExtensionKey cefName="lifetime" metaName="cs_lifetime"/>
+		<ExtensionKey cefName="payload" metaName="cs_payload"/>
+		<ExtensionKey cefName="rpackets" metaName="cn_rpackets"/>
+		<ExtensionKey cefName="rpayload" metaName="cs_rpayload"/>
+		<ExtensionKey cefName="streams" metaName="cs_streams"/>
+		<ExtensionKey cefName="whois.date.creation" metaName="cs_datecret"/>
+		<ExtensionKey cefName="whois.registrant" metaName="cs_registrant"/>
+		<ExtensionKey cefName="whois.registrar" metaName="cs_registrar"/>
+		<ExtensionKey cefName="whois.server" metaName="cs_whois_server"/>
+		<ExtensionKey cefName="time" metaName="param_event_time">
+			<device2meta device="nginx" metaName="cs_fld"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="did" metaName="cn_log_did"/>
+		<ExtensionKey cefName="rid" metaName="cn_log_rid"/>
+		<ExtensionKey cefName="medium" metaName="cs_log_medium"/>
+		<ExtensionKey cefName="USER" metaName="cs_user">
+		    <device2meta device="rsa_netwitness_malware" metaName="username"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="file.sha1.hash" metaName="checksum"/>
+		<ExtensionKey cefName="file.sha256.hash" metaName="checksum"/>
+	
+	
+		<ExtensionKey cefName="TrendMicroDsFrameType" metaName="cs_frametype">
+			<device2meta device="trendmicrodsa" metaName="cs_fld"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="TrendMicroDsPacketData" metaName="cs_packettype">
+			<device2meta device="trendmicrodsa" metaName="cs_fld"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="TrendMicroDsTenant" metaName="cs_tenant">
+			<device2meta device="trendmicrodsa" metaName="cs_fld"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="TrendMicroDsTags" metaName="cs_fld"/>
+		<ExtensionKey cefName="TrendMicroDsTenantId" metaName="cs_tenantid">
+			<device2meta device="trendmicrodsa" metaName="cs_fld"/>
+		</ExtensionKey>
+		
+	
+	
+		<ExtensionKey cefName="target" metaName="daddr">
+			<device2meta device="trendmicrodsa" metaName="hostname"/>
+		</ExtensionKey>
+			
+		
+	
+	
+		<ExtensionKey cefName="reason" metaName="result"/>		
+		
+	
+	
+		<ExtensionKey cefName="analyzedBy" metaName="cs_analyzedby"/>
+		<ExtensionKey cefName="loginName" metaName="cs_loginname"/>
+		<ExtensionKey cefName="sourceIp" metaName="saddr"/>
+	
+   
+		<ExtensionKey cefName="authorization.role" metaName="user_role"/>
+		<ExtensionKey cefName="authorization.scope" metaName="cs_authorization.scope"/>
+		<ExtensionKey cefName="correlationId" metaName="id2"/>
+		<ExtensionKey cefName="event.description" metaName="event_description"/>
+		<ExtensionKey cefName="eventDataId" metaName="id"/>
+		<ExtensionKey cefName="eventName.localizedValue" metaName="event_state"/>
+		<ExtensionKey cefName="level" metaName="severity"/>
+		<ExtensionKey cefName="operationId" metaName="operation_id"/>
+		<ExtensionKey cefName="operationName.localizedValue" metaName="action"/>
+		<ExtensionKey cefName="properties.requestbody" metaName="cs_properties.requestbody"/>
+		<ExtensionKey cefName="resourceGroupName.group" metaName="group"/>
+		<ExtensionKey cefName="resourceProviderName.localizedValue" metaName="cs_resourceProviderName.localizedValue"/>
+		<ExtensionKey cefName="status" metaName="disposition">
+			<device2meta device="trendmicrodsa" metaName="cs_fld"/>
+			<device2meta device="vmwareappdefense" metaName="event_state"/>
+			<device2meta device="aws_cloudwatch" metaName="resultcode"/>
+			<device2meta device="msazuregraph_security" metaName="event_state"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="subscriptionId" metaName="id1"/>
+		<ExtensionKey cefName="uid" metaName="user.id"/>
+		
+	
+		<ExtensionKey cefName="id" metaName="cs_fld">
+			<device2meta device="trendmicrodsa" metaName="cs_fld"/>
+			<device2meta device="vmwareappdefense" metaName="id"/>
+			<device2meta device="msoffice365" metaName="id"/>
+			<device2meta device="NetskopeCloudSecurityPlatform" metaName="id"/>
+			<device2meta device="msazuregraph_security" metaName="id"/>
+			
+		</ExtensionKey>
+		<ExtensionKey cefName="signinDateTimeInMillis" metaName="event_time_string"/>
+		<ExtensionKey cefName="userPrincipalName" metaName="username"/>
+		<ExtensionKey cefName="appId" metaName="cs_fld"/>
+		<ExtensionKey cefName="loginStatus" metaName="disposition"/>
+		<ExtensionKey cefName="deviceInformation" metaName="info"/>
+		<ExtensionKey cefName="geoCoordinates.latitude" metaName="latdec_src"/>
+		<ExtensionKey cefName="geoCoordinates.longitude" metaName="longdec_src"/>
+		<ExtensionKey cefName="location.state" metaName="location_state"/>
+		<ExtensionKey cefName="location.country" metaName="location_country"/>
+		
+	
+		<ExtensionKey cefName="activityType" metaName="obj_type"/>
+		<ExtensionKey cefName="activityDate" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="tenantGeolocation" metaName="cs_fld"/>
+		<ExtensionKey cefName="componentOrSource" metaName="cs_fld"/>
+		<ExtensionKey cefName="additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="actorType" metaName="audit_object"/>
+		<ExtensionKey cefName="activityDateInMillis" metaName="cs_fld"/>
+		<ExtensionKey cefName="activityOperationType" metaName="cs_fld"/>
+		<ExtensionKey cefName="tenantId" metaName="cs_fld"/>
+		<ExtensionKey cefName="tenantName" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="actor.User.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.User.name" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.User.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.User.puid" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.User.servicePrincipalName" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="actor.Application.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.Application.name" metaName="application"/>
+		<ExtensionKey cefName="actor.Application.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.Application.userPrincipalName" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="actor.Other.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.Other.name" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.Other.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.Other.userPrincipalName" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="targets.User.additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.modifiedProperties" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.userPrincipalName" metaName="c_username"/>
+		<ExtensionKey cefName="targets.User.ipAddress" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.targetResourceType" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.userSource" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.name" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.puid" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.isPrivileged" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.User.modifiedProperties.name" metaName="change_attribute"/>
+		<ExtensionKey cefName="targets.User.modifiedProperties.oldValue" metaName="change_old"/>
+		<ExtensionKey cefName="targets.User.modifiedProperties.newValue" metaName="change_new"/>
+		
+		<ExtensionKey cefName="targets.Application.modifiedProperties" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Application.servicePrincipalName" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Application.name" metaName="application"/>
+		<ExtensionKey cefName="targets.Application.additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Application.targetResourceType" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Application.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Application.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Application.modifiedProperties.name" metaName="change_attribute"/>
+		<ExtensionKey cefName="targets.Application.modifiedProperties.oldValue" metaName="change_old"/>
+		<ExtensionKey cefName="targets.Application.modifiedProperties.newValue" metaName="change_new"/>
+		
+		<ExtensionKey cefName="targets.Group.modifiedProperties" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Group.servicePrincipalName" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Group.name" metaName="group"/>
+		<ExtensionKey cefName="targets.Group.additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Group.targetResourceType" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Group.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Group.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Group.modifiedProperties.name" metaName="change_attribute"/>
+		<ExtensionKey cefName="targets.Group.modifiedProperties.oldValue" metaName="change_old"/>
+		<ExtensionKey cefName="targets.Group.modifiedProperties.newValue" metaName="change_new"/>
+		
+		<ExtensionKey cefName="targets.Role.modifiedProperties" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Role.servicePrincipalName" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Role.name" metaName="user_role"/>
+		<ExtensionKey cefName="targets.Role.additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Role.targetResourceType" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Role.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Role.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Role.modifiedProperties.name" metaName="change_attribute"/>
+		<ExtensionKey cefName="targets.Role.modifiedProperties.oldValue" metaName="change_old"/>
+		<ExtensionKey cefName="targets.Role.modifiedProperties.newValue" metaName="change_new"/>
+		
+		<ExtensionKey cefName="targets.Device.modifiedProperties" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Device.servicePrincipalName" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Device.name" metaName="device"/>
+		<ExtensionKey cefName="targets.Device.additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Device.targetResourceType" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Device.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Device.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.Device.modifiedProperties.name" metaName="change_attribute"/>
+		<ExtensionKey cefName="targets.Device.modifiedProperties.oldValue" metaName="change_old"/>
+		<ExtensionKey cefName="targets.Device.modifiedProperties.newValue" metaName="change_new"/>
+		
+		<ExtensionKey cefName="targets.ServicePrincipal.modifiedProperties" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.servicePrincipalName" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.name" metaName="service"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.additionalDetails" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.targetResourceType" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.objectId" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.@odata.type" metaName="cs_fld"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.modifiedProperties.name" metaName="change_attribute"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.modifiedProperties.oldValue" metaName="change_old"/>
+		<ExtensionKey cefName="targets.ServicePrincipal.modifiedProperties.newValue" metaName="change_new"/>
+		<ExtensionKey cefName="nw.saddr" metaName="saddr"/>
+
+
+		<ExtensionKey cefName="organizationId" metaName="domain_id"/>
+		<ExtensionKey cefName="internalLogonType" metaName="cs_fld"/>
+		<ExtensionKey cefName="logon" metaName="logon_type"/>
+		<ExtensionKey cefName="userType" metaName="user_role"/>
+		<ExtensionKey cefName="userKey" metaName="cs_fld"/>
+		<ExtensionKey cefName="objectId" metaName="obj_name"/>
+		<ExtensionKey cefName="externalAccess" metaName="cs_fld"/>
+		<ExtensionKey cefName="mailboxOwnerSid" metaName="sid"/>
+		<ExtensionKey cefName="mailboxOwnerUPN" metaName="mail_id"/>
+		<ExtensionKey cefName="mailboxGuid" metaName="cs_fld"/>
+		<ExtensionKey cefName="SourceFileName" metaName="filename"/>
+        <ExtensionKey cefName="SourceFileExtension" metaName="extension"/>
+        <ExtensionKey cefName="DestinationFileName" metaName="filename"/>
+        <ExtensionKey cefName="DestinationFileExtension" metaName="extension"/>
+		<ExtensionKey cefName="DestFolder.Path" metaName="directory"/>
+		<ExtensionKey cefName="ClientMachineName" metaName="hostname"/>
+		<ExtensionKey cefName="ObjectType" metaName="obj_type"/>
+		<ExtensionKey cefName="Endpoint" metaName="os"/>
+		<ExtensionKey cefName="PolicyDetails.PolicyName" metaName="policyname"/>
+		<ExtensionKey cefName="PolicyDetails.PolicyId" metaName="policy_id"/>
+		<ExtensionKey cefName="ExchangeMetaData.From" metaName="from"/>
+		<ExtensionKey cefName="CmdletOptions" metaName="param"/>
+		<ExtensionKey cefName="Cmdlet" metaName="action"/>
+		<ExtensionKey cefName="nw.recipient_0" metaName="to"/>
+		<ExtensionKey cefName="nw.recipient_1" metaName="to"/>
+		<ExtensionKey cefName="nw.recipient_2" metaName="to"/>
+		<ExtensionKey cefName="LogonError" metaName="result"/>
+		<ExtensionKey cefName="Subject" metaName="subject"/>
+		<ExtensionKey cefName="Comments" metaName="comments"/>
+		<ExtensionKey cefName="PolicyId" metaName="policy_id"/>
+		<ExtensionKey cefName="Status" metaName="disposition"/>
+		<ExtensionKey cefName="EntityType" metaName="threat_name"/>
+		<ExtensionKey cefName="Name" metaName="alert"/>
+		<ExtensionKey cefName="Category" metaName="category"/>
+		<ExtensionKey cefName="nw.ad" metaName="threat_val"/>
+		<ExtensionKey cefName="nw.trc" metaName="to"/>
+		<ExtensionKey cefName="AffectedItems.Subject" metaName="subject"/>
+        <ExtensionKey cefName="SendAsUserSmtp" metaName="email"/>
+        <ExtensionKey cefName="LogonUserSid" metaName="c_sid"/>
+        <ExtensionKey cefName="LogonUserDisplayName" metaName="c_username"/>
+		<ExtensionKey cefName="nw.groupname" metaName="group"/>
+		<ExtensionKey cefName="nw.user" metaName="c_username"/>
+		<ExtensionKey cefName="nw.device" metaName="device"/>
+		
+		
+		<ExtensionKey cefName="method_name" metaName="context"/>
+		<ExtensionKey cefName="Query" metaName="query"/>
+		<ExtensionKey cefName="request_size" metaName="sbytes"/>
+		<ExtensionKey cefName="response_size" metaName="rbytes"/>
+		<ExtensionKey cefName="run_time" metaName="duration"/>
+		<ExtensionKey cefName="cipher_suite" metaName="s_cipher"/>
+		<ExtensionKey cefName="session_type" metaName="info"/>
+		<ExtensionKey cefName="user_type" metaName="user_role"/>
+		<ExtensionKey cefName="status_code" metaName="resultcode"/>
+		<ExtensionKey cefName="request_status" metaName="result"/>
+		<ExtensionKey cefName="login_status" metaName="result"/>
+		<ExtensionKey cefName="referrer_uri" metaName="referrer"/>
+		<ExtensionKey cefName="api_version" metaName="version"/>
+		<ExtensionKey cefName="client_ip" metaName="hostip"/>
+		<ExtensionKey cefName="client_version" metaName="version"/>
+		
+		
+		
+		<ExtensionKey cefName="AkamaiSiemApiKey" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemASN" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemCity" metaName="location_city"/>
+		<ExtensionKey cefName="AkamaiSiemContinent" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemCountry" metaName="location_country"/>
+		<ExtensionKey cefName="AkamaiSiemCustomData" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemRegion" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemRequestHeaders" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemResponseHeaders" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemResponseStatus" metaName="resultcode"/>
+		<ExtensionKey cefName="AkamaiSiemRuleTags" metaName="category"/>
+		<ExtensionKey cefName="AkamaiSiemRuleVersions" metaName="version"/>
+		<ExtensionKey cefName="AkamaiSiemSlowPostAction" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemSlowPostRate" metaName="cs_fld"/>
+		<ExtensionKey cefName="AkamaiSiemTLSVersion" metaName="cs_fld"/>
+
+		
+		<ExtensionKey cefName="rulename" metaName="rulename"/>
+		<ExtensionKey cefName="networkSecurityGroup" metaName="rule_group"/>
+		<ExtensionKey cefName="resourceGroup" metaName="group"/>
+		
+		
+		<ExtensionKey cefName="district" metaName="domain"/>
+        <ExtensionKey cefName="error" metaName="result"/>
+		<ExtensionKey cefName="component" metaName="obj_name"/>
+		<ExtensionKey cefName="host" metaName="hostname"/>
+	    <ExtensionKey cefName="error_message" metaName="result"/>
+        <ExtensionKey cefName="authMethodName" metaName="authmethod"/>
+		<ExtensionKey cefName="AuthenticationMethod" metaName="authmethod"/>
+		<ExtensionKey cefName="User" metaName="username"/>
+		<ExtensionKey cefName="timeMillis" metaName="cs_fld"/>
+		<ExtensionKey cefName="cvProduct" metaName="cs_fld"/>
+		<ExtensionKey cefName="authType" metaName="cs_fld"/>
+		<ExtensionKey cefName="proxyConnectionIp" metaName="cs_fld"/>
+		<ExtensionKey cefName="identity" metaName="cs_fld"/>
+		<ExtensionKey cefName="algorithm" metaName="cs_fld"/>
+		<ExtensionKey cefName="requestTimeMillis" metaName="cs_fld"/>
+		<ExtensionKey cefName="cvapi" metaName="cs_fld"/>
+		<ExtensionKey cefName="CachedAuthentication" metaName="cs_fld"/>
+		<ExtensionKey cefName="masked" metaName="cs_fld"/>
+		<ExtensionKey cefName="fullIdentity" metaName="cs_fld"/>
+		<ExtensionKey cefName="format" metaName="cs_fld"/>
+		<ExtensionKey cefName="cvtoolkit" metaName="cs_fld"/>
+		<ExtensionKey cefName="authTimeMillis" metaName="cs_fld"/>
+		<ExtensionKey cefName="hsmEnabled" metaName="cs_fld"/>
+		<ExtensionKey cefName="proxyType" metaName="cs_fld"/>
+		<ExtensionKey cefName="returnEncryptedKeyOption" metaName="cs_fld"/>
+		<ExtensionKey cefName="rollover" metaName="cs_fld"/>
+		<ExtensionKey cefName="isUserPassSet" metaName="cs_fld"/>
+		<ExtensionKey cefName="authTokens" metaName="cs_fld"/>
+		<ExtensionKey cefName="length" metaName="dclass_counter1"/>
+
+		
+		<ExtensionKey cefName="origin.geo_location.city" metaName="location_city"/>
+		<ExtensionKey cefName="origin.geo_location.region" metaName="location_state"/>
+		<ExtensionKey cefName="origin.geo_location.ip_address" metaName="saddr"/>
+		<ExtensionKey cefName="origin.geo_location.country" metaName="location_country"/>
+		<ExtensionKey cefName="timestamp" metaName="param_event_time"/>
+		<ExtensionKey cefName="actor.user.display_name" metaName="username"/>
+		<ExtensionKey cefName="actor.user.account_id" metaName="service_account"/>
+		<ExtensionKey cefName="actor.user.email" metaName="user_address"/>
+		<ExtensionKey cefName="details.user_agent" metaName="user_agent"/>
+		<ExtensionKey cefName="actor.app.display_name" metaName="application"/>
+		<ExtensionKey cefName="origin.access_method.end_user.session_id" metaName="sessionid"/>
+		<ExtensionKey cefName="actor.admin.display_name" metaName="username"/>
+		<ExtensionKey cefName="actor.admin.account_id" metaName="service_account"/>
+		<ExtensionKey cefName="actor.admin.email" metaName="user_address"/>
+
+	
+		
+		<ExtensionKey cefName="cs1" metaName="cs_fld" >
+			<device2meta device="trendmicrodsa" metaName="context"/>
+			<device2meta device="bluecat" metaName="action" label="query"/>
+			<device2meta device="websense" metaName="policyname" label="Policy"/>
+			<device2meta device="mcafeewg" metaName="virusname" label="Virus Name"/>
+			<device2meta device="bit9" metaName="checksum" label="File Hash"/>
+			<device2meta device="mcafeereconnex" metaName="policyname"/>
+			<device2meta device="akamaikona" metaName="rulename"/>
+			<device2meta device="guardium" metaName="severity"/>
+			<device2meta device="msata" metaName="url"/>
+			<device2meta device="citrixns" metaName="policyname"/>
+			<device2meta device="forcepoint_email_security" metaName="virusname" label="Virus Name"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cs1Label" metaName="cs_fld" />
+	
+		<ExtensionKey cefName="cs2" metaName="cs_fld">
+			<device2meta device="bit9" metaName="v_instafname" label="installerFilename"/>
+			<device2meta device="guardium" metaName="obj_type"/>
+			<device2meta device="akamaikona" metaName="context"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cs2Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cs3" metaName="cs_fld">
+			<device2meta device="websense" metaName="content_type" label="ContentType"/>
+			<device2meta device="bit9" metaName="policyname"/>
+			<device2meta device="mcafeereconnex" metaName="content_type"/>
+			<device2meta device="akamaikona" metaName="info"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cs3Label" metaName="cs_fld"/>
+
+		<ExtensionKey cefName="cs4" metaName="cs_fld">
+			<device2meta device="mcafeewg" metaName="info" label="URL Categories"/>
+			<device2meta device="checkpointfw1" metaName="threat_name" label="Protection Name"/>
+			<device2meta device="citrixns" metaName="severity"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cs4Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cs5" metaName="cs_fld">
+			<device2meta device="mcafeewg" metaName="policyname" label="Policy"/>
+			<device2meta device="bit9" metaName="rulename" label="ruleName"/>
+			<device2meta device="checkpointfw1" metaName="category" label="Matched Category"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cs5Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cs6" metaName="cs_fld">
+			<device2meta device="mcafeewg" metaName="risk" label="Reputation"/>	
+			<device2meta device="checkpointfw1" metaName="application" label="Application Name"/>			
+		</ExtensionKey>
+		<ExtensionKey cefName="cs6Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cn1" metaName="cn_fld">
+			<device2meta device="trendmicrods" metaName="hostid" label="Host ID"/>
+			<device2meta device="trendmicrodsa" metaName="hostid" label="Host ID"/>
+			<device2meta device="mcafeewg" metaName="result" label="Block Reason"/>			
+		</ExtensionKey>
+		<ExtensionKey cefName="cn1Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cn2" metaName="cn_fld">
+			<device2meta device="trendmicrodsa" metaName="result" label="Host ID"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="cn2Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cn3" metaName="cn_fld"/>
+		<ExtensionKey cefName="cn3Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cn4" metaName="cn_fld"/>
+		<ExtensionKey cefName="cn4Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cn5" metaName="cn_fld"/>
+		<ExtensionKey cefName="cn5Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cn6" metaName="cn_fld"/>
+		<ExtensionKey cefName="cn6Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="c6a1" metaName="cn_fld"/>
+		<ExtensionKey cefName="c6a1Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="c6a2" metaName="cn_fld"/>
+		<ExtensionKey cefName="c6a2Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="c6a3" metaName="cn_fld"/>
+		<ExtensionKey cefName="c6a3Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="c6a4" metaName="cn_fld"/>
+		<ExtensionKey cefName="c6a4Label" metaName="cs_fld"/>
+				
+		<ExtensionKey cefName="cfp1" metaName="cn_fld"/>
+		<ExtensionKey cefName="cfp1Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cfp2" metaName="cn_fld"/>
+		<ExtensionKey cefName="cfp2Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cfp3" metaName="cn_fld"/>
+		<ExtensionKey cefName="cfp3Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="cfp4" metaName="cn_fld"/>
+		<ExtensionKey cefName="cfp4Label" metaName="cs_fld"/>
+	
+		<ExtensionKey cefName="flexString1" metaName="cn_fld"/>
+		<ExtensionKey cefName="flexString1Label" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="flexString2" metaName="cn_fld">
+			<device2meta device="akamaikona" metaName="policy_id"/>
+			<device2meta device="checkpointfw1" metaName="threat_val" label="Attack Information"/>
+			<device2meta device="checkpointfw1" metaName="action" label="Malware Action"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="flexString2Label" metaName="cs_fld"/>		
+        
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.peHeaderMetadata.description" metaName="event_description"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.peHeaderMetadata.productName" metaName="product"/>
+		<ExtensionKey cefName="violationDetails.ipProtocol" metaName="protocol"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.certificate.certificateexinfo.serialNumber" metaName="cert.serial"/>
+		<ExtensionKey cefName="violatingProcess.cliArguments" metaName="param"/>
+		<ExtensionKey cefName="severity" metaName="severity"/>
+		<ExtensionKey cefName="violatingVirtualMachine.name" metaName="service"/>
+		<ExtensionKey cefName="violationDetails.processHash" metaName="checksum"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.processFileInfo.fileSizeBytes" metaName="filename_size"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.threat" metaName="threat_val"/>
+		<ExtensionKey cefName="violationDetails.remotePort" metaName="dport"/>
+		<ExtensionKey cefName="violatingVirtualMachine.hostName" metaName="hostname"/>
+		<ExtensionKey cefName="createdAt" metaName="param_recorded_time">
+				<device2meta device="amazonguardduty" metaName="param_starttime"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="violatingVirtualMachine.osType" metaName="os"/>
+		<ExtensionKey cefName="count" metaName="dclass_counter1"/>
+		<ExtensionKey cefName="violatingProcess.fullPathName" metaName="filename"/>
+		<ExtensionKey cefName="lastReceivedAt" metaName="param_event_time"/>
+		<ExtensionKey cefName="violationDetails.remoteAddress" metaName="daddr"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.peHeaderMetadata.companyName" metaName="user_org"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.peHeaderMetadata.productVersion" metaName="version"/>
+		<ExtensionKey cefName="violationDetails.localAddress" metaName="saddr"/>
+		<ExtensionKey cefName="violationDetails.alert" metaName="alert"/>
+		<ExtensionKey cefName="ruleViolated" metaName="rulename"/>
+		<ExtensionKey cefName="violatingVirtualMachine.ipAddress" metaName="hostip"/>
+		<ExtensionKey cefName="violatingVirtualMachine.macAddress" metaName="macaddr"/>
+		<ExtensionKey cefName="violationDetails.processPath" metaName="process"/>
+		<ExtensionKey cefName="processPath" metaName="process"/>
+		<ExtensionKey cefName="remediation.id" metaName="id1"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.certificate.commonName" metaName="cert_subject"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.certificate.certificateexinfo.publisher" metaName="cert_ca"/>
+		<ExtensionKey cefName="violatingProcess.processReputationProfile.certificate.certificateexinfo.issuerThumbprint" metaName="cert_checksum"/>
+		
+		
+		<ExtensionKey cefName="availabilityZone" metaName="zone"/>
+		<ExtensionKey cefName="instanceId" metaName="agent.id"/>
+		<ExtensionKey cefName="groupId" metaName="groupid"/>
+		<ExtensionKey cefName="groupName" metaName="group"/>
+		<ExtensionKey cefName="instanceState" metaName="event_state"/>
+		<ExtensionKey cefName="userName" metaName="username"/>
+		<ExtensionKey cefName="connectionDirection" metaName="direction"/>
+		<ExtensionKey cefName="actionType" metaName="action"/>
+		<ExtensionKey cefName="additionalInfo" metaName="info"/>
+		<ExtensionKey cefName="updatedAt" metaName="param_recorded_time"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.RemotePortDetails.Port" metaName="dport"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.LocalPortDetails.Port" metaName="sport"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.RemoteIpDetails.Country.CountryName" metaName="location_country"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.RemoteIpDetails.City.CityName" metaName="location_city"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.RemoteIpDetails.GeoLocation.Lat" metaName="latdec_dst"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.RemoteIpDetails.GeoLocation.Lon" metaName="longdec_dst"/>
+		<ExtensionKey cefName="Service.Action.AwsApiCallAction.RemoteIpDetails.Country.CountryName" metaName="location_country"/>
+		<ExtensionKey cefName="Service.Action.AwsApiCallAction.RemoteIpDetails.City.CityName" metaName="location_city"/>
+		<ExtensionKey cefName="Service.Action.AwsApiCallAction.RemoteIpDetails.GeoLocation.Lat" metaName="latdec_dst"/>
+		<ExtensionKey cefName="Service.Action.AwsApiCallAction.RemoteIpDetails.GeoLocation.Lon" metaName="longdec_dst"/>
+		<ExtensionKey cefName="Service.Action.NetworkConnectionAction.RemoteIpDetails.IpAddressV4" metaName="daddr"/>
+		<ExtensionKey cefName="Service.Action.AwsApiCallAction.RemoteIpDetails.IpAddressV4" metaName="daddr"/>
+		<ExtensionKey cefName="serviceName" metaName="service"/>
+		<ExtensionKey cefName="resourceType" metaName="obj_type"/>
+		<ExtensionKey cefName="PrivateIpAddress" metaName="saddr"/>
+		<ExtensionKey cefName="accountId" metaName="id1"/>
+		 
+		<ExtensionKey cefName="resource.type" metaName="obj_type"/>
+		<ExtensionKey cefName="jsonPayload.resource.zone" metaName="cs_fld"/>
+		<ExtensionKey cefName="jsonPayload.resource.id" metaName="cs_fld"/>
+		<ExtensionKey cefName="jsonPayload.actor.user" metaName="c_username"/>
+		<ExtensionKey cefName="jsonPayload.operation.id" metaName="operation_id"/>
+		<ExtensionKey cefName="jsonPayload.request.url" metaName="url"/>
+		<ExtensionKey cefName="jsonPayload.trace_id" metaName="id2"/>
+		<ExtensionKey cefName="jsonPayload.user_agent" metaName="user_agent"/>
+		<ExtensionKey cefName="protoPayload.authorizationInfo.permission" metaName="permissions"/>
+		<ExtensionKey cefName="protoPayload.response.status" metaName="disposition"/>
+		<ExtensionKey cefName="protoPayload.serviceName" metaName="service.name"/>
+		<ExtensionKey cefName="protoPayload.response.operationType" metaName="cs_fld"/>
+		<ExtensionKey cefName="protoPayload.response.user" metaName="user"/>
+		<ExtensionKey cefName="protoPayload.requestMetadata.callerIp" metaName="saddr"/>
+		<ExtensionKey cefName="protoPayload.requestMetadata.callerSuppliedUserAgent" metaName="user_agent"/>
+		<ExtensionKey cefName="protoPayload.authenticationInfo.principalEmail" metaName="email"/>
+		<ExtensionKey cefName="protoPayload.methodName" metaName="action"/>
+		<ExtensionKey cefName="protoPayload.status.message" metaName="info"/>
+		<ExtensionKey cefName="protoPayload.method" metaName="action"/>
+		<ExtensionKey cefName="protoPayload.startTime" metaName="param_starttime"/>
+		<ExtensionKey cefName="protoPayload.endTime" metaName="param_endtime"/>
+		<ExtensionKey cefName="protoPayload.request.resource.instanceName.instanceId" metaName="instance"/>
+		<ExtensionKey cefName="resource.labels.instance_id" metaName="agent.id"/>
+		<ExtensionKey cefName="resource.labels.zone" metaName="zone"/>
+		<ExtensionKey cefName="resource.labels.database_id" metaName="db_id"/>
+		<ExtensionKey cefName="resource.labels.region" metaName="location_desc"/>
+		<ExtensionKey cefName="logName" metaName="event_log"/>
+		<ExtensionKey cefName="insertId" metaName="id"/>
+		<ExtensionKey cefName="httpRequest.status" metaName="resultcode"/>
+		<ExtensionKey cefName="protoPayload.ip" metaName="saddr"/>
+		<ExtensionKey cefName="resource.labels.project_id" metaName="group"/>
+		<ExtensionKey cefName="protoPayload.resourceName" metaName="obj_name"/>
+		<ExtensionKey cefName="protoPayload.response.error.code" metaName="error"/>
+		<ExtensionKey cefName="protoPayload.response.error.errors.message" metaName="cs_fld"/>
+		
+		
+		<ExtensionKey cefName="dstip" metaName="daddr"/>
+		<ExtensionKey cefName="event_type" metaName="event_type"/>
+		<ExtensionKey cefName="dsthost" metaName="dhost"/>
+		<ExtensionKey cefName="site" metaName="cs_fld"/>
+		<ExtensionKey cefName="srcip" metaName="saddr"/>
+		<ExtensionKey cefName="alert_type" metaName="vendor_event_cat"/>
+		<ExtensionKey cefName="organization_unit" metaName="org.src"/>
+		<ExtensionKey cefName="_id" metaName="id1"/>
+		<ExtensionKey cefName="app_session_id" metaName="sessionid"/>
+		<ExtensionKey cefName="dst_location" metaName="city.dst"/>
+		<ExtensionKey cefName="category" metaName="category"/>
+		<ExtensionKey cefName="src_longitude" metaName="longdec_src"/>
+		<ExtensionKey cefName="dst_country" metaName="location_dst"/>
+		<ExtensionKey cefName="device" metaName="device"/>
+		<ExtensionKey cefName="access_method" metaName="authmethod"/>
+		<ExtensionKey cefName="object_type" metaName="obj_type"/>
+		<ExtensionKey cefName="dst_latitude" metaName="latdec_dst"/>
+		<ExtensionKey cefName="dst_longitude" metaName="longdec_dst"/>
+		<ExtensionKey cefName="to_user" metaName="username"/>
+		<ExtensionKey cefName="from_user" metaName="c_username"/>
+		<ExtensionKey cefName="src_location" metaName="city.src"/>
+		<ExtensionKey cefName="org" metaName="user_org"/>
+		<ExtensionKey cefName="src_country" metaName="location_src"/>
+		<ExtensionKey cefName="src_latitude" metaName="latdec_src"/>
+		<ExtensionKey cefName="url" metaName="url"/>
+		<ExtensionKey cefName="risk_level_id" metaName="risk_num"/>
+		<ExtensionKey cefName="object" metaName="filename">		
+			<device2meta device="enforcive_escpa" metaName="cs_fld"/>
+		</ExtensionKey>
+		<ExtensionKey cefName="alert_name" metaName="alert"/>
+		<ExtensionKey cefName="activity" metaName="action"/>
+		<ExtensionKey cefName="browser" metaName="user_agent"/>
+		<ExtensionKey cefName="audit_log_event" metaName="event_description"/>
+		<ExtensionKey cefName="_insertion_epoch_timestamp" metaName="cs_recorded_time"/>
+		<ExtensionKey cefName="severity_level" metaName="severity"/>
+		<ExtensionKey cefName="supporting_data" metaName="cs_fld"/>
+		<ExtensionKey cefName="device_name" metaName="device"/>
+		<ExtensionKey cefName="alarm_description" metaName="event_description"/>
+		<ExtensionKey cefName="serial" metaName="serial_number"/>
+		<ExtensionKey cefName="alarm_name" metaName="alert"/>
+		<ExtensionKey cefName="supporting_data.severity" metaName="severity"/>
+        <ExtensionKey cefName="numbytes" metaName="bytes"/>
+		<ExtensionKey cefName="server_bytes" metaName="rbytes"/>
+		<ExtensionKey cefName="client_bytes" metaName="sbytes"/>
+		<ExtensionKey cefName="page_duration" metaName="duration"/>
+		<ExtensionKey cefName="page_starttime" metaName="cs_page_starttime"/>
+		<ExtensionKey cefName="page_endtime" metaName="cs_page_endtime"/>
+		<ExtensionKey cefName="userip" metaName="hostip"/>
+		<ExtensionKey cefName="userkey" metaName="cs_fld"/>
+        <ExtensionKey cefName="transaction_id" metaName="cs_fld"/>
+		<ExtensionKey cefName="action" metaName="action"/>
+		<ExtensionKey cefName="object_id" metaName="cs_fld"/>
+        <ExtensionKey cefName="instance_type" metaName="obj_type"/>
+        <ExtensionKey cefName="policy" metaName="policyname"/>
+		<ExtensionKey cefName="user" metaName="cs_fld"> 
+				<device2meta device="rsa_netwitness_audit" metaName="username"/>
+				<device2meta device="enforcive_escpa" metaName="username"/>
+		</ExtensionKey>			
+
+		
+		<ExtensionKey cefName="eventLogDate" metaName="param_event_time"/>
+		<ExtensionKey cefName="eventId" metaName="id"/>
+		<ExtensionKey cefName="targetObject1Id" metaName="obj_id"/>
+		<ExtensionKey cefName="targetObject1Name" metaName="obj_server"/>
+		<ExtensionKey cefName="adminUserName" metaName="administrator"/>
+		<ExtensionKey cefName="adminUserRole" metaName="user_role"/>
+		<ExtensionKey cefName="result" metaName="disposition"/>
+		<ExtensionKey cefName="application" metaName="application"/>
+		<ExtensionKey cefName="sourceIPAddress" metaName="saddr"/>
+		<ExtensionKey cefName="serverURL" metaName="url"/>
+		<ExtensionKey cefName="serverIPAddress" metaName="daddr"/>
+		<ExtensionKey cefName="activityKey" metaName="result"/>
+        <ExtensionKey cefName="activityCode" metaName="resultcode"/>
+        <ExtensionKey cefName="customerId" metaName="id1"/>
+        <ExtensionKey cefName="customerName" metaName="user_org"/>
+        <ExtensionKey cefName="AccessID" metaName="sigid"/>
+		<ExtensionKey cefName="AccessType" metaName="signame"/>
+		<ExtensionKey cefName="eventCategory" metaName="category"/>
+		<ExtensionKey cefName="policyId" metaName="policy_id"/>
+		<ExtensionKey cefName="policyName" metaName="policyname"/>
+		<ExtensionKey cefName="deviceName" metaName="device"/>
+		<ExtensionKey cefName="userId" metaName="uid"/>
+		<ExtensionKey cefName="method" metaName="authmethod"> 
+				<device2meta device="citrixns" metaName="web_method"/>
+		</ExtensionKey>			
+		<ExtensionKey cefName="eventCode" metaName="resultcode"/>
+		
+        
+		<ExtensionKey cefName="interface-id" metaName="interface"/>
+		<ExtensionKey cefName="srcaddr" metaName="saddr"/>
+		<ExtensionKey cefName="dstaddr" metaName="daddr"/>
+		<ExtensionKey cefName="srcport" metaName="sport"/>
+		<ExtensionKey cefName="dstport" metaName="dport"/>
+		<ExtensionKey cefName="log-status" metaName="event_state"/>
+		<ExtensionKey cefName="account-id" metaName="id1"/>
+		
+		<ExtensionKey cefName="operationName" metaName="action"/>
+		<ExtensionKey cefName="resultType" metaName="cs_fld"/>
+		<ExtensionKey cefName="resultSignature" metaName="cs_result"/>
+		<ExtensionKey cefName="callerIpAddress" metaName="saddr"/>
+		<ExtensionKey cefName="identity.claims.http://schemas.microsoft.com/claims/authnmethodsreferences" metaName="authmethod"/>
+		<ExtensionKey cefName="identity.claims.name" metaName="c_username"/>
+		<ExtensionKey cefName="properties.statusCode" metaName="disposition"/>
+		<ExtensionKey cefName="properties.eventName" metaName="event_log"/>
+		<ExtensionKey cefName="EventName" metaName="event_log"/>
+		<ExtensionKey cefName="durationMs" metaName="duration_string"/>
+		<ExtensionKey cefName="nw.subscriptions" metaName="id1"/>
+		<ExtensionKey cefName="nw.resourcegroups" metaName="group"/>
+		<ExtensionKey cefName="nw.virtualmachines" metaName="vsys"/>
+		<ExtensionKey cefName="nw.providers" metaName="event_source"/>
+        
+		<ExtensionKey cefName="InternalIp" metaName="saddr"/>
+		<ExtensionKey cefName="ExternalIp" metaName="stransaddr"/>
+		<ExtensionKey cefName="Domain" metaName="domain"/>
+		<ExtensionKey cefName="ResponseCode" metaName="result"/>
+		<ExtensionKey cefName="QueryType" metaName="dns_querytype"/>
+		<ExtensionKey cefName="Action" metaName="action"/>
+		<ExtensionKey cefName="Identity" metaName="obj_name"/>
+		<ExtensionKey cefName="Categories" metaName="category"/>
+		<ExtensionKey cefName="MostGranularIdentityType" metaName="cs_fld"/>
+		<ExtensionKey cefName="BlockedCategories" metaName="cs_fld"/>
+		
+		<ExtensionKey cefName="eventType" metaName="event_type"/>
+		<ExtensionKey cefName="Identities" metaName="obj_name"/>
+		<ExtensionKey cefName="AMPMalwareName" metaName="threat_name"/>
+		<ExtensionKey cefName="DestinationIP" metaName="daddr"/>
+		<ExtensionKey cefName="Referer" metaName="referer"/>
+		<ExtensionKey cefName="AVDetections" metaName="virusname"/>
+		<ExtensionKey cefName="requestSize" metaName="sbytes"/>
+		<ExtensionKey cefName="responseSize" metaName="rbytes"/>
+		<ExtensionKey cefName="IdentityType" metaName="obj_type"/>
+		<ExtensionKey cefName="SHA" metaName="checksum"/>
+		<ExtensionKey cefName="PUAs" metaName="cs_fld"/>
+		<ExtensionKey cefName="userAgent" metaName="user_agent"/>
+		<ExtensionKey cefName="responseBodySize" metaName="cs_fld"/>
+		<ExtensionKey cefName="ContentType" metaName="content_type"/>
+		<ExtensionKey cefName="AMPScore" metaName="cs_fld"/>
+		<ExtensionKey cefName="AMPDisposition" metaName="disposition"/>
+		<ExtensionKey cefName="URL" metaName="url"/>
+		<ExtensionKey cefName="statusCode" metaName="resultcode"/>
+		<ExtensionKey cefName="Verdict" metaName="action"/>
+		
+		<ExtensionKey cefName="SourceIp" metaName="saddr"/>
+		<ExtensionKey cefName="SourcePort" metaName="sport"/>
+		<ExtensionKey cefName="DestinationPort" metaName="dport"/>
+		
+		<ExtensionKey cefName="id.time" metaName="param_event_time"/>
+		<ExtensionKey cefName="id.uniqueQualifier" metaName="id"/>
+		<ExtensionKey cefName="id.applicationName" metaName="category"/>
+		<ExtensionKey cefName="actor.email" metaName="username"/>
+		<ExtensionKey cefName="USER_EMAIL" metaName="email"/>
+		<ExtensionKey cefName="scope_0" metaName="cs_fld"/>
+		<ExtensionKey cefName="scope_1" metaName="cs_fld"/>
+		<ExtensionKey cefName="app_name" metaName="application"/>
+		<ExtensionKey cefName="ROLE_NAME" metaName="user_role"/>
+		<ExtensionKey cefName="ipAddress" metaName="stransaddr"/>
+		<ExtensionKey cefName="GROUP_EMAIL" metaName="group"/>
+		<ExtensionKey cefName="DOMAIN_NAME" metaName="domain"/>
+		<ExtensionKey cefName="API_CLIENT_NAME" metaName="cs_fld"/>
+		<ExtensionKey cefName="API_SCOPES" metaName="cs_fld"/>
+		<ExtensionKey cefName="actor.profileId" metaName="user.id"/>
+		<ExtensionKey cefName="CERTIFICATE_NAME" metaName="cert_common"/>
+		<ExtensionKey cefName="ORG_UNIT_NAME" metaName="user_org"/>
+		<ExtensionKey cefName="SERVICE_NAME" metaName="service.name"/>
+		<ExtensionKey cefName="DESTINATION_USER_EMAIL" metaName="to"/>
+		<ExtensionKey cefName="APPLICATION_NAME" metaName="application"/>
+		<ExtensionKey cefName="is_suspicious" metaName="cs_fld"/>
+		<ExtensionKey cefName="login_type" metaName="logon_type"/>
+		<ExtensionKey cefName="login_challenge_method_0" metaName="authmethod"/>
+		<ExtensionKey cefName="login_challenge_status" metaName="disposition"/>
+		<ExtensionKey cefName="user_agent" metaName="user_agent"/>
+		<ExtensionKey cefName="ownerDomain" metaName="domain"/>
+		<ExtensionKey cefName="recipient_email" metaName="to"/>
+		<ExtensionKey cefName="notification_message_id" metaName="cs_fld"/>
+		<ExtensionKey cefName="notification_type" metaName="subject"/>
+		<ExtensionKey cefName="event_id" metaName="cs_fld"/>
+		<ExtensionKey cefName="start_time" metaName="cs_fld"/>
+		<ExtensionKey cefName="end_time" metaName="cs_fld"/>
+		<ExtensionKey cefName="access_level" metaName="accesses"/>
+		<ExtensionKey cefName="grantee_email" metaName="cs_fld"/>
+		<ExtensionKey cefName="calendar_timezone" metaName="timezone"/>
+		<ExtensionKey cefName="event_response_status" metaName="result"/>
+		<ExtensionKey cefName="acl_permission" metaName="permissions"/>
+
+		
+		<ExtensionKey cefName="cloud_ioc.short_description" metaName="event_description"/>
+		<ExtensionKey cefName="computer.connector_guid" metaName="cs_fld"/>
+		<ExtensionKey cefName="network_info.remote_ip" metaName="daddr"/>
+		<ExtensionKey cefName="network_info.parent.file_name" metaName="filename_src"/>
+		<ExtensionKey cefName="network_info.remote_port" metaName="dport"/>
+		<ExtensionKey cefName="file.parent.identity.sha256" metaName="cs_fld"/>
+		<ExtensionKey cefName="vulnerabilities.url" metaName="url"/>
+		<ExtensionKey cefName="computer.hostname" metaName="shost"/>
+		<ExtensionKey cefName="detection" metaName="virusname"/>
+		<ExtensionKey cefName="network_info.nfm.protocol" metaName="protocol"/>
+		<ExtensionKey cefName="scan.scanned_paths" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.file_name" metaName="filename"/>
+		<ExtensionKey cefName="detection_id" metaName="id2"/>
+		<ExtensionKey cefName="file.identity.sha256" metaName="checksum"/>
+		<ExtensionKey cefName="scan.clean" metaName="cs_fld"/>
+		<ExtensionKey cefName="vulnerabilities.name" metaName="threat_name"/>
+		<ExtensionKey cefName="file.attack_details.application" metaName="application"/>
+		<ExtensionKey cefName="file.parent.process_id" metaName="process_id_src"/>
+		<ExtensionKey cefName="file.file_path" metaName="directory"/>
+		<ExtensionKey cefName="scan.malicious_detections" metaName="dclass_counter1"/>
+		<ExtensionKey cefName="vulnerabilities.score" metaName="threat_val"/>
+		<ExtensionKey cefName="computer.links.trajectory" metaName="cs_fld"/>
+		<ExtensionKey cefName="scan.description" metaName="context"/>
+		<ExtensionKey cefName="file.archived_file.identity.sha256" metaName="cs_fld"/>
+		<ExtensionKey cefName="computer.network_addresses.mac" metaName="smacaddr"/>
+		<ExtensionKey cefName="file.identity.sha1" metaName="cs_fld"/>
+		<ExtensionKey cefName="vulnerabilities.version" metaName="cs_fld"/>
+		<ExtensionKey cefName="start_date" metaName="cs_fld"/>
+		<ExtensionKey cefName="network_info.local_ip" metaName="saddr"/>
+		<ExtensionKey cefName="file.attack_details.attacked_module" metaName="cs_fld"/>
+		<ExtensionKey cefName="network_info.dirty_url" metaName="url"/>
+		<ExtensionKey cefName="computer.active" metaName="cs_fld"/>
+		<ExtensionKey cefName="connector_guid" metaName="connectionid"/>
+		<ExtensionKey cefName="network_info.parent.process_id" metaName="process_id_src"/>
+		<ExtensionKey cefName="network_info.local_port" metaName="sport"/>
+		<ExtensionKey cefName="vulnerabilities.cve" metaName="cve"/>
+		<ExtensionKey cefName="scan.scanned_processes" metaName="cs_fld"/>
+		<ExtensionKey cefName="computer.user" metaName="username"/>
+		<ExtensionKey cefName="event_type_id" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.disposition" metaName="disposition"/>
+		<ExtensionKey cefName="network_info.parent.disposition" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.archived_file.disposition" metaName="cs_fld"/>
+		<ExtensionKey cefName="start_timestamp" metaName="param_starttime"/>
+		<ExtensionKey cefName="scan.scanned_files" metaName="cs_fld"/>
+		<ExtensionKey cefName="computer.links.computer" metaName="cs_fld"/>
+		<ExtensionKey cefName="network_info.parent.identity.sha1" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.attack_details.base_address" metaName="cs_fld"/>
+		<ExtensionKey cefName="cloud_ioc.description" metaName="info"/>
+		<ExtensionKey cefName="computer.links.group" metaName="cs_fld"/>
+		<ExtensionKey cefName="computer.network_addresses.ip" metaName="saddr"/>
+		<ExtensionKey cefName="file.identity.md5" metaName="cs_fld"/>
+		<ExtensionKey cefName="network_info.parent.identity.sha256" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.parent.identity.md5" metaName="cs_fld"/>
+		<ExtensionKey cefName="network_info.parent.identity.md5" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.parent.identity.sha1" metaName="cs_fld"/>
+		<ExtensionKey cefName="timestamp_nanoseconds" metaName="cs_fld"/>
+		<ExtensionKey cefName="file.parent.file_name" metaName="filename_src"/>
+		<ExtensionKey cefName="file.parent.disposition" metaName="disposition"/>
+		<ExtensionKey cefName="computer.external_ip" metaName="stransaddr"/>
+		<ExtensionKey cefName="network_info.nfm.direction" metaName="direction"/>
+		<ExtensionKey cefName="fault_event_title" metaName="result"/>
+		<ExtensionKey cefName="error.error_code" metaName="resultcode"/>
+		<ExtensionKey cefName="error.description" metaName="result"/>
+		
+		
+		<ExtensionKey cefName="ad.app" metaName="application"/>
+		<ExtensionKey cefName="ad.appact" metaName="action"/>
+		<ExtensionKey cefName="ad.appcat" metaName="category"/>
+		<ExtensionKey cefName="ad.appid" metaName="id1"/>
+		<ExtensionKey cefName="ad.applist" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.apprisk" metaName="risk"/>
+		<ExtensionKey cefName="ad.cat" metaName="category"/>
+		<ExtensionKey cefName="ad.countapp" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.countweb" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.craction" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.crlevel" metaName="severity"/>
+		<ExtensionKey cefName="ad.crscore" metaName="reputation_num"/>
+		<ExtensionKey cefName="ad.devtype" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.direction" metaName="direction"/>
+		<ExtensionKey cefName="ad.dstcountry" metaName="location_dst"/>
+		<ExtensionKey cefName="ad.dstdevtype" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.dstintfrole" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.dstmac" metaName="dmacaddr"/>
+		<ExtensionKey cefName="ad.dstserver" metaName="dhost"/>
+		<ExtensionKey cefName="ad.duration" metaName="duration"/>
+		<ExtensionKey cefName="ad.eventtime" metaName="event_time_string"/>
+		<ExtensionKey cefName="ad.eventtype" metaName="event_type"/>
+		<ExtensionKey cefName="ad.incidentserialno" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.lanin" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.lanout" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.logdesc" metaName="event_description"/>
+		<ExtensionKey cefName="ad.logid" metaName="id"/>
+		<ExtensionKey cefName="ad.masterdstmac" metaName="dmacaddr"/>
+		<ExtensionKey cefName="ad.mastersrcmac" metaName="smacaddr"/>
+		<ExtensionKey cefName="ad.method" metaName="authmethod"/>
+		<ExtensionKey cefName="ad.policyid" metaName="policy_id"/>
+		<ExtensionKey cefName="ad.policytype" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.poluuid" metaName="id2"/>
+		<ExtensionKey cefName="ad.profile" metaName="profile"/>
+		<ExtensionKey cefName="ad.rcvdpkt" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.referralurl" metaName="url"/>
+		<ExtensionKey cefName="ad.reqtype" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.scertcname" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.sentpkt" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.shaperdropsentbyte" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.shaperperipdropbyte" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.shaperperipname" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.shapersentname" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.shapingpolicyid" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.srccountry" metaName="location_src"/>
+		<ExtensionKey cefName="ad.srcintfrole" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.srcmac" metaName="smacaddr"/>
+		<ExtensionKey cefName="ad.srcserver" metaName="shost"/>
+		<ExtensionKey cefName="ad.status" metaName="event_state"/>
+		<ExtensionKey cefName="ad.subtype" metaName="obj_type"/>
+		<ExtensionKey cefName="ad.trandisp" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.utmaction" metaName="action"/>
+		<ExtensionKey cefName="ad.vd" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.wanin" metaName="cs_fld"/>
+		<ExtensionKey cefName="ad.wanout" metaName="cs_fld"/>
+		<ExtensionKey cefName="logver" metaName="version"/>
+		
+		
+		<ExtensionKey cefName="reasonForFailure" metaName="result"/> 
+		<ExtensionKey cefName="Role" metaName="user_role"/> 
+		<ExtensionKey cefName="role" metaName="user_role"/> 
+		<ExtensionKey cefName="uri" metaName="directory"/> 
+		<ExtensionKey cefName="AccountProvider" metaName="info"/> 
+		<ExtensionKey cefName="file" metaName="filename"/> 
+		<ExtensionKey cefName="ModuleSettings" metaName="info"/> 
+		<ExtensionKey cefName="deviceIDs" metaName="hardware_id"/> 
+		<ExtensionKey cefName="account" metaName="username"/> 
+		<ExtensionKey cefName="userRole" metaName="user_role"/>
+		<ExtensionKey cefName="key" metaName="obj_name"/>
+		<ExtensionKey cefName="value" metaName="cs_fld"/>
+		<ExtensionKey cefName="name" metaName="alert"/>
+		<ExtensionKey cefName="enabled" metaName="cs_fld"/>
+		<ExtensionKey cefName="disabled" metaName="cs_fld"/>
+		<ExtensionKey cefName="notificationBinding" metaName="info"/>
+		<ExtensionKey cefName="incident" metaName="context"/>
+		<ExtensionKey cefName="alert" metaName="alert"/>
+		<ExtensionKey cefName="remoteAddress" metaName="saddr"/>
+		<ExtensionKey cefName="addRole" metaName="user_role"/>
+		<ExtensionKey cefName="addPermission" metaName="permissions"/>
+		<ExtensionKey cefName="params" metaName="info"/>
+		<ExtensionKey cefName="arguments" metaName="info"/>
+
+		
+		<ExtensionKey cefName="bapp" metaName="cs_fld"/>
+		<ExtensionKey cefName="acttype" metaName="cs_fld"/>
+		<ExtensionKey cefName="actcode" metaName="cs_fld"/>
+		<ExtensionKey cefName="library" metaName="cs_fld"/>
+		<ExtensionKey cefName="objecttype" metaName="obj_type"/>
+		<ExtensionKey cefName="program" metaName="application"/>
+		<ExtensionKey cefName="jobid" metaName="operation_id"/>
+		<ExtensionKey cefName="rcv" metaName="cs_fld"/>
+		
+		
+	
+		<ExtensionKey cefName="device_time" metaName="param_event_time"/>
+		<ExtensionKey cefName="device_uid" metaName="agent.id"/>
+		<ExtensionKey cefName="internalIP" metaName="saddr"/>
+		<ExtensionKey cefName="internalHost" metaName="shost"/>
+		<ExtensionKey cefName="sha2" metaName="checksum"/>
+		<ExtensionKey cefName="md5" metaName="checksum"/>
+		<ExtensionKey cefName="AVEVirusName" metaName="virusname"/>
+		<ExtensionKey cefName="actual_action" metaName="action"/>
+		<ExtensionKey cefName="user_name" metaName="username"/>
+	    <ExtensionKey cefName="domain_name" metaName="domain"/>
+		<ExtensionKey cefName="disposition" metaName="disposition"/>
+		<ExtensionKey cefName="disposition_atp" metaName="cs_fld"/>
+		<ExtensionKey cefName="externalIP" metaName="daddr"/>
+		<ExtensionKey cefName="externalPort" metaName="dport"/>
+		<ExtensionKey cefName="data_source_url_domain" metaName="alias.ip"/>
+		<ExtensionKey cefName="data_source_url" metaName="url"/>
+		<ExtensionKey cefName="VantageSignatureID" metaName="sigid"/>
+		<ExtensionKey cefName="incident_uuid" metaName="cs_fld"/>
+		<ExtensionKey cefName="rule_name" metaName="rulename"/>
+		<ExtensionKey cefName="description" metaName="event_description"/>
+		<ExtensionKey cefName="message" metaName="context"/>
+		<ExtensionKey cefName="json" metaName="info"/>
+		
+		
+		<ExtensionKey cefName="vendorInformation.provider" metaName="event_source"/>
+		<ExtensionKey cefName="azureSubscriptionId" metaName="id1"/>
+		<ExtensionKey cefName="closedDateTime" metaName="param_endtime"/>
+		<ExtensionKey cefName="activityGroupName" metaName="group"/>
+		<ExtensionKey cefName="comments" metaName="comments"/>
+		<ExtensionKey cefName="eventDateTime" metaName="param_event_time"/>
+		<ExtensionKey cefName="lastModifiedDateTime" metaName="param_effective_time"/>
+		<ExtensionKey cefName="userStates.userPrincipalName" metaName="username"/>
+		<ExtensionKey cefName="userStates.emailRole" metaName="cs_fld"/>
+		<ExtensionKey cefName="userStates.domainName" metaName="domain.src"/>
+		<ExtensionKey cefName="userStates.aadUserId" metaName="user.id"/>
+		<ExtensionKey cefName="userStates.accountName" metaName="user"/>
+		<ExtensionKey cefName="userStates.logonIp" metaName="saddr"/>
+		<ExtensionKey cefName="userStates.logonLocation" metaName="location_desc"/>
+		<ExtensionKey cefName="userStates.riskScore" metaName="risk_num"/>
+		<ExtensionKey cefName="createdDateTime" metaName="param_starttime"/>
+		<ExtensionKey cefName="vendorInformation.subProvider" metaName="context"/>
+		<ExtensionKey cefName="vendorInformation.vendor" metaName="product"/>
+		<ExtensionKey cefName="title" metaName="info"/>
+		
+		<ExtensionKey cefName="HOST.ID" metaName="id1"/>
+		<ExtensionKey cefName="HOST.IP" metaName="saddr"/>
+		<ExtensionKey cefName="HOST.OS" metaName="os"/>
+		<ExtensionKey cefName="HOST.NETBIOS" metaName="domain_id"/>
+		<ExtensionKey cefName="HOST.DNS" metaName="event_computer"/>
+		<ExtensionKey cefName="DETECTION.QID" metaName="id2"/>
+		<ExtensionKey cefName="DETECTION.RESULTS" metaName="event_description"/>
+		<ExtensionKey cefName="DETECTION.STATUS" metaName="result"/>
+		<ExtensionKey cefName="DETECTION.SEVERITY" metaName="severity"/>
+		<ExtensionKey cefName="QID.BUGTRAQ_LIST.BUGTRAQ.URL" metaName="url"/>
+		<ExtensionKey cefName="QID.CVE_LIST.CVE.ID" metaName="cve"/>
+		
+		<ExtensionKey cefName="messageID" metaName="cs_fld"/>
+		<ExtensionKey cefName="to" metaName="to"/>
+		<ExtensionKey cefName="from" metaName="from"/>
+		<ExtensionKey cefName="cc" metaName="cc"/>
+		<ExtensionKey cefName="trueSrc" metaName="saddr"/>
+		<ExtensionKey cefName="x-mailer" metaName="cs_fld"/>
+		<ExtensionKey cefName="exceptionReason" metaName="info"/>
+		<ExtensionKey cefName="fnameAndfileHash" metaName="cs_fld"/>
+		<ExtensionKey cefName="hybridSpamScore" metaName="cs_fld"/>
+		<ExtensionKey cefName="localSpamScore" metaName="cs_fld"/>
+		<ExtensionKey cefName="replyTo" metaName="to"/>
+		<ExtensionKey cefName="encryptedDelivery" metaName="cs_fld"/>
+		<ExtensionKey cefName="deliveryCode" metaName="resultcode"/>
+		<ExtensionKey cefName="deliveryCodeInfo" metaName="cs_fld"/>
+</ExtensionKeys>
+</DEVICEMESSAGES>

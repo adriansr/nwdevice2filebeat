@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<DEVICEMESSAGES
+	name="mcafeepa"
+	displayname="McAfee Policy Auditor"
+	group="Configuration Management">
+<VERSION
+	xml="9"
+	checksum="9fe469a37c9fe0618baeb33f8a924da5"
+	revision="0"
+	device="2.0" />
+
+ 
+<HEADER 
+	id1="0001" 
+	id2="0001"  
+	content="%mcafeepa-&lt;messageid&gt;: &lt;!payload&gt;" /> 
+
+<HEADER 
+	id1="0002" 
+	id2="0002"  
+	content="%mcafeepa-4-&lt;messageid&gt;: &lt;!payload&gt;" /> 
+
+<MESSAGE 
+	id1="Pass" 
+	id2="Pass" 
+	eventcategory="1502000000" 
+	functions="&lt;@disposition:pass&gt;"
+	content="&lt;fld2&gt;^^&lt;benchmark&gt;^^&lt;version&gt;^^&lt;hostname&gt;^^&lt;fld1&gt;^^&lt;endtime&gt;^^&lt;rule_uid&gt;^^{pass|&lt;fld3&gt;}^^Pass^^&lt;result&gt;^^&lt;group&gt;^^&lt;directory&gt;^^&lt;policy_waiver&gt;" />
+<MESSAGE 
+	id1="Fail" 
+	id2="Fail" 
+	eventcategory="1502000000" 
+	functions="&lt;@disposition:fail&gt;"
+	content="&lt;fld2&gt;^^&lt;benchmark&gt;^^&lt;version&gt;^^&lt;hostname&gt;^^&lt;fld1&gt;^^&lt;endtime&gt;^^&lt;rule_uid&gt;^^{fail|&lt;fld3&gt;}^^Fail^^&lt;result&gt;^^&lt;group&gt;^^&lt;directory&gt;^^&lt;policy_waiver&gt;" />
+<MESSAGE 
+	id1="Other" 
+	id2="Other" 
+	eventcategory="1502000000" 
+	functions="&lt;@disposition:notapplicable&gt;"
+	content="&lt;fld2&gt;^^&lt;benchmark&gt;^^&lt;version&gt;^^&lt;hostname&gt;^^&lt;fld1&gt;^^&lt;endtime&gt;^^&lt;rule_uid&gt;^^notapplicable^^Other^^&lt;result&gt;^^&lt;group&gt;^^&lt;directory&gt;^^&lt;policy_waiver&gt;" />
+	
+</DEVICEMESSAGES>

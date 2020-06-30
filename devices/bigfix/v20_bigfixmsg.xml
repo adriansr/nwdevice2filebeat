@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<DEVICEMESSAGES
+	name="bigfix"
+	displayname="BigFix"
+	group="Configuration Management">
+<VERSION
+	xml="4"
+	checksum="2a412eaaa00875bf8f63c39f19debf57"
+	revision="0"
+	device="2.0" />
+
+ 
+<HEADER 
+	id1="0001" 
+	id2="0001"  
+	content="%BIGFIX: &lt;messageid&gt;^^&lt;!payload&gt;" /> 
+<MESSAGE 
+	id1="BIGFIX_ACTION" 
+	id2="BIGFIX_ACTION" 
+	eventcategory="1609000000" 
+	functions="&lt;@:*SYSVAL($MSGID,$ID1)&gt;"
+	content="&lt;operation_id&gt;^^&lt;hostid&gt;^^&lt;action&gt;^^&lt;username&gt;^^&lt;event_time&gt;^^&lt;id&gt;^^&lt;category&gt;^^&lt;result&gt;" />
+</DEVICEMESSAGES>

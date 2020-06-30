@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<DEVICEMESSAGES
+	name="websenseds"
+	displayname="Websense Data Security"
+	group="DLP">
+<VERSION
+	xml="19"
+	checksum="6ce081752b4e8f47168a8d3a68027898"
+	revision="127"
+	device="2.0"/>
+	
+<TAGVALMAP
+	delimiter=" "/>
+<HEADER
+	id1="0001"
+	id2="0001"
+	messageid="STRCAT('websense', &apos;_&apos;, 'ds')"
+	content="&lt;hevent_time_string&gt; &lt;hhostname&gt; CEF:0|Websense|Data Security|&lt;hversion&gt;|&lt;hevent_type&gt;|&lt;hevent_description&gt;|&lt;hseverity&gt;|&lt;!payload&gt;"/>
+
+<HEADER
+	id1="0002"
+	id2="0002"
+	messageid="STRCAT('websense', &apos;_&apos;, 'ds')"
+	content="CEF:0|{Websense|Forcepoint}|{ Data Security | TRITON AP-DATA | Forcepoint DLP }|&lt;hversion&gt;|&lt;hevent_type&gt;|&lt;hevent_description&gt;|&lt;hseverity&gt;|&lt;!payload&gt;"/>
+
+
+<VALUEMAP
+		name="getEventLegacyCategoryName"
+		default="Other.Default"
+		keyvaluepairs="1502010000=&apos;Policies.Rules.Rejects&apos;|1502020000=&apos;Policies.Rules.Successful&apos;" />
+<VALUEMAP
+	    name="getEventLegacyCategory"
+		default="1901000000"
+		keyvaluepairs="Permitted=&apos;1502020000&apos;|Blocked=&apos;1502010000&apos;" />	
+<MESSAGE
+	id1="websense_ds"
+	id2="websense_ds"
+	eventcategory="1502010000"
+	tagval="true"
+	missField="true"
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@hostname:*HDR(hhostname)&gt;&lt;@product:*HDR(hproduct)&gt;&lt;@version:*HDR(hversion)&gt;&lt;@event_type:*HDR(hevent_type)&gt;&lt;@event_description:*HDR(hevent_description)&gt;&lt;@severity:*HDR(hseverity)&gt;&lt;@event_time_str:*HDR(hevent_time_str)&gt;&lt;@event_cat:*getEventLegacyCategory(action)&gt;&lt;@event_cat_name:*getEventLegacyCategoryName(event_cat)&gt;"
+	content="act=&lt;action&gt; duser=&lt;username&gt; fname=&lt;filename&gt; msg=&lt;msg&gt; suser=&lt;c_username&gt; cat=&lt;category&gt; sourceServiceName=&lt;service&gt; analyzedBy=&lt;cs_analyzedby&gt; loginName=&lt;cs_loginname&gt; sourceIp=&lt;saddr&gt; severityType=&lt;severity&gt; sourceHost=&lt;shost&gt; productVersion=&lt;fld1&gt; maxMatches=&lt;fld2&gt; timeStamp=&lt;event_time&gt; destinationHosts=&lt;dhost&gt; Ticket=&lt;info&gt;" />
+</DEVICEMESSAGES>

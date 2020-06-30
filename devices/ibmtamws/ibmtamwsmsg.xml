@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<DEVICEMESSAGES
+	name="ibmtamws"
+	displayname="IBM TAM WebSEAL"
+	group="Access Control">
+<VERSION
+	xml="14"
+	checksum="8e6375fe7756ef462c1d8522ab195d5f"
+	revision="133"
+	device="2.0" />
+	
+<TAGVALMAP
+    pairdelimiter="|" 
+	encapsulator="&quot;" />
+
+ 
+ 
+<HEADER 
+	id1="0001" 
+	id2="0001"  
+	content="%IBMTAMWS: Date=&lt;hfld1&gt;^^Eventid=&lt;messageid&gt;^^&lt;!payload:hfld1&gt;" /> 
+<HEADER 
+	id1="0002" 
+	id2="0002"  
+	content="%IBMTAMWS-&lt;hfld1&gt;: &lt;hfld2&gt; - &lt;hfld3&gt; [&lt;hfld4&gt;] &quot;&lt;messageid&gt; &lt;!payload:hfld2&gt;" /> 
+<HEADER 
+	id1="0003" 
+	id2="0003"  
+	content="%IBMTAMWS-&lt;hfld1&gt;: &lt;hfld2&gt; - &lt;hfld3&gt; &lt;hfld4&gt; &lt;hfld5&gt; &quot;&lt;messageid&gt; &lt;!payload:hfld2&gt;" /> 
+<HEADER 
+	id1="0004" 
+	id2="0004"  
+	content="&lt;hfld1&gt; &lt;hostname&gt; &lt;hfld3&gt; &lt;hfld4&gt; - - &lt;messageid&gt;|&lt;!payload&gt;" /> 
+
+<VALUEMAP 
+	name="outcome" 
+	default="$NONE" 
+	keyvaluepairs="0=&apos;Success&apos;|1=&apos;Failure&apos;|2=&apos;Pending&apos;|3=&apos;Unknown&apos;" />
+<MESSAGE 
+	id1="GET" 
+	id2="GET" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; [&lt;fld3&gt; &lt;timezone&gt;] &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+<MESSAGE 
+	id1="GET:01" 
+	id2="GET" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; &lt;fld3&gt; &lt;timezone&gt; &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+
+<MESSAGE 
+	id1="POST" 
+	id2="POST" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; [&lt;fld3&gt; &lt;timezone&gt;] &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+<MESSAGE 
+	id1="POST:01" 
+	id2="POST" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; &lt;fld3&gt; &lt;timezone&gt; &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+
+<MESSAGE 
+	id1="HEAD" 
+	id2="HEAD" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; [&lt;fld3&gt; &lt;timezone&gt;] &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+<MESSAGE 
+	id1="HEAD:01" 
+	id2="HEAD" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; &lt;fld3&gt; &lt;timezone&gt; &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+
+<MESSAGE 
+	id1="OPTIONS" 
+	id2="OPTIONS" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; [&lt;fld3&gt; &lt;timezone&gt;] &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+<MESSAGE 
+	id1="TRACE" 
+	id2="TRACE" 
+	eventcategory="1204000000" 
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld3)&gt;"
+	content="&lt;saddr&gt; - &lt;username&gt; [&lt;fld3&gt; &lt;timezone&gt;] &quot;&lt;web_method&gt; &lt;url&gt; &lt;fld6&gt;&quot; &lt;resultcode&gt; &lt;rbytes&gt;" />
+<MESSAGE 
+	id1="101:Success" 
+	id2="101" 
+	eventcategory="1401060000" 
+	functions="&lt;@action:Login&gt;&lt;@disposition:Success&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=0^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="101:Failure" 
+	id2="101" 
+	eventcategory="1401030000" 
+	functions="&lt;@action:Login&gt;&lt;@disposition:Failure&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=1^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="101" 
+	id2="101" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Login&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="102" 
+	id2="102" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Password change&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="103" 
+	id2="103" 
+	eventcategory="1401070000" 
+	functions="&lt;@action:Logout&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="104:Success" 
+	id2="104" 
+	eventcategory="1302000000" 
+	functions="&lt;@action:Authenticate&gt;&lt;@disposition:Success&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=0^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="104:Failure" 
+	id2="104" 
+	eventcategory="1301000000" 
+	functions="&lt;@action:Authenticate&gt;&lt;@disposition:Failure&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=1^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+	
+<MESSAGE 
+	id1="104" 
+	id2="104" 
+	eventcategory="1304000000" 
+	functions="&lt;@action:Authenticate&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="105" 
+	id2="105" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Step-up&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="106:Success" 
+	id2="106" 
+	eventcategory="1302000000" 
+	functions="&lt;@action:Re-authentication&gt;&lt;@disposition:Success&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=0^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="106:Failure" 
+	id2="106" 
+	eventcategory="1301000000" 
+	functions="&lt;@action:Re-authentication&gt;&lt;@disposition:Failure&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=1^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+	
+<MESSAGE 
+	id1="106" 
+	id2="106" 
+	eventcategory="1304000000" 
+	functions="&lt;@action:Re-authentication&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="107" 
+	id2="107" 
+	eventcategory="1304000000" 
+	functions="&lt;@action:Credentials refresh&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="108:Success" 
+	id2="108" 
+	eventcategory="1302000000" 
+	functions="&lt;@action:Authorization check&gt;&lt;@disposition:Success&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=0^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="108:Failure" 
+	id2="108" 
+	eventcategory="1301000000" 
+	functions="&lt;@action:Authorization check&gt;&lt;@disposition:Failure&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=1^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+	
+<MESSAGE 
+	id1="108" 
+	id2="108" 
+	eventcategory="1304000000" 
+	functions="&lt;@action:Authorization check&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="109" 
+	id2="109" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Resource Access&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="109:01" 
+	id2="109" 
+	eventcategory="1401000000" 
+	functions="&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;" />
+	
+<MESSAGE 
+	id1="110" 
+	id2="110" 
+	eventcategory="1304000000" 
+	functions="&lt;@action:Get credentials&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="111" 
+	id2="111" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Modify credentials/combine credentials&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="112" 
+	id2="112" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Get credentials from pac&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="113" 
+	id2="113" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Get pac&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="114" 
+	id2="114" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Get entitlements&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="115" 
+	id2="115" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime start&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="116" 
+	id2="116" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime stop&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="117" 
+	id2="117" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime audit start&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="118" 
+	id2="118" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime audit stop&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="119" 
+	id2="119" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime audit level change&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="120" 
+	id2="120" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime statistic&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="121" 
+	id2="121" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime heartbeat up&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="122" 
+	id2="122" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime heartbeat down&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="123" 
+	id2="123" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime lost contact&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="124" 
+	id2="124" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime contact restored&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="125" 
+	id2="125" 
+	eventcategory="1612000000" 
+	functions="&lt;@action:Runtime monitor&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="126:Success" 
+	id2="126" 
+	eventcategory="1401060000" 
+	functions="&lt;@action:Switch User Login&gt;&lt;@disposition:Success&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=0^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="126:Failure" 
+	id2="126" 
+	eventcategory="1401030000" 
+	functions="&lt;@action:Switch User Login&gt;&lt;@disposition:Failure&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=1^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="126" 
+	id2="126" 
+	eventcategory="1401000000" 
+	functions="&lt;@action:Switch User Login&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="127" 
+	id2="127" 
+	eventcategory="1401070000" 
+	functions="&lt;@action:Switch-user logout&gt;&lt;@disposition:*outcome(fld7)&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F-%H:%U:%O',fld1)&gt;"
+	content="&lt;fld1&gt;.&lt;fld2&gt;^^Eventid=&lt;fld3&gt;^^Outcome=&lt;fld7&gt;^^Reason=&lt;result&gt;^^Blade=&lt;event_source&gt;^^Instance=&lt;instance&gt;^^Component=&lt;category&gt;^^Action=&lt;event_type&gt;^^Location=&lt;hostname&gt;^^Principal=&lt;username&gt;^^name_in_rgy=&lt;src_dn&gt;^^Session_id=&lt;sessionid&gt;^^User_Location=&lt;saddr&gt;^^Resource=&lt;obj_type&gt;^^Object=&lt;obj_name&gt;^^Auth_Type=&lt;authmethod&gt;^^Term_reason=&lt;info&gt;^^Audit_event=&lt;event_state&gt;" />
+<MESSAGE 
+	id1="isam-http-request-log" 
+	id2="isam-http-request-log" 
+	eventcategory="1204000000" 
+	tagval="true" 
+	missField="true"
+	functions="&lt;@web_query:*URL($QUERY,url)&gt;&lt;@web_root:*URL($ROOT,url)&gt;&lt;@webpage:*URL($PAGE,url)&gt;&lt;@event_time:*EVNTTIME($MSG,'%F/%B/%W:%H:%U:%O',fld2)&gt;"
+	content="client-ip=&lt;saddr&gt;|server-ip=&lt;daddr&gt;|client-logname=&lt;fld1&gt;|remote-user=&lt;username&gt;|time=&lt;fld2&gt;|port=&lt;port&gt;|protocol=&lt;protocol&gt;|request-method=&lt;web_method&gt;|response-status=&lt;resultcode&gt;|url=&lt;url&gt;|bytes=&lt;rbytes&gt;|remote-host=&lt;hostip&gt;|request=&lt;fld4&gt;" />
+
+</DEVICEMESSAGES>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<DEVICEMESSAGES
+	name="sophos"
+	displayname="Sophos Enterprise Console"
+	group="Anti Virus">
+<VERSION 
+	xml="77"
+	checksum="eb2867009eb88408a193e512d05acedc"
+	revision="131"
+	device="2.0" />
+<TAGVALMAP
+    pairdelimiter="^^" />
+<HEADER 
+	id1="0001" 
+	id2="0001"  
+	content="%sophoses: &lt;hfld1&gt;^^&lt;hfld2&gt;^^&lt;hfld3&gt;^^&lt;messageid&gt;^^&lt;!payload:hfld1&gt;" /> 
+  
+<HEADER 
+	id1="0002" 
+	id2="0002"  
+	content="%SOPHOS &lt;messageid&gt; &lt;!payload:messageid&gt;" />
+<HEADER 
+	id1="0003" 
+	id2="0003"  
+	messageid="STRCAT('SOPHOSES_TVM')"
+	content="%sophosestvm: &lt;id1&gt;^^&lt;!payload&gt;" />
+<HEADER 
+	id1="0004" 
+	id2="0004"  
+	messageid="STRCAT('SOPHOSES_TVM')"
+	content="%sophoses: EventID=&lt;id1&gt;^^&lt;!payload&gt;" />
+<HEADER 
+	id1="0005" 
+	id2="0005"  
+	messageid="STRCAT('SOPHOSES_TVM')"
+	content="%sophoses: ThreatID=&lt;id1&gt;^^&lt;!payload&gt;" />	
+<VALUEMAP 
+		name ="threat_type"
+		default="undefined"
+		keyvaluepairs="1=&apos;Virus&apos;|2=&apos;PUA&apos;|3=&apos;Firewall&apos;|4=&apos;Suspicious Behavior&apos;|5=&apos;Suspicious_Files&apos;|6=&apos;Controlled_App&apos;" />
+	
+<MESSAGE 
+	id1="Infected"
+	id2="Infected" 
+	eventcategory="1003010000" 
+	functions="&lt;@ec_subject:File&gt;&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;"
+	content="Infected file \&quot;&lt;filename&gt;&quot; has been &lt;action&gt;..." />
+		
+<MESSAGE 
+	id1="On-access"
+	id2="On-access" 
+	eventcategory="1003000000" 
+	functions="&lt;@ec_subject:User&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;"
+	content="On-access &lt;event_description&gt; \&quot;&lt;filename&gt;&quot; for user &lt;username&gt;.." />
+		
+<MESSAGE 
+	id1="Process"
+	id2="Process" 
+	eventcategory="1003000000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@obj_type:Process&gt;"
+	content="Process &apos;&lt;obj_name&gt;&apos; &lt;event_description&gt; pattern &apos;&lt;rule&gt;&apos;. ...&lt;action&gt;. ...&lt;info&gt;..." />
+	
+<MESSAGE 
+	id1="Virus/spyware"
+	id2="Virus/spyware" 
+	eventcategory="1003050000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@action:Virus Detected&gt;"
+	content="Virus/spyware &apos;&lt;threat_name&gt;&apos; has been detected in \&quot;&lt;filename&gt;&quot;&lt;info&gt;" />
+		
+
+<MESSAGE 
+	id1="Virus"
+	id2="1" 
+	eventcategory="1003010000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@threat_name:*PARMVAL(obj_name)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;^^&lt;filename&gt;" />
+		
+<MESSAGE 
+	id1="Virus:01"
+	id2="1" 
+	eventcategory="1003010000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@threat_name:*PARMVAL(obj_name)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;" />
+		
+<MESSAGE 
+	id1="PUA"
+	id2="2" 
+	eventcategory="1502000000" 
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;^^&lt;filename&gt;" />
+<MESSAGE 
+	id1="PUA_01"
+	id2="2" 
+	eventcategory="1502000000" 
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;" />
+<MESSAGE 
+	id1="Firewall"
+	id2="3" 
+	eventcategory="1502000000" 
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;^^&lt;filename&gt;" />
+<MESSAGE 
+	id1="Firewall_01"
+	id2="3" 
+	eventcategory="1502000000" 
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;" />
+<MESSAGE 
+	id1="Suspicious_Behaviour"
+	id2="4" 
+	eventcategory="1502000000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;^^&lt;filename&gt;" />
+<MESSAGE 
+	id1="Suspicious_Behaviour_01"
+	id2="4" 
+	eventcategory="1502000000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;" />
+<MESSAGE 
+	id1="Suspicious_Files"
+	id2="5" 
+	eventcategory="1502000000" 
+	functions="&lt;@ec_theme:TEV&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;^^&lt;filename&gt;" />
+<MESSAGE 
+	id1="Controlled_App"
+	id2="6" 
+	eventcategory="1502000000" 
+	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_type:*threat_type(fld52)&gt;&lt;@obj_type:ThreatName&gt;&lt;@event_time:*EVNTTIME($MSG,'%W-%G-%F %N:%U:%O',fld10,fld11)&gt;"
+	content="&lt;id&gt;^^&lt;fld53&gt;^^&lt;hostname&gt;^^&lt;fld52&gt;^^&lt;fld51&gt;^^&lt;obj_name&gt;^^&lt;fld10&gt; &lt;fld11&gt;.&lt;fld12&gt;^^&lt;action&gt;^^&lt;filename&gt;" />
+<MESSAGE 
+    id1="SOPHOSES_TVM" 
+    id2="SOPHOSES_TVM" 
+    eventcategory="1001000000" 
+	missField="true"
+	tagval="true"
+    functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@event_time:*EVNTTIME($MSG,'%B %F %W %N:%U%Q','%W-%G-%F %Z',fld1)&gt;&lt;@recorded_time:*EVNTTIME($MSG,'%B %F %W %N:%U%Q','%W-%G-%F %Z',fld4)&gt;"
+    content="ComputerID=&lt;agent.id&gt;^^EventTime=&lt;fld1&gt;^^AlertType=&lt;threat_name&gt;^^UserName=&lt;username&gt;^^FamilyID=&lt;id2&gt;^^Thumbprint=&lt;fld2&gt;^^ProcessName=&lt;process&gt;^^FileVersion=&lt;version&gt;^^FilePath=&lt;directory&gt;^^Pid=&lt;process_id&gt;^^Status=&lt;disposition&gt;^^InsertedAt=&lt;fld4&gt;^^ComputerName=&lt;hostname&gt;^^EventTypeID=&lt;id2&gt;^^EventTypeName=&lt;event_type&gt;^^Name=&lt;hostname&gt;^^ReportingName=&lt;fld47&gt;^^ActionID=&lt;fld46&gt;^^ActionName=&lt;action&gt;^^ScanTypeID=&lt;fld45&gt;^^ScanTypeName=&lt;context&gt;^^SubTypeID=&lt;fld44&gt;^^SubTypeName=&lt;fld43&gt;^^ThreatTypeID=&lt;id2&gt;^^ThreatTypeName=&lt;category&gt;^^ThreatSubTypeID=&lt;fld42&gt;^^ThreatSubTypeName=&lt;fld41&gt;^^Priority=&lt;fld40&gt;^^ThreatName=&lt;threat_name&gt;^^FullFilePath=&lt;directory&gt;^^CheckSum=&lt;checksum&gt;^^FirstDetectedAt=&lt;fld50&gt;^^ActionTakenName=&lt;action&gt;" />
+
+</DEVICEMESSAGES>

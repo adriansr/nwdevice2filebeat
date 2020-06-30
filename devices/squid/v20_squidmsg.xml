@@ -14,14 +14,14 @@
 <HEADER 
 	id1="0001" 
 	id2="0001"  
-	content="%SQUID-4: &lt;hsaddr&gt; &lt;hsport&gt; [&lt;fld20&gt; &lt;fld21&gt;] &quot;&lt;messageid&gt; &lt;!payload:hsaddr&gt;" />
+	content="&lt;hsaddr&gt; &lt;hsport&gt; [&lt;fld20&gt; &lt;fld21&gt;] &quot;&lt;messageid&gt; &lt;!payload:hsaddr&gt;" />
 
 
   
 <HEADER 
 	id1="0002" 
 	id2="0002"  
-	content="%SQUID-4: &lt;hevent_time_string&gt; &lt;hduration&gt; &lt;hsaddr&gt; &lt;haction&gt;/&lt;hresultcode&gt; &lt;hsbytes&gt; &lt;messageid&gt; &lt;!payload:hevent_time_string&gt;" />
+	content="&lt;hevent_time_string&gt; &lt;hduration&gt; &lt;hsaddr&gt; &lt;haction&gt;/&lt;hresultcode&gt; &lt;hsbytes&gt; &lt;messageid&gt; &lt;!payload:hevent_time_string&gt;" />
 
 	
 	

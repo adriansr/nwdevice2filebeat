@@ -45,31 +45,7 @@ processors:
         field: destination.as.organization_name
         target_field: destination.as.organization.name
         ignore_missing: true
-  - append:
-        field: related.ip
-        value: "{{destination.ip}}"
-        if: "ctx?.destination?.ip != null"
-  - append:
-        field: related.ip
-        value: "{{destination.nat.ip}}"
-        if: "ctx?.destination?.nat?.ip != null"
-  - append:
-        field: related.ip
-        value: "{{source.ip}}"
-        if: "ctx?.source?.ip != null"
-  - append:
-        field: related.ip
-        value: "{{source.nat.ip}}"
-        if: "ctx?.source?.nat?.ip != null"
-  - append:
-        field: related.user
-        value: "{{destination.user.name}}"
-        if: "ctx?.destination?.user?.name != null"
-  - append:
-        field: related.user
-        value: "{{source.user.name}}"
-        if: "ctx?.source?.user?.name != null"
 on_failure:
-  - set:
+  - append:
         field: error.message
         value: "{{ _ingest.on_failure_message }}"

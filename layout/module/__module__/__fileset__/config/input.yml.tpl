@@ -19,5 +19,9 @@ tags: {{.tags}}
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module) -))
 ((- getvar "extra_processors" -))
-- community_id:
+- community_id: ~
+- add_fields:
+    target: ''
+    fields:
+        ecs.version: 1.5.0
 

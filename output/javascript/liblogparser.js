@@ -166,6 +166,7 @@ function match(id, src, pattern, on_success) {
         target_prefix: FIELDS_OBJECT,
         ignore_failure: true,
         overwrite_keys: true,
+        trim_values: "right"
     });
     return function (evt) {
         var msg = evt.Get(src);

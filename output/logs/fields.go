@@ -23,17 +23,14 @@ const (
 )
 
 func makeYear(rng *rand.Rand, t time.Time) string {
-	//return fmt.Sprintf("20%02d", rng.Intn(20))
 	return strconv.Itoa(t.Year())
 }
 
 func makeMonth(rng *rand.Rand, t time.Time) string {
-	//return time.Month(1 + rng.Intn(12)).String()
 	return t.Month().String()
 }
 
 func makeDay(rng *rand.Rand, t time.Time) string {
-	//return fmt.Sprintf("%02d", 1+rng.Intn(28))
 	return strconv.Itoa(t.Day())
 }
 
@@ -49,7 +46,7 @@ func makeTime(rng *rand.Rand, t time.Time) string {
 		t.Second())
 }
 
-func oneOf(list []string) valueGenerator {
+func oneOf(list ...string) valueGenerator {
 	return func(rng *rand.Rand, t time.Time) string {
 		return list[rng.Intn(len(list))]
 	}
@@ -92,18 +89,33 @@ var overrideFields = map[string]valueGenerator{
 	"event_id": func(rng *rand.Rand, t time.Time) string {
 		return fmt.Sprintf("%08x", rng.Intn(0x100000000))
 	},
-	"reason": oneOf([]string{
+	"reason": oneOf(
 		"blocked",
 		"allowed",
 		"denied",
 		"cancelled",
 		"accepted",
-	}),
-	"status": makeText,
-	"host":   makeText,
-	"hour":   fromDatePattern("H"),
-	"min":    fromDatePattern("T"),
-	"sec":    fromDatePattern("S"),
+		"denylist",
+		"allowlist",
+		"malware",
+		"attack",
+	),
+	"action": oneOf(
+		"block",
+		"allow",
+		"deny",
+		"cancel",
+		"accept",
+	),
+	"status":  makeText,
+	"host":    makeText,
+	"hour":    fromDatePattern("H"),
+	"min":     fromDatePattern("T"),
+	"sec":     fromDatePattern("S"),
+	"url":     makeURL,
+	"url_raw": makeURL,
+	"p_url":   makeURL,
+	"url_fld": makeURL,
 }
 
 type fieldsGen map[string]valueGenerator

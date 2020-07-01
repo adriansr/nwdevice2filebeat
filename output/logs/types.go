@@ -77,3 +77,37 @@ func makeIPv6(rng *rand.Rand, t time.Time) string {
 func makeByte(rng *rand.Rand, t time.Time) string {
 	return strconv.Itoa(rng.Intn(256))
 }
+
+var subdomain = oneOf(
+	"",
+	"www.",
+	"mail.",
+	"internal.",
+	"api.",
+	"www5.",
+)
+
+var tld = oneOf(
+	"com",
+	"net",
+	"org",
+)
+
+var ext = oneOf(
+	"html",
+	"htm",
+	"gif",
+	"jpg",
+	"txt")
+
+func makeURL(rng *rand.Rand, t time.Time) string {
+	return fmt.Sprintf("https://%sexample.%s/%s/%s.%s?%s=%s#%s",
+		subdomain(rng, t),
+		tld(rng, t),
+		makeText(rng, t),
+		makeText(rng, t),
+		ext(rng, t),
+		makeText(rng, t),
+		makeText(rng, t),
+		makeText(rng, t))
+}

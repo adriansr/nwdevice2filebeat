@@ -234,10 +234,8 @@ func (c dateComponent) Generate(rng *rand.Rand, t time.Time) string {
 				h = 12
 			}
 			sb.WriteString(strconv.Itoa(h))
-		case 'T': // 2-digit minute
+		case 'T', 'U': // 2-digit minute
 			sb.WriteString(fmt.Sprintf("%02d", t.Minute()))
-		case 'U': // variable minute
-			sb.WriteString(strconv.Itoa(t.Minute()))
 		case 'P': // AM/PM
 			if t.Hour() < 12 {
 				sb.WriteString("AM")
@@ -250,10 +248,8 @@ func (c dateComponent) Generate(rng *rand.Rand, t time.Time) string {
 			} else {
 				sb.WriteString("P.M.")
 			}
-		case 'S': // 2-digit seconds
+		case 'S', 'O': // 2-digit seconds
 			sb.WriteString(fmt.Sprintf("%02d", t.Second()))
-		case 'O': // variable seconds
-			sb.WriteString(strconv.Itoa(t.Second()))
 		case 'Y': // 2-digit year
 			sb.WriteString(fmt.Sprintf("%02d", t.Year()%100))
 		case 'W': // 4-digit year
@@ -300,30 +296,8 @@ type url struct{}
 func (c url) String() string { return "url" }
 func (url) Quality() int     { return 10 }
 
-var subdomain = oneOf([]string{
-	"",
-	"www.",
-	"mail.",
-	"internal.",
-	"api.",
-	"www5.",
-})
-
-var tld = oneOf([]string{
-	".com",
-	".net",
-	".org",
-})
-
 func (_ url) Generate(rng *rand.Rand, t time.Time) string {
-	return fmt.Sprintf("https://%sexample%s/%s?%s=%s#%s",
-		subdomain(rng, t),
-		tld(rng, t),
-		makeText(rng, t),
-		makeText(rng, t),
-		makeText(rng, t),
-		makeText(rng, t),
-	)
+	return makeURL(rng, t)
 }
 
 type fieldHints map[string][]valueHint
@@ -380,7 +354,7 @@ func (st *state) valueFor(field string) (string, error) {
 		}
 	}
 	if best.Quality() > 0 {
-
+		return best.Generate(st.rng, st.time), nil
 	}
 	return st.defaultValueFor(field)
 }

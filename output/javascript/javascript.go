@@ -337,8 +337,11 @@ func writeMapString(m map[string]string, out *output.CodeWriter) {
 func writeDateTimeLike(dt parser.DateTime, name, fnPrefix string, out *output.CodeWriter) {
 	out.Write(name).Write("({").Newline().Indent().
 		Write("dest: ").JS(dt.Target).Write(",").Newline().
-		Write("args: ").JS(dt.Fields).Write(",").Newline().
-		Write("fmts: [").Newline().Indent()
+		Write("args: ").JS(dt.Fields).Write(",").Newline()
+	if dt.IsUTC {
+		out.Write("tz: 'Z',").Newline()
+	}
+	out.Write("fmts: [").Newline().Indent()
 	for fmtIdx := range dt.Formats {
 		out.Write("[")
 		for idx, fmt := range dt.Formats[fmtIdx] {

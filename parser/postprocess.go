@@ -402,7 +402,7 @@ func removeNoops(parser *Parser) error {
 
 func convertEventTime(p *Parser) (err error) {
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
-		if call, ok := node.(Call); ok && call.Function == "EVNTTIME" || call.Function == "DUR" {
+		if call, ok := node.(Call); ok && call.Function == "EVNTTIME" || call.Function == "DUR" || call.Function == "UTC" {
 			numArgs := len(call.Args)
 			if numArgs < 2 {
 				err = errors.Errorf("at %s: %s call has too little arguments: %d", call.Source(), call.Function, numArgs)
@@ -446,16 +446,16 @@ func convertEventTime(p *Parser) (err error) {
 				}
 				repl.Formats[idx] = fmt
 			}
-
-			var result Operation = repl
 			switch call.Function {
 			case "DUR":
-				result = Duration(repl)
+				return WalkReplace, Duration(repl)
 			case "UTC":
 				// UTC call is the same as EVNTTIME but without timezone conversion.
 				repl.IsUTC = true
+				fallthrough
+			default:
+				return WalkReplace, repl
 			}
-			return WalkReplace, result
 		}
 		return WalkContinue, nil
 	})
@@ -1109,7 +1109,7 @@ var KnownFunctions = map[string]FunctionInfo{
 	"RMQ":        {MinArgs: 1, MaxArgs: 1},
 	"STRCAT":     {MinArgs: 1},
 	"URL":        {MinArgs: 2, MaxArgs: 2},
-	"UTC":        {MinArgs: 3, MaxArgs: 3},
+	"UTC":        {MinArgs: 2},
 
 	"HDR":     {MinArgs: 1, MaxArgs: 1, Stripped: true},
 	"SYSVAL":  {MinArgs: 1, MaxArgs: 2, Stripped: true},

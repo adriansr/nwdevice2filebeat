@@ -501,8 +501,8 @@ function date_time_try_pattern_at_pos(fmt, str, pos, date) {
 }
 
 function date_time(opts) {
+    var tzOffset = opts.tz || tz_offset;
     return function (evt) {
-        var tzOffset = tz_offset;
         if (tzOffset === "event") {
             tzOffset = evt.Get("event.timezone");
         }
@@ -514,7 +514,7 @@ function date_time(opts) {
                 return;
             }
         }
-        if (debug) console.warn("in date_time: id=" + opts.id + " (s) FAILED: " + str);
+        if (debug) console.warn("in date_time: id=" + opts.id + " FAILED: " + str);
     };
 }
 

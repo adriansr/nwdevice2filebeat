@@ -423,39 +423,79 @@ function date_time_join_args(evt, arglist) {
     return str;
 }
 
-function date_time_try_pattern(fmt, str, tzOffset) {
-    var date = new Date();
-    // Zero the date as much as possible.
-    // date.setTime(0); <- not doing this to avoid dates defaulting to 1970.
-    // Better to just clean the time part incl. milliseconds.
-    date.setUTCHours(0, 0, 0, 0);
-    // Using current year so logs default to this year.
-    // Must use 1st Jan instead of current day to avoid problems when the
-    // day of the month is defined before the month. For example:
-    // Current date: 1 Nov
-    // Logs: "31/Oct".
-    // It will try to set day=31 to a date object with mon=Nov, which is not
-    // valid.
-    date.setUTCFullYear(date.getFullYear(), 0, 1);
-    var pos = date_time_try_pattern_at_pos(fmt, str, 0, date);
-    if (tzOffset !== undefined && tzOffset !== "") {
-        var dateString = date.toISOString().replace("Z", tzOffset);
-        var newdate = new Date(dateString);
-        if (!isNaN(newdate)) {
-            date = newdate;
-        } else {
-            console.warn("Failed parsing date in given offset: " + dateString);
+function to2Digit(num) {
+    return num? (num < 10? "0" + num : num) : "00";
+}
+
+// Make two-digit dates 00-69 interpreted as 2000-2069
+// and dates 70-99 translated to 1970-1999.
+var twoDigitYearEpoch = 70;
+var twoDigitYearCentury = 2000;
+
+// This is to accept dates up to 2 days in the future, only used when
+// no year is specified in a date. 2 days should be enough to account for
+// time differences between systems and different tz offsets.
+var maxFutureDelta = 2*24*60*60*1000;
+
+// DateContainer stores date fields and then converts those fields into
+// a Date. Necessary because building a Date using its set() methods gives
+// different results depending on the order of components.
+function DateContainer(tzOffset) {
+    this.offset = tzOffset === undefined? "Z" : tzOffset;
+}
+
+DateContainer.prototype = {
+    setYear: function(v) {this.year = v;},
+    setMonth: function(v) {this.month = v;},
+    setDay: function(v) {this.day = v;},
+    setHours: function(v) {this.hours = v;},
+    setMinutes: function(v) {this.minutes = v;},
+    setSeconds: function(v) {this.seconds = v;},
+
+    setUNIX: function(v) {this.unix = v;},
+
+    set2DigitYear: function(v) {
+        this.year = v < twoDigitYearEpoch? twoDigitYearCentury + v : twoDigitYearCentury + v - 100;
+    },
+
+    toDate: function() {
+        if (this.unix !== undefined) {
+            return new Date(this.unix * 1000);
         }
+        if (this.day === undefined || this.month === undefined) {
+            // Can't make a date from this.
+            return undefined;
+        }
+        if (this.year === undefined) {
+            // A date without a year. Set current year, or previous year
+            // if date would be in the future.
+            var now = new Date();
+            this.year = now.getFullYear();
+            var date = this.toDate();
+            if (date.getTime() - now.getTime() > maxFutureDelta) {
+                date.setFullYear(now.getFullYear() - 1);
+            }
+            return date;
+        }
+        var MM = to2Digit(this.month);
+        var DD = to2Digit(this.day);
+        var hh = to2Digit(this.hours);
+        var mm = to2Digit(this.minutes);
+        var ss = to2Digit(this.seconds);
+        return new Date(this.year + "-" + MM + "-" + DD + "T" + hh + ":" + mm + ":" + ss + this.offset);
     }
-    return pos !== undefined? date : undefined;
+}
+
+function date_time_try_pattern(fmt, str, tzOffset) {
+    var date = new DateContainer(tzOffset);
+    var pos = date_time_try_pattern_at_pos(fmt, str, 0, date);
+    return pos !== undefined? date.toDate() : undefined;
 }
 
 function date_time_try_pattern_at_pos(fmt, str, pos, date) {
     var len = str.length;
     for (var proc = 0; pos !== undefined && pos < len && proc < fmt.length; proc++) {
-        //console.warn("in date_time: enter proc["+proc+"] parsed='" + str.substr(0, pos) + "' unparsed='" +  str.substr(pos) + "' pos=" + pos + " date="+date);
         pos = fmt[proc](str, pos, date);
-        //console.warn("in date_time: leave proc["+proc+"]='" + str + "' pos=" + pos + " date="+date);
     }
     return pos;
 }
@@ -463,7 +503,7 @@ function date_time_try_pattern_at_pos(fmt, str, pos, date) {
 function date_time(opts) {
     return function (evt) {
         var tzOffset = tz_offset;
-        if (tz_offset === "event") {
+        if (tzOffset === "event") {
             tzOffset = evt.Get("event.timezone");
         }
         var str = date_time_join_args(evt, opts.args);
@@ -471,7 +511,6 @@ function date_time(opts) {
             var date = date_time_try_pattern(opts.fmts[i], str, tzOffset);
             if (date !== undefined) {
                 evt.Put(FIELDS_PREFIX + opts.dest, date);
-                //if (debug) console.warn("in date_times: succeeded: " + evt.Get(FIELDS_PREFIX + opts.dest));
                 return;
             }
         }
@@ -585,51 +624,26 @@ var shortMonths = {
     "dec": [11, 4],
 };
 
-var monthSetter = {
-    call: function (date, value) {
-        date.setUTCMonth(value - 1);
-    }
-};
-
-var unixSetter = {
-    call: function (date, value) {
-        date.setTime(value * 1000);
-    }
-};
-
-
-// Make two-digit dates 00-69 interpreted as 2000-2069
-// and dates 70-99 translated to 1970-1999.
-// This is to support unix epoch.
-var twoDigitYearEpoch = 70;
-var twoDigitYearCentury = 2000;
-
-var year2DigitSetter = {
-    call: function(date, value) {
-        date.setUTCFullYear(value < twoDigitYearEpoch? twoDigitYearCentury + value : twoDigitYearCentury + value - 100);
-    }
-};
-
 // var dC = undefined;
 var dR = dateMonthName(true);
 var dB = dateMonthName(false);
-var dM = dateFixedWidthNumber("M", 2, 1, 12, monthSetter);
-var dG = dateVariableWidthNumber("G", 1, 12, monthSetter);
-var dD = dateFixedWidthNumber("D", 2, 1, 31, Date.prototype.setUTCDate);
-var dF = dateVariableWidthNumber("F", 1, 31, Date.prototype.setUTCDate);
-var dH = dateFixedWidthNumber("H", 2, 0, 24, Date.prototype.setUTCHours);
-var dI = dateVariableWidthNumber("I", 0, 24, Date.prototype.setUTCHours); // Accept hours >12
-var dN = dateVariableWidthNumber("N", 0, 24, Date.prototype.setUTCHours);
-var dT = dateFixedWidthNumber("T", 2, 0, 59, Date.prototype.setUTCMinutes);
-var dU = dateVariableWidthNumber("U", 0, 59, Date.prototype.setUTCMinutes);
+var dM = dateFixedWidthNumber("M", 2, 1, 12, DateContainer.prototype.setMonth);
+var dG = dateVariableWidthNumber("G", 1, 12,  DateContainer.prototype.setMonth);
+var dD = dateFixedWidthNumber("D", 2, 1, 31, DateContainer.prototype.setDay);
+var dF = dateVariableWidthNumber("F", 1, 31, DateContainer.prototype.setDay);
+var dH = dateFixedWidthNumber("H", 2, 0, 24, DateContainer.prototype.setHours);
+var dI = dateVariableWidthNumber("I", 0, 24, DateContainer.prototype.setHours); // Accept hours >12
+var dN = dateVariableWidthNumber("N", 0, 24, DateContainer.prototype.setHours);
+var dT = dateFixedWidthNumber("T", 2, 0, 59, DateContainer.prototype.setMinutes);
+var dU = dateVariableWidthNumber("U", 0, 59, DateContainer.prototype.setMinutes);
 var dP = parseAMPM; // AM|PM
 var dQ = parseAMPM; // A.M.|P.M
-var dS = dateFixedWidthNumber("S", 2, 0, 60, Date.prototype.setUTCSeconds);
-var dO = dateVariableWidthNumber("O", 0, 60, Date.prototype.setUTCSeconds);
-var dY = dateFixedWidthNumber("Y", 2, 0, 99, year2DigitSetter);
-var dW = dateFixedWidthNumber("W", 4, 1000, 9999, Date.prototype.setUTCFullYear);
+var dS = dateFixedWidthNumber("S", 2, 0, 60, DateContainer.prototype.setSeconds);
+var dO = dateVariableWidthNumber("O", 0, 60, DateContainer.prototype.setSeconds);
+var dY = dateFixedWidthNumber("Y", 2, 0, 99, DateContainer.prototype.set2DigitYear);
+var dW = dateFixedWidthNumber("W", 4, 1000, 9999, DateContainer.prototype.setYear);
 var dZ = parseHMS;
-var dX = dateVariableWidthNumber("X", 0, 0x10000000000, unixSetter);
+var dX = dateVariableWidthNumber("X", 0, 0x10000000000, DateContainer.prototype.setUNIX);
 
 // parseAMPM parses "A.M", "AM", "P.M", "PM" from logs.
 // Only works if this modifier appears after the hour has been read from logs
@@ -665,14 +679,14 @@ function parseAMPM(str, pos, date) {
         }
         pos += 2;
     }
-    var hh = date.getUTCHours();
+    var hh = date.hours;
     if (isPM) {
         // Accept existing hour in 24h format.
         if (hh < 12) hh += 12;
     } else {
         if (hh === 12) hh = 0;
     }
-    date.setUTCHours(hh);
+    date.setHours(hh);
     return pos;
 }
 
@@ -742,7 +756,7 @@ function dateMonthName(long) {
             //console.warn("parsing date_time: '" + mon + "' is not a valid short month (%B)");
             return;
         }
-        date.setUTCMonth(idx[0]);
+        date.setMonth(idx[0]+1);
         return pos + 3 + (long ? idx[1] : 0);
     };
 }
@@ -1913,6 +1927,13 @@ function test_date_times() {
                 str: "2017-10-16T15:23:42"
             },
             "2017-10-16T15:23:42.000Z"),
+        pass_test(
+            {
+                fmt: [dW,dc("-"),dM,dc("-"),dD,dc("T"),dH,dc(":"),dT,dc(":"),dS],
+                str: "2017-10-16T15:23:42",
+                tz: "-02:00",
+            },
+            "2017-10-16T17:23:42.000Z"),
         pass_test(
             {
                 fmt: [dR, dF, dc("th"), dY, dc(","), dI, dQ, dU, dc("min"), dO, dc("secs")],

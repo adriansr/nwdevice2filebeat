@@ -1898,6 +1898,13 @@ function do_populate(evt, base, targets) {
 }
 
 function test() {
+    // Silence console output during test.
+    var saved = console;
+    console = {
+        debug: function() {},
+        warn: function() {},
+        error: function() {},
+    };
     test_date_times();
     test_tz();
     test_conversions();
@@ -1905,6 +1912,7 @@ function test() {
     test_url();
     test_calls();
     test_assumptions();
+    console = saved;
 }
 
 function pass_test(input, output) {

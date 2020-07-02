@@ -69,9 +69,13 @@ func init() {
 		cmd.MarkPersistentFlagRequired("device")
 		generateCmd.AddCommand(cmd)
 	}
+
 	genModuleCmd.PersistentFlags().String("output", "", "Output directory where the module is written to")
 	genModuleCmd.PersistentFlags().String("module", "", "Module name")
 	genModuleCmd.PersistentFlags().String("fileset", "", "Fileset name")
+	genModuleCmd.PersistentFlags().String("vendor", "", "Vendor name")
+	genModuleCmd.PersistentFlags().String("product", "", "Product name")
+	genModuleCmd.PersistentFlags().String("type", "", "Type of logs (observer.type)")
 	genModuleCmd.PersistentFlags().Uint16("port", 9010, "Default port number")
 	genModuleCmd.MarkPersistentFlagDirname("output")
 	genModuleCmd.MarkPersistentFlagRequired("output")
@@ -79,6 +83,9 @@ func init() {
 	genPackageCmd.PersistentFlags().String("output", "", "Output directory where the package is written to")
 	genPackageCmd.PersistentFlags().String("module", "", "Package name")
 	genPackageCmd.PersistentFlags().String("fileset", "", "Dataset name")
+	genPackageCmd.PersistentFlags().String("vendor", "", "Vendor name")
+	genPackageCmd.PersistentFlags().String("product", "", "Product name")
+	genPackageCmd.PersistentFlags().String("type", "", "Type of logs (observer.type)")
 	genPackageCmd.PersistentFlags().String("version", "0.0.1", "Package version")
 	genPackageCmd.PersistentFlags().Uint16("port", 9010, "Default port number")
 	genPackageCmd.MarkPersistentFlagDirname("output")
@@ -170,12 +177,23 @@ func generate(cmd *cobra.Command, targetLayout string) error {
 	if cfg.Module.Port == 0 {
 		cfg.Module.Port = 9010
 	}
+	if cfg.Module.Product == "" {
+		cfg.Module.Product = p.Description.DisplayName
+	}
+	if cfg.Module.Vendor == "" {
+		cfg.Module.Vendor = cfg.Module.Name
+	}
+	if cfg.Module.Type == "" {
+		cfg.Module.Type = p.Description.Group
+	}
 	outLayout, err := layout.New(targetLayout, layout.Vars{
 		LogParser:     p,
 		DisplayName:   p.Description.DisplayName,
-		Group:         p.Description.Group,
 		Module:        cfg.Module.Name,
 		Fileset:       cfg.Module.Fileset,
+		Product:       cfg.Module.Product,
+		Vendor:        cfg.Module.Vendor,
+		Group:         cfg.Module.Type,
 		Version:       cfg.Module.Version,
 		Port:          cfg.Module.Port,
 		GeneratedTime: time.Now().UTC(),

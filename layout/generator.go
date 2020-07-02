@@ -55,6 +55,8 @@ type Vars struct {
 	Group         string
 	Module        string
 	Fileset       string
+	Product       string
+	Vendor        string
 	Version       string
 	Port          uint16
 	GeneratedTime time.Time

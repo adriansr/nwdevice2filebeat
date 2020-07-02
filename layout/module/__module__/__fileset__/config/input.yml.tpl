@@ -17,6 +17,13 @@ host: "{{.syslog_host}}:{{.syslog_port}}"
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
+fields_under_root: true
+fields:
+    observer:
+        vendor: ((.Vendor | printf "%q"))
+        product: ((.Product | printf "%q"))
+        type: ((.Group | printf "%q"))
+
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module) -))
 ((- getvar "extra_processors" -))
@@ -25,4 +32,3 @@ processors:
     target: ''
     fields:
         ecs.version: 1.5.0
-

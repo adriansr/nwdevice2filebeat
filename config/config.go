@@ -24,10 +24,13 @@ type Config struct {
 
 	// Module generation settings.
 	Module struct {
-		Name    string
-		Fileset string
-		Version string
-		Port    uint16
+		Name    string // Name of the module
+		Fileset string // Fileset for this device
+		Product string // Product name (observer.product)
+		Type    string // Type of observer (observer.type)
+		Vendor  string // Vendor name (observer.vendor)
+		Version string // Module version
+		Port    uint16 // Default port number
 	}
 
 	// Verbosity is the logging verbosity level for this invocation of the tool.

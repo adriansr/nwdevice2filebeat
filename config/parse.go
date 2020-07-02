@@ -28,6 +28,9 @@ func NewFromCommand(cmd *cobra.Command) (cfg Config, err error) {
 	cfg.Module.Fileset, _ = cmd.PersistentFlags().GetString("fileset")
 	cfg.Module.Version, _ = cmd.PersistentFlags().GetString("version")
 	cfg.Module.Port, _ = cmd.PersistentFlags().GetUint16("port")
+	cfg.Module.Vendor, _ = cmd.PersistentFlags().GetString("vendor")
+	cfg.Module.Product, _ = cmd.PersistentFlags().GetString("product")
+	cfg.Module.Type, _ = cmd.PersistentFlags().GetString("type")
 
 	if opts, err := cmd.PersistentFlags().GetStringSlice("optimize"); err == nil {
 		if cfg.Opt, err = parseOpts(opts); err != nil {

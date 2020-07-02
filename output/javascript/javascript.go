@@ -43,8 +43,7 @@ func (js *javascript) Settings() config.PipelineSettings {
 }
 
 func (js *javascript) Populate(lyt *layout.Generator) (err error) {
-	if lyt.HasDir("config.dir") {
-		err = lyt.SetVar("extra_processors", fmt.Sprintf(`
+	preamble := `
 - script:
     lang: javascript
     params:
@@ -52,11 +51,13 @@ func (js *javascript) Populate(lyt *layout.Generator) (err error) {
       rsa: {{ .rsa_fields }}
       tz_offset: {{ .tz_offset }}
       keep_raw: {{ .keep_raw_fields }}
-      debug: {{ .debug }}
+      debug: {{ .debug }}`
+	if lyt.HasDir("config.dir") {
+		err = lyt.SetVar("extra_processors", preamble+`
     files:
     - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/liblogparser.js
     - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/pipeline.js
-`))
+`)
 		if err != nil {
 			return err
 		}
@@ -73,12 +74,7 @@ func (js *javascript) Populate(lyt *layout.Generator) (err error) {
 			return err
 		}
 	} else {
-		err = lyt.SetVar("extra_processors", fmt.Sprintf(`
-- script:
-    lang: javascript
-    params:
-      ecs: true
-      rsa: {{ .rsa_fields }}
+		err = lyt.SetVar("extra_processors", fmt.Sprintf(preamble+`
     source: |
 ((inline "liblogparser.js" | indent " " 6))
 ((inline "pipeline.js" | indent " " 6))

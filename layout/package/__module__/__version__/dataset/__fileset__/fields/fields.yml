@@ -12,11 +12,6 @@
       type: keyword
     - name: event_desc
       type: keyword
-    - name: payload
-      type: long
-      description: This is the size of a payload in a Packet Session. This key should
-        never be used to parse Meta data from a session (Logs/Packets) Directly, this
-        is a Reserved key in NetWitness
     - name: message
       type: keyword
       description: This key captures the contents of instant messages

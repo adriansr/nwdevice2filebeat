@@ -7,7 +7,6 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,,,,action,action,Text,None,,,,rsa.misc.action,event.action,217,misc,action,keyword
 1,Database,Index ID,This key captures IndexID of the index.,info,index,Text,Transient,,,,rsa.db.index,,214,db,index,keyword
 1,Network,Source IP Address,This key should only be used when it’s a Source IP Address.,saddr,ip.src,IPv4,None,(null)|-,ipv6.src,saddr_v6,source.ip,,209,network,ip_src,ip
-1,Reserved,Payload Size,"This is the size of a payload in a Packet Session. This key should never be used to parse Meta data from a session (Logs/Packets) Directly, this is a Reserved key in NetWitness",payload,payload,UInt32,Transient,,,,rsa.internal.payload,,206,internal,payload,integer
 1,Miscellaneous,Message,This key captures the contents of instant messages,message,message,Text,Transient,,,,rsa.internal.message,,193,internal,message,keyword
 1,Network,Hostname Aliases,This key should be used when the source or destination context of a hostname is not clear.Also it captures the Device Hostname. Any Hostname that isnt ad.computer.,hostname,alias.host,Text,None,,,,rsa.network.alias_host,host.name,192,network,alias_host,keyword
 1,Investigations,Event Activity,This key captures the particular event activity(Ex:Logoff),ec_activity,ec.activity,Text,None,,,,rsa.investigations.ec_activity,,183,investigations,ec_activity,keyword

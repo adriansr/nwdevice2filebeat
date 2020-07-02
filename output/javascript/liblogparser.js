@@ -1537,7 +1537,6 @@ var rsa_mappings = {
     "patient_id": {to:[{field: "rsa.healthcare.patient_id", setter: fld_set}]},
     "patient_lname": {to:[{field: "rsa.healthcare.patient_lname", setter: fld_set}]},
     "patient_mname": {to:[{field: "rsa.healthcare.patient_mname", setter: fld_set}]},
-    "payload": {convert: to_long, to:[{field: "rsa.internal.payload", setter: fld_set}]},
     "payload.req": {convert: to_long, to:[{field: "rsa.internal.payload_req", setter: fld_set}]},
     "payload.res": {convert: to_long, to:[{field: "rsa.internal.payload_res", setter: fld_set}]},
     "peer": {to:[{field: "rsa.crypto.peer", setter: fld_set}]},

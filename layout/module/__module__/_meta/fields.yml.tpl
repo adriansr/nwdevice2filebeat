@@ -8,12 +8,6 @@
       default_field: false
       description: >
         Name of the network interface where the traffic has been observed.
-
-- key: rsa
-  title: RSA Fields
-  description: >
-    RSA fields.
-  fields:
     - name: rsa
       type: group
       default_field: false
@@ -29,11 +23,6 @@
           type: keyword
         - name: event_desc
           type: keyword
-        - name: payload
-          type: long
-          description: This is the size of a payload in a Packet Session. This key should
-            never be used to parse Meta data from a session (Logs/Packets) Directly, this
-            is a Reserved key in NetWitness
         - name: message
           type: keyword
           description: This key captures the contents of instant messages
@@ -1959,4 +1948,3 @@
         - name: registry_value
           type: keyword
           description: This key captures values or decorators used within a registry entry
-

@@ -106,9 +106,8 @@ with open(sys.argv[2], 'r') as f:
                     ref = {'type': es_type}
                 ecs[field] = ref
 
-with open('fields.yml', 'w') as f:
-    yaml.dump(serialize(rsa), stream=f, default_flow_style=False, sort_keys=False)
+for action in [(rsa, 'fields.yml'), (ecs, 'ecs.yml')]:
+    print('Saving {} ...'.format(action[1]))
+    with open(action[1], 'w') as f:
+        yaml.dump(serialize(action[0]), stream=f, default_flow_style=False, sort_keys=False)
 
-
-with open('ecs.yml', 'w') as f:
-    yaml.dump(serialize(ecs), stream=f, default_flow_style=False, sort_keys=False)

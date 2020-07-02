@@ -48,10 +48,10 @@ func (js *javascript) Populate(lyt *layout.Generator) (err error) {
     lang: javascript
     params:
       ecs: true
-      rsa: {{ .rsa_fields }}
-      tz_offset: {{ .tz_offset }}
-      keep_raw: {{ .keep_raw_fields }}
-      debug: {{ .debug }}`
+      rsa: {{((getvar "var_prefix"))rsa_fields}}
+      tz_offset: {{((getvar "var_prefix"))tz_offset}}
+      keep_raw: {{((getvar "var_prefix"))keep_raw_fields}}
+      debug: {{((getvar "var_prefix"))debug}}`
 	if lyt.HasDir("config.dir") {
 		err = lyt.SetVar("extra_processors", preamble+`
     files:

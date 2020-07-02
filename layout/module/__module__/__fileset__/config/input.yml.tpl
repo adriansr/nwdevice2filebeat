@@ -26,6 +26,7 @@ fields:
 
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module) -))
+((- setvar "var_prefix" "." -))
 ((- getvar "extra_processors" -))
 {{ if .community_id }}
 - community_id: ~

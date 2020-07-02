@@ -10,6 +10,11 @@ fields:
 
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module "/" .Fileset) -))
+((- setvar "var_prefix" "" -))
 ((- getvar "extra_processors" -))
 - community_id:
 - add_locale: ~
+- add_fields:
+    target: ''
+    fields:
+        ecs.version: 1.5.0

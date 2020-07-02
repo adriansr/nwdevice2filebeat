@@ -15,6 +15,7 @@ streams:
     show_user: false
     default:
       - ((.Module))-((.Fileset))
+      - forwarded
   - name: udp_host
     type: text
     title: UDP host to listen on
@@ -29,6 +30,31 @@ streams:
     required: true
     show_user: true
     default: ((.Port))
+  - name: tz_offset
+    type: text
+    title: Timezone offset (+HH:mm format)
+    required: false
+    show_user: true
+    default: "local"
+  - name: rsa_fields
+    type: boolean
+    title: Add non-ECS fields
+    required: false
+    show_user: true
+    default: true
+  - name: keep_raw_fields
+    type: boolean
+    title: Keep raw parser fields
+    required: false
+    show_user: true
+    default: false
+  - name: debug
+    type: boolean
+    title: Enable debug logging
+    required: false
+    show_user: true
+    default: false
+
 - input: tcp
   title: ((.DisplayName)) logs
   description: Collect ((.DisplayName)) logs
@@ -42,6 +68,7 @@ streams:
     show_user: false
     default:
       - ((.Module))-((.Fileset))
+      - forwarded
   - name: tcp_host
     type: text
     title: TCP host to listen on
@@ -56,6 +83,31 @@ streams:
     required: true
     show_user: true
     default: ((.Port))
+  - name: tz_offset
+    type: text
+    title: Timezone offset (+HH:mm format)
+    required: false
+    show_user: true
+    default: "local"
+  - name: rsa_fields
+    type: boolean
+    title: Add non-ECS fields
+    required: false
+    show_user: true
+    default: true
+  - name: keep_raw_fields
+    type: boolean
+    title: Keep raw parser fields
+    required: false
+    show_user: true
+    default: false
+  - name: debug
+    type: boolean
+    title: Enable debug logging
+    required: false
+    show_user: true
+    default: false
+
 - input: file
   title: ((.DisplayName)) logs
   description: Collect ((.DisplayName)) logs from file
@@ -76,3 +128,28 @@ streams:
     show_user: false
     default:
       - ((.Module))-((.Fileset))
+      - forwarded
+  - name: tz_offset
+    type: text
+    title: Timezone offset (+HH:mm format)
+    required: false
+    show_user: true
+    default: "local"
+  - name: rsa_fields
+    type: boolean
+    title: Add non-ECS fields
+    required: false
+    show_user: true
+    default: true
+  - name: keep_raw_fields
+    type: boolean
+    title: Keep raw parser fields
+    required: false
+    show_user: true
+    default: false
+  - name: debug
+    type: boolean
+    title: Enable debug logging
+    required: false
+    show_user: true
+    default: false

@@ -36,6 +36,24 @@ The port to listen for syslog traffic. Defaults to `((.Port))`
 
 NOTE: Ports below 1024 require Filebeat to run as root.
 
+*`var.tz_offset`*::
+
+By default, datetimes in the logs will be interpreted as relative to
+the timezone configured in the host where {beatname_uc} is running. If ingesting
+logs from a host on a different timezone, use this field to set the timezone
+offset so that datetimes are correctly parsed. Valid values are in the form
+±HH:mm, for example, `-07:00` for `UTC-7`.
+
+*`var.rsa_fields`*::
+
+Flag to control the addition of non-ECS fields to the event. Defaults to true,
+which causes both ECS and custom fields under `rsa` to be are added.
+
+*`var.keep_raw_fields`*::
+
+Flag to control the addition of the raw parser fields to the event. This fields
+will be found under `rsa.raw`. The default is false.
+
 :has-dashboards!:
 
 :fileset_ex!:

@@ -12,7 +12,15 @@ var:
     default: udp
   - name: community_id
     default: true
- 
+  - name: tz_offset
+    default: local
+  - name: rsa_fields
+    default: true
+  - name: keep_raw_fields
+    default: false
+  - name: debug
+    default: false
+
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
 

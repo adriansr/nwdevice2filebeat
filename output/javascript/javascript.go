@@ -49,6 +49,10 @@ func (js *javascript) Populate(lyt *layout.Generator) (err error) {
     lang: javascript
     params:
       ecs: true
+      rsa: {{ .rsa_fields }}
+      tz_offset: {{ .tz_offset }}
+      keep_raw: {{ .keep_raw_fields }}
+      debug: {{ .debug }}
     files:
     - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/liblogparser.js
     - ((getvar "basedir"))/((relpath "rel.dir" "config.dir"))/pipeline.js
@@ -74,6 +78,7 @@ func (js *javascript) Populate(lyt *layout.Generator) (err error) {
     lang: javascript
     params:
       ecs: true
+      rsa: {{ .rsa_fields }}
     source: |
 ((inline "liblogparser.js" | indent " " 6))
 ((inline "pipeline.js" | indent " " 6))

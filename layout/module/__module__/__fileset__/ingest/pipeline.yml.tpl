@@ -2,6 +2,10 @@
 description: Pipeline for ((.DisplayName))
 
 processors:
+  # User agent
+  - user_agent:
+        field: user_agent.original
+        ignore_missing: true
   # IP Geolocation Lookup
   - geoip:
         field: source.ip

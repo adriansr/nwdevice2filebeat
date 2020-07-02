@@ -276,11 +276,12 @@ func (valuemap) Quality() int     { return 10 }
 func (c valuemap) Generate(rng *rand.Rand, t time.Time) string {
 	idx, n := 0, rng.Intn(len(c.Mappings))
 	for k := range c.Mappings {
-		if idx < n {
+		if idx == n {
 			return k
 		}
+		idx++
 	}
-	return makeText(rng, t)
+	panic(n)
 }
 
 type urlComponent parser.URLComponent
@@ -502,7 +503,13 @@ func (s *state) appendActions(list parser.OpList) error {
 			if !ok {
 				return errors.Errorf("valuemap call for unknown valuemap %s", v.MapName)
 			}
-			s.knownFields[v.Target] = append(s.knownFields[v.Target], valuemap(*vm))
+			if len(v.Key) != 1 {
+				continue
+			}
+			fld, ok := v.Key[0].(parser.Field)
+			if ok {
+				s.knownFields[fld.Name] = append(s.knownFields[fld.Name], valuemap(*vm))
+			}
 
 		case parser.URLExtract:
 			s.knownFields[v.Target] = append(s.knownFields[v.Target], urlComponent(v.Component))

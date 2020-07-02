@@ -501,8 +501,8 @@ function date_time_try_pattern_at_pos(fmt, str, pos, date) {
 }
 
 function date_time(opts) {
-    var tzOffset = opts.tz || tz_offset;
     return function (evt) {
+        var tzOffset = opts.tz || tz_offset;
         if (tzOffset === "event") {
             tzOffset = evt.Get("event.timezone");
         }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -173,3 +174,24 @@ func makeHostName(rng *rand.Rand, t time.Time) string {
 		subdomain(rng, t),
 		hostName(rng, t))
 }
+
+func join(generators ...valueGenerator) valueGenerator {
+	return func(rng *rand.Rand, t time.Time) string {
+		var sb strings.Builder
+		for _, gen := range generators {
+			sb.WriteString(gen(rng, t))
+		}
+		return sb.String()
+	}
+}
+
+func ct(s string) valueGenerator {
+	return func(rng *rand.Rand, t time.Time) string {
+		return s
+	}
+}
+
+var makeInterface = join(
+	oneOf("eth", "enp0s", "lo"),
+	makeInt,
+)

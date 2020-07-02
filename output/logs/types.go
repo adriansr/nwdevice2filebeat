@@ -143,3 +143,33 @@ var makeUserAgent = oneOf(
 	"Mozilla/5.0 (Linux; Android 9; G8142) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36",
 	"Mozilla/5.0 (Linux; Android 8.1.0; SM-A260G Build/OPR6; rv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Rocket/2.1.17(19420) Chrome/81.0.4044.138 Mobile Safari/537.36",
 	"Mozilla/5.0 (Linux; Android 7.0; SM-S337TL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.83 Mobile Safari/537.36")
+
+var makeHTTPMethod = oneOf(
+	"GET",
+	"POST",
+	"PUT",
+	"OPTIONS",
+	"HEAD",
+)
+
+var hostName = oneOf(
+	"localhost",
+	"example",
+	"test",
+	"invalid",
+	"local",
+	"localdomain",
+	"domain",
+	"lan",
+	"home",
+	"host",
+	"corp",
+)
+
+func makeHostName(rng *rand.Rand, t time.Time) string {
+	return fmt.Sprintf("%s%s.%s%s",
+		makeText(rng, t),
+		makeInt(rng, t),
+		subdomain(rng, t),
+		hostName(rng, t))
+}

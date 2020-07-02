@@ -3,7 +3,7 @@ module_version: "1.0"
 var:
   - name: paths
   - name: tags
-    default: [((.Module)).((.Fileset))]
+    default: ["((.Module)).((.Fileset))", "forwarded"]
   - name: syslog_host
     default: localhost
   - name: syslog_port

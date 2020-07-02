@@ -14,7 +14,8 @@ host: "{{.syslog_host}}:{{.syslog_port}}"
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module) -))

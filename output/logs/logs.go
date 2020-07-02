@@ -269,19 +269,21 @@ func (c dateComponent) Generate(rng *rand.Rand, t time.Time) string {
 	return sb.String()
 }
 
-type valuemap parser.ValueMap
+type valueMapKey []string
 
-func (c valuemap) String() string { return "value_map" }
-func (valuemap) Quality() int     { return 10 }
-func (c valuemap) Generate(rng *rand.Rand, t time.Time) string {
-	idx, n := 0, rng.Intn(len(c.Mappings))
-	for k := range c.Mappings {
-		if idx == n {
-			return k
-		}
-		idx++
+func newValueMapKey(vm *parser.ValueMap) valueMapKey {
+	result := make(valueMapKey, 0, len(vm.Mappings))
+	for key := range vm.Mappings {
+		result = append(result, key)
 	}
-	panic(n)
+	sort.Strings(result)
+	return result
+}
+
+func (c valueMapKey) String() string { return "value_map" }
+func (valueMapKey) Quality() int     { return 10 }
+func (c valueMapKey) Generate(rng *rand.Rand, t time.Time) string {
+	return c[rng.Intn(len(c))]
 }
 
 type urlComponent parser.URLComponent
@@ -508,7 +510,7 @@ func (s *state) appendActions(list parser.OpList) error {
 			}
 			fld, ok := v.Key[0].(parser.Field)
 			if ok {
-				s.knownFields[fld.Name] = append(s.knownFields[fld.Name], valuemap(*vm))
+				s.knownFields[fld.Name] = append(s.knownFields[fld.Name], newValueMapKey(vm))
 			}
 
 		case parser.URLExtract:

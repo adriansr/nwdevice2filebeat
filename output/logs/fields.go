@@ -153,20 +153,14 @@ var overrideFields = map[string]valueGenerator{
 	"version":    join(ct("1."), makeInt),
 	"result":     oneOf("failure", "success", "unknown"),
 	"process":    join(makeText, ct(".exe")),
-	"timezone": oneOf(
-		"CET",
-		"CEST",
-		"OMST",
-		"ET",
-		"CT",
-		"PT",
-		"PST",
-		"GMT+02:00",
-		"GMT-07:00",
-	),
+	"timezone":   makeTimezone,
+	"tzone":      makeTimezone,
 	"gmtdate": func(rng *rand.Rand, t time.Time) string {
 		return t.UTC().Format(time.RFC3339)
 	},
+	"addr":    makeIPv4, // TODO: Why is this one not mapped in the CSV?
+	"address": makeIPv4,
+	"pid":     makeInt,
 }
 
 type fieldsGen map[string]valueGenerator

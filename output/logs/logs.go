@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/adriansr/nwdevice2filebeat/config"
@@ -79,14 +80,35 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 	t := startTime
 	delta := endTime.Sub(startTime) / time.Duration(p.Config.NumLines)
 	minDelta := time.Second
-	for line := uint(1); line <= p.Config.NumLines; line++ {
+	var numErrors uint
+	const maxSavedErrors = 20
+	var errs multierror.Errors
+	var numLines uint
+	for numLines < p.Config.NumLines {
 		text, err := lg.newLine(p, t)
 		if err != nil {
-			return errors.Wrapf(err, "failed to generate line #%d", line)
+			if numErrors < maxSavedErrors {
+				errs = append(errs, errors.Wrapf(err, "failed to generate line #%d", numLines))
+			}
+			numErrors++
+			if numErrors > maxSavedErrors && numErrors > numLines {
+				return errs.Err()
+			}
+			continue
 		}
+		numLines++
 		lg.tmpFile.WriteString(text)
 		lg.tmpFile.WriteString("\n")
 		t = t.Add(2*time.Duration(lg.rng.Intn(int(delta-minDelta))) + minDelta)
+	}
+	log.Printf("%s: Generated %d lines and got %d errors.", p.Description.Name, numLines, numErrors)
+	if numErrors > 0 {
+		for idx, err := range errs {
+			log.Printf("- error #%d: %v", idx, err.Error())
+		}
+		if numErrors > maxSavedErrors {
+			log.Printf("[... and %d more errors ...]", numErrors-maxSavedErrors)
+		}
 	}
 	return nil
 }
@@ -498,7 +520,8 @@ func (lc *lineComposer) defaultValueFor(field string) (string, error) {
 				return makeText(lc.rng, lc.time), nil
 			}
 		}
-		return "", errors.New("no default generator for field")
+		//return "", errors.New("no default generator for field")
+		gen = makeText
 	}
 	return gen(lc.rng, lc.time), nil
 }

@@ -195,3 +195,15 @@ var makeInterface = join(
 	oneOf("eth", "enp0s", "lo"),
 	makeInt,
 )
+
+var makeTimezone = oneOf(
+	"CET",
+	"CEST",
+	"OMST",
+	"ET",
+	"CT",
+	"PT",
+	"PST",
+	"GMT+02:00",
+	"GMT-07:00",
+)

@@ -305,7 +305,8 @@ func (_ url) Generate(rng *rand.Rand, t time.Time) string {
 
 type fieldHints map[string][]valueHint
 
-type state struct {
+type lineComposer struct {
+	payload     *int
 	time        time.Time
 	parser      parser.Parser
 	rng         *rand.Rand
@@ -315,14 +316,14 @@ type state struct {
 	history     []string
 }
 
-func (st *state) Build() (string, error) {
+func (lc *lineComposer) Build() (string, error) {
 	var sb strings.Builder
-	for _, act := range st.expression {
+	for _, act := range lc.expression {
 		switch v := act.(type) {
 		case parser.Constant:
 			sb.WriteString(v.Value())
 		case parser.Field:
-			value, err := st.valueFor(v.Name)
+			value, err := lc.valueFor(v.Name)
 			if err != nil {
 				return "", errors.Wrapf(err, "getting value for field '%s'", v.Name)
 			}
@@ -334,8 +335,8 @@ func (st *state) Build() (string, error) {
 	return sb.String(), nil
 }
 
-func (st *state) valueFor(field string) (string, error) {
-	hints, ok := st.knownFields[field]
+func (lc *lineComposer) valueFor(field string) (string, error) {
+	hints, ok := lc.knownFields[field]
 	if !ok || len(hints) == 0 {
 		return "", errors.Errorf("field %s not captured", field)
 	}
@@ -349,7 +350,7 @@ func (st *state) valueFor(field string) (string, error) {
 		hint := hints[idx]
 		if hint == c {
 			// Discard used hints
-			st.knownFields[field] = hints[idx:]
+			lc.knownFields[field] = hints[idx:]
 			break
 		}
 		if best.Quality() < hint.Quality() {
@@ -357,46 +358,46 @@ func (st *state) valueFor(field string) (string, error) {
 		}
 	}
 	if best.Quality() > 0 {
-		return best.Generate(st.rng, st.time), nil
+		return best.Generate(lc.rng, lc.time), nil
 	}
-	return st.defaultValueFor(field)
+	return lc.defaultValueFor(field)
 }
 
-func (st *state) defaultValueFor(field string) (string, error) {
-	gen, ok := st.fieldsGen[field]
+func (lc *lineComposer) defaultValueFor(field string) (string, error) {
+	gen, ok := lc.fieldsGen[field]
 	if !ok {
 		if len(field) > 0 {
 			// override header fields.
 			if field[0] == 'h' {
-				if value, err := st.defaultValueFor(field[1:]); err == nil {
+				if value, err := lc.defaultValueFor(field[1:]); err == nil {
 					return value, nil
 				}
 			}
 			// otherwise just populate unhinted temporary fields with text
 			if lastChr := field[len(field)-1]; lastChr >= '0' && lastChr <= '9' {
-				return makeText(st.rng, st.time), nil
+				return makeText(lc.rng, lc.time), nil
 			}
 		}
 		return "", errors.New("no default generator for field")
 	}
-	return gen(st.rng, st.time), nil
+	return gen(lc.rng, lc.time), nil
 }
 
-func (st *state) Log() {
-	log.Printf("Expression: %s", st.expression.Hashable())
-	log.Printf("Hints: (%d values)", len(st.knownFields))
-	keys := make([]string, 0, len(st.knownFields))
-	for k := range st.knownFields {
+func (lc *lineComposer) Log() {
+	log.Printf("Expression: %s", lc.expression.Hashable())
+	log.Printf("Hints: (%d values)", len(lc.knownFields))
+	keys := make([]string, 0, len(lc.knownFields))
+	for k := range lc.knownFields {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		log.Printf(" '%s' = %+v", k, st.knownFields[k])
+		log.Printf(" '%s' = %+v", k, lc.knownFields[k])
 	}
 }
 
 func (lg *logs) newLine(p parser.Parser, t time.Time) (string, error) {
-	state := state{
+	state := lineComposer{
 		time:        t,
 		parser:      p,
 		rng:         lg.rng,
@@ -410,7 +411,7 @@ func (lg *logs) newLine(p parser.Parser, t time.Time) (string, error) {
 	return state.Build()
 }
 
-func (lg *logs) randomWalk(node parser.Operation, st *state) error {
+func (lg *logs) randomWalk(node parser.Operation, st *lineComposer) error {
 	switch v := node.(type) {
 	case parser.Chain:
 		for _, child := range v.Children() {
@@ -445,24 +446,52 @@ func (lg *logs) randomWalk(node parser.Operation, st *state) error {
 	return nil
 }
 
-func (s *state) appendPattern(p parser.Pattern) error {
+func findField(p parser.Pattern, name string) (pos []int) {
+	for idx, entry := range p {
+		if fld, ok := entry.(parser.Field); ok && fld.Name == name {
+			pos = append(pos, idx)
+		}
+	}
+	return pos
+}
+
+func (lc *lineComposer) appendPattern(p parser.Pattern) error {
+	if lc.payload != nil {
+		loc := *lc.payload
+		if overlap := len(lc.expression) - loc; overlap <= 0 || len(p) < overlap {
+			errors.Errorf("payload overlap is troublesome. historic=%+v overlap=%d in=%s new=%s",
+				lc.history, overlap, p.String(), lc.expression.String())
+		}
+		// TODO
+		lc.expression = lc.expression[:loc]
+		lc.payload = nil
+	}
+
 	for idx, entry := range p {
 		switch v := entry.(type) {
 		case parser.Field:
-			s.knownFields[v.Name] = append(s.knownFields[v.Name], captured{})
-			s.expression = append(s.expression, entry)
+			lc.knownFields[v.Name] = append(lc.knownFields[v.Name], captured{})
+			lc.expression = append(lc.expression, entry)
 		case parser.Constant:
-			s.expression = append(s.expression, entry)
+			lc.expression = append(lc.expression, entry)
 
 		case parser.Payload:
-			if idx < len(p)-1 || v.Name != "" {
-				return errors.Errorf("overlapping payload not supported at pos %d/%d %+v",
-					idx, len(p), v)
+			if idx != len(p)-1 {
+				return errors.Errorf("payload field is not the final entry in the pattern. historic=%+v pattern=%s",
+					lc.history, p.String())
+			}
+			if v.Name != "" {
+				loc := findField(lc.expression, v.Name)
+				if len(loc) != 1 {
+					return errors.Errorf("payload field must appear once. historic=%+v loc=%+v pattern=%s",
+						lc.history, loc, p.String())
+				}
+				lc.payload = &loc[0]
 			}
 			break
 
 		case parser.Alternatives:
-			if err := s.appendPattern(v[s.rng.Intn(len(v))]); err != nil {
+			if err := lc.appendPattern(v[lc.rng.Intn(len(v))]); err != nil {
 				return err
 			}
 
@@ -473,35 +502,24 @@ func (s *state) appendPattern(p parser.Pattern) error {
 	return nil
 }
 
-func (s *state) appendActions(list parser.OpList) error {
+func (lc *lineComposer) appendActions(list parser.OpList) error {
 	for _, act := range list {
 		switch v := act.(type) {
 		case parser.SetField:
 			switch vv := v.Value[0].(type) {
 			case parser.Field:
-				s.knownFields[v.Target] = append(s.knownFields[v.Target], copyField(vv))
+				lc.knownFields[v.Target] = append(lc.knownFields[v.Target], copyField(vv))
 			case parser.Constant:
-				s.knownFields[v.Target] = append(s.knownFields[v.Target], constant(vv))
+				lc.knownFields[v.Target] = append(lc.knownFields[v.Target], constant(vv))
 			default:
 				return errors.Errorf("unexpected value type %T in %s", vv, v.Hashable())
 			}
 		case parser.DateTime:
-			s.knownFields[v.Target] = append(s.knownFields[v.Target], date{})
-			// TODO: Multiple formats
-			if len(v.Fields) == 1 {
-				// 1 to many
-				s.knownFields[v.Fields[0]] = append(s.knownFields[v.Fields[0]], dateComponent(v.Formats[0]))
-			} else if len(v.Fields) == len(v.Formats[0]) {
-				// 1:1 mapping
-				for idx, src := range v.Fields {
-					s.knownFields[src] = append(s.knownFields[src], dateComponent(v.Formats[0][idx:idx+1]))
-				}
-			} else {
-				// TODO: n fields for m components
-				return errors.Errorf("don't know how to split datetime %+v", v)
+			if err := lc.enrichFromDateTime(v); err != nil {
+				return err
 			}
 		case parser.ValueMapCall:
-			vm, ok := s.parser.ValueMapsByName[v.MapName]
+			vm, ok := lc.parser.ValueMapsByName[v.MapName]
 			if !ok {
 				return errors.Errorf("valuemap call for unknown valuemap %s", v.MapName)
 			}
@@ -510,16 +528,93 @@ func (s *state) appendActions(list parser.OpList) error {
 			}
 			fld, ok := v.Key[0].(parser.Field)
 			if ok {
-				s.knownFields[fld.Name] = append(s.knownFields[fld.Name], newValueMapKey(vm))
+				lc.knownFields[fld.Name] = append(lc.knownFields[fld.Name], newValueMapKey(vm))
 			}
 
 		case parser.URLExtract:
-			s.knownFields[v.Target] = append(s.knownFields[v.Target], urlComponent(v.Component))
-			s.knownFields[v.Source] = append(s.knownFields[v.Source], url{})
+			lc.knownFields[v.Target] = append(lc.knownFields[v.Target], urlComponent(v.Component))
+			lc.knownFields[v.Source] = append(lc.knownFields[v.Source], url{})
 
 		default:
 			return errors.Errorf("unsupported action type %T", v)
 		}
 	}
 	return nil
+}
+
+func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) error {
+	lc.knownFields[dt.Target] = append(lc.knownFields[dt.Target], date{})
+	// TODO: Multiple formats
+	fmt := dt.Formats[0]
+	fields := dt.Fields
+	switch {
+	case len(fields) == 1: // 1 to many
+		lc.knownFields[fields[0]] = append(lc.knownFields[fields[0]], dateComponent(fmt))
+
+	case len(fields) == len(fmt): // 1:1 mapping
+		for idx, src := range fields {
+			lc.knownFields[src] = append(lc.knownFields[src], dateComponent(fmt[idx:idx+1]))
+		}
+
+	case len(fields) == 2 && len(fmt) > 2: // Split 3+ fields in 2.
+		// Try to split the fmt in two parts, one for date, one for time.
+		pos := splitDateAndTime(fmt)
+		if pos != -1 {
+			lc.knownFields[fields[0]] = append(lc.knownFields[fields[0]], dateComponent(fmt[:pos]))
+			lc.knownFields[fields[1]] = append(lc.knownFields[fields[1]], dateComponent(fmt[pos:]))
+			break
+		}
+		fallthrough
+	case len(fields) < len(fmt): // Split fields, at least 1 fmt per fld
+		div := len(fmt) / len(fields)
+		rem := len(fmt) % len(fields)
+		pos := 0
+		for _, fld := range fields {
+			next := pos + div
+			if pos == 0 {
+				next += rem
+			}
+			lc.knownFields[fld] = append(lc.knownFields[fld], dateComponent(fmt[pos:next]))
+			pos = next
+		}
+	default:
+		// Don't know how to split this. More fields than formats
+		return errors.Errorf("don't know how to split datetime %+v", dt)
+	}
+	return nil
+}
+
+// Which chars correspond to date components, in opposition to time components
+var dateChars = map[byte]struct{}{
+	'R': {},
+	'B': {},
+	'M': {},
+	'G': {},
+	'D': {},
+	'F': {},
+	'Y': {},
+	'W': {},
+}
+
+// Find the offset which splits a datetime pattern into a date and time
+// component (or time and date). Returns -1 if there is no such offset.
+// (for example only date components or mixed date and time).
+func splitDateAndTime(pattern []parser.DateTimeItem) int {
+	split, isDate := -1, false
+	for idx, elem := range pattern {
+		if elem.Spec() == parser.DateTimeConstant {
+			continue
+		}
+		_, is := dateChars[elem.Spec()]
+		if is != isDate {
+			isDate = is
+			if idx > 0 {
+				if split != -1 {
+					return -1
+				}
+				split = idx
+			}
+		}
+	}
+	return split
 }

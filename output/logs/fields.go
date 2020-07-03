@@ -167,6 +167,9 @@ var overrideFields = map[string]valueGenerator{
 		"GMT+02:00",
 		"GMT-07:00",
 	),
+	"gmtdate": func(rng *rand.Rand, t time.Time) string {
+		return t.UTC().Format(time.RFC3339)
+	},
 }
 
 type fieldsGen map[string]valueGenerator

@@ -340,23 +340,27 @@ func (lc *lineComposer) valueFor(field string) (string, error) {
 	if !ok || len(hints) == 0 {
 		return "", errors.Errorf("field %s not captured", field)
 	}
-	var c captured
-	if hints[0] != c {
-		return "", errors.Errorf("field %s is not captured", field)
+	var capt captured
+	// Discard information prior to capture
+	for len(hints) > 0 && hints[0] != capt {
+		hints = hints[1:]
+	}
+	if len(hints) == 0 {
+		return "", errors.Errorf("field %s not captured", field)
 	}
 	best := hints[0]
 	idx := 1
 	for ; idx < len(hints); idx++ {
 		hint := hints[idx]
-		if hint == c {
-			// Discard used hints
-			lc.knownFields[field] = hints[idx:]
+		if hint == capt {
 			break
 		}
 		if best.Quality() < hint.Quality() {
 			best = hint
 		}
 	}
+	// Discard used hints
+	lc.knownFields[field] = hints[idx:]
 	if best.Quality() > 0 {
 		return best.Generate(lc.rng, lc.time), nil
 	}
@@ -470,6 +474,7 @@ func (lc *lineComposer) appendPattern(p parser.Pattern) error {
 	for idx, entry := range p {
 		switch v := entry.(type) {
 		case parser.Field:
+			// mark field as captured
 			lc.knownFields[v.Name] = append(lc.knownFields[v.Name], captured{})
 			lc.expression = append(lc.expression, entry)
 		case parser.Constant:
@@ -482,11 +487,14 @@ func (lc *lineComposer) appendPattern(p parser.Pattern) error {
 			}
 			if v.Name != "" {
 				loc := findField(lc.expression, v.Name)
-				if len(loc) != 1 {
+				if len(loc) == 1 {
+					lc.payload = &loc[0]
+				} else if len(loc) == 0 && v.Name == "$START" {
+					lc.payload = new(int) // payload pos is zero
+				} else {
 					return errors.Errorf("payload field must appear once. historic=%+v loc=%+v pattern=%s",
 						lc.history, loc, p.String())
 				}
-				lc.payload = &loc[0]
 			}
 			break
 
@@ -502,15 +510,19 @@ func (lc *lineComposer) appendPattern(p parser.Pattern) error {
 	return nil
 }
 
+func (lc *lineComposer) addHint(field string, hint valueHint) {
+	lc.knownFields[field] = append(lc.knownFields[field], hint)
+}
+
 func (lc *lineComposer) appendActions(list parser.OpList) error {
 	for _, act := range list {
 		switch v := act.(type) {
 		case parser.SetField:
 			switch vv := v.Value[0].(type) {
 			case parser.Field:
-				lc.knownFields[v.Target] = append(lc.knownFields[v.Target], copyField(vv))
+				lc.addHint(v.Target, copyField(vv))
 			case parser.Constant:
-				lc.knownFields[v.Target] = append(lc.knownFields[v.Target], constant(vv))
+				lc.addHint(v.Target, constant(vv))
 			default:
 				return errors.Errorf("unexpected value type %T in %s", vv, v.Hashable())
 			}
@@ -528,12 +540,12 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 			}
 			fld, ok := v.Key[0].(parser.Field)
 			if ok {
-				lc.knownFields[fld.Name] = append(lc.knownFields[fld.Name], newValueMapKey(vm))
+				lc.addHint(fld.Name, newValueMapKey(vm))
 			}
 
 		case parser.URLExtract:
-			lc.knownFields[v.Target] = append(lc.knownFields[v.Target], urlComponent(v.Component))
-			lc.knownFields[v.Source] = append(lc.knownFields[v.Source], url{})
+			lc.addHint(v.Target, urlComponent(v.Component))
+			lc.addHint(v.Source, url{})
 
 		default:
 			return errors.Errorf("unsupported action type %T", v)
@@ -543,25 +555,25 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 }
 
 func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) error {
-	lc.knownFields[dt.Target] = append(lc.knownFields[dt.Target], date{})
+	lc.addHint(dt.Target, date{})
 	// TODO: Multiple formats
 	fmt := dt.Formats[0]
 	fields := dt.Fields
 	switch {
 	case len(fields) == 1: // 1 to many
-		lc.knownFields[fields[0]] = append(lc.knownFields[fields[0]], dateComponent(fmt))
+		lc.addHint(fields[0], dateComponent(fmt))
 
 	case len(fields) == len(fmt): // 1:1 mapping
 		for idx, src := range fields {
-			lc.knownFields[src] = append(lc.knownFields[src], dateComponent(fmt[idx:idx+1]))
+			lc.addHint(src, dateComponent(fmt[idx:idx+1]))
 		}
 
 	case len(fields) == 2 && len(fmt) > 2: // Split 3+ fields in 2.
 		// Try to split the fmt in two parts, one for date, one for time.
 		pos := splitDateAndTime(fmt)
 		if pos != -1 {
-			lc.knownFields[fields[0]] = append(lc.knownFields[fields[0]], dateComponent(fmt[:pos]))
-			lc.knownFields[fields[1]] = append(lc.knownFields[fields[1]], dateComponent(fmt[pos:]))
+			lc.addHint(fields[0], dateComponent(fmt[:pos]))
+			lc.addHint(fields[1], dateComponent(fmt[pos:]))
 			break
 		}
 		fallthrough
@@ -574,7 +586,7 @@ func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) error {
 			if pos == 0 {
 				next += rem
 			}
-			lc.knownFields[fld] = append(lc.knownFields[fld], dateComponent(fmt[pos:next]))
+			lc.addHint(fld, dateComponent(fmt[pos:next]))
 			pos = next
 		}
 	default:

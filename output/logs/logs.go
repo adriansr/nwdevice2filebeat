@@ -162,7 +162,7 @@ func (_ copyField) Generate(rng *rand.Rand, t time.Time) string {
 type constant parser.Constant
 
 func (c constant) String() string { return "const('" + parser.Constant(c).Value() + "')" }
-func (_ constant) Quality() int   { return 0 }
+func (_ constant) Quality() int   { return 1 }
 func (_ constant) Generate(rng *rand.Rand, t time.Time) string {
 	return makeText(rng, t)
 }
@@ -263,27 +263,36 @@ func (c dateComponent) Generate(rng *rand.Rand, t time.Time) string {
 		case 'X':
 			sb.WriteString(fmt.Sprintf("%d", t.Unix()))
 		default:
-			panic(errors.Errorf("unsupported format %%%s for date hint", comp.Spec()))
+			panic(errors.Errorf("unsupported format %%%v for date hint", comp.Spec()))
 		}
 	}
 	return sb.String()
 }
 
-type valueMapKey []string
+type mapKey []string
 
-func newValueMapKey(vm *parser.ValueMap) valueMapKey {
-	result := make(valueMapKey, 0, len(vm.Mappings))
-	for key := range vm.Mappings {
+func newMapKey(dict map[string]int) mapKey {
+	result := make(mapKey, 0, len(dict))
+	for key := range dict {
 		result = append(result, key)
 	}
 	sort.Strings(result)
 	return result
 }
 
-func (c valueMapKey) String() string { return "value_map" }
-func (valueMapKey) Quality() int     { return 10 }
-func (c valueMapKey) Generate(rng *rand.Rand, t time.Time) string {
+func (c mapKey) String() string { return "value_map" }
+func (mapKey) Quality() int     { return 10 }
+func (c mapKey) Generate(rng *rand.Rand, t time.Time) string {
 	return c[rng.Intn(len(c))]
+}
+
+func (c mapKey) Filter(expr strcat) (filtered mapKey) {
+	for _, entry := range c {
+		if dict := expr.Split(entry); dict != nil {
+			filtered = append(filtered, entry)
+		}
+	}
+	return filtered
 }
 
 type urlComponent parser.URLComponent
@@ -301,6 +310,113 @@ func (url) Quality() int     { return 10 }
 
 func (_ url) Generate(rng *rand.Rand, t time.Time) string {
 	return makeURL(rng, t)
+}
+
+type strcat []parser.Value
+
+func (c strcat) String() string { return fmt.Sprintf("strcat(%+v)", []parser.Value(c)) }
+func (_ strcat) Quality() int   { return 20 }
+func (_ strcat) Generate(rng *rand.Rand, t time.Time) string {
+	panic("strcat can't be generated directly")
+}
+
+func (c strcat) Split(s string) (kv map[string]string) {
+	// This is similar to a dissect, but need to support consecutive "captures".
+	// not consecutive constants as those are merged by the parser.
+	// strcat(fl1, fl2)
+	// strcat("_", fl1, fl2, "_", fl3)
+	// strcat(fl1, "_", fl2, fl3)
+	// strcat("_", fld1, "_")
+	if len(c) == 0 {
+		return nil
+	}
+
+	// Validate and remove trailing constant. This is to avoid an edge cases
+	// like: strcat{fld1,'_',fld2,'_')
+	//    s: "A_B_C_"
+	// wanted: fld1=A fld2=B_C
+	//    not: fld1=A fld2=B
+	if lastCt, ok := c[len(c)-1].(parser.Constant); ok {
+		pos := strings.LastIndex(s, lastCt.Value())
+		if pos == -1 || pos+len(lastCt.Value()) != len(s) {
+			return nil
+		}
+		s = s[:pos]
+		c = c[:len(c)-1]
+	}
+	var values []string   // N values (the string between constants)
+	var fields [][]string // N x M values (one or more fields per each value above)
+	for pos := 0; pos < len(c); pos++ {
+		switch v := c[pos].(type) {
+		case parser.Constant:
+			if strings.Index(s, v.Value()) != 0 {
+				return nil
+			}
+			s = s[len(v.Value()):]
+		case parser.Field:
+			if len(s) == 0 {
+				return nil
+			}
+			thisFields := []string{v.Name}
+			nextCtPos := -1
+			nextCtValue := ""
+			for nextPos := pos + 1; nextCtPos == -1 && nextPos < len(c); nextPos++ {
+				switch next := c[nextPos].(type) {
+				case parser.Field:
+					thisFields = append(thisFields, next.Name)
+				case parser.Constant:
+					nextCtPos = nextPos
+					nextCtValue = next.Value()
+				}
+			}
+			fields = append(fields, thisFields)
+			if nextCtPos != -1 {
+				// Need at least one character per captured field
+				if len(s) < len(thisFields) {
+					return nil
+				}
+				end := strings.Index(s[len(thisFields):], nextCtValue)
+				if end == -1 {
+					return nil
+				}
+				end += len(thisFields)
+				values = append(values, s[:end])
+				s = s[end+len(nextCtValue):]
+				pos = nextCtPos
+			} else {
+				values = append(values, s)
+				s = ""
+				pos = len(c)
+			}
+		default:
+			panic(fmt.Sprintf("bad item in strcat expression: %T (%v)", v, v))
+		}
+	}
+	//if len(s) > 0 {
+	//	values = append(values, s)
+	//}
+	if len(s) > 0 || len(values) != len(fields) || len(fields) == 0 {
+		panic(fmt.Sprintf("unexpected %+q vs %+q", values, fields))
+	}
+	kv = make(map[string]string)
+	for idx, fs := range fields {
+		value := values[idx]
+		if len(fs) == 1 {
+			kv[fs[0]] = value
+		} else {
+			div := len(value) / len(fs)
+			rem := len(value) % len(fs)
+			for i, f := range fs {
+				end := div
+				if i == 0 {
+					end += rem
+				}
+				kv[f] = value[:end]
+				value = value[end:]
+			}
+		}
+	}
+	return kv
 }
 
 type fieldHints map[string][]valueHint
@@ -408,42 +524,45 @@ func (lg *logs) newLine(p parser.Parser, t time.Time) (string, error) {
 		fieldsGen:   lg.fieldsGen,
 		knownFields: make(fieldHints),
 	}
-	if err := lg.randomWalk(p.Root, &state); err != nil {
+	if err := state.randomWalk(p.Root); err != nil {
 		return "", errors.Wrapf(err, "error during random walk (historic:%+v)", state.history)
 	}
 	state.Log()
 	return state.Build()
 }
 
-func (lg *logs) randomWalk(node parser.Operation, st *lineComposer) error {
+func (lc *lineComposer) randomWalk(node parser.Operation) error {
 	switch v := node.(type) {
 	case parser.Chain:
 		for _, child := range v.Children() {
-			if err := lg.randomWalk(child, st); err != nil {
+			if err := lc.randomWalk(child); err != nil {
 				return err
 			}
 		}
 
 	case parser.LinearSelect:
 		children := v.Children()
-		return lg.randomWalk(children[lg.rng.Intn(len(children))], st)
+		return lc.randomWalk(children[lc.rng.Intn(len(children))])
 
 	case parser.Match:
-		st.history = append(st.history, v.ID)
-		if err := st.appendPattern(v.Pattern); err != nil {
+		lc.history = append(lc.history, v.ID)
+		if err := lc.appendPattern(v.Pattern); err != nil {
 			return err
 		}
-		if err := st.appendActions(v.OnSuccess); err != nil {
+		if err := lc.appendActions(v.OnSuccess); err != nil {
 			return err
 		}
 
 	case parser.MsgIdSelect:
-		_, found := st.knownFields["messageid"]
-		if !found {
-			return errors.New("no hints for messageid")
+		msgID, err := lc.composeMessageID(v)
+		if err != nil {
+			return err
 		}
-		// TODO:
-		return lg.randomWalk(v.Children()[lg.rng.Intn(len(v.Children()))], st)
+		idx, ok := v.Map[msgID]
+		if !ok {
+			return errors.Errorf("No messages for messageid '%s'", msgID)
+		}
+		return lc.randomWalk(v.Children()[idx])
 	default:
 		return errors.Errorf("unsupported node type %T", v)
 	}
@@ -457,6 +576,45 @@ func findField(p parser.Pattern, name string) (pos []int) {
 		}
 	}
 	return pos
+}
+
+func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string, err error) {
+	hints := lc.knownFields["messageid"]
+	log.Printf("MessageID: %+v", hints)
+	if len(hints) != 1 {
+		return "", errors.Errorf("bad number of hints for messageid: %+v", hints)
+	}
+	switch v := hints[0].(type) {
+	case constant:
+		msgID = parser.Constant(v).Value()
+	case captured:
+		// Let's just make a messageID at random
+		msgID = newMapKey(node.Map).Generate(lc.rng, lc.time)
+	case strcat:
+		// Compose a messageid from an expression like:
+		// strcat([Field(msgIdPart1) Constant('_') Field(msgIdPart2) Constant('_') Field(msgIdPart3)])
+		matching := newMapKey(node.Map).Filter(v)
+		if len(matching) == 0 {
+			return "", errors.Errorf("no messageids match strcat pattern %+v", v)
+		}
+		msgID = matching.Generate(lc.rng, lc.time)
+		kv := v.Split(msgID)
+		if kv == nil {
+			return "", errors.Errorf("strcat pattern %v doesn't split '%s'", v, msgID)
+		}
+		// set the appropriate msgIdPartN fields so that the STRCAT operation
+		// generates the expected messageid
+		log.Printf("Generated messageid '%s'", msgID)
+		log.Printf("^ for pattern '%+v'", v)
+		for field, value := range kv {
+			log.Printf("^ with '%s'='%s'", field, value)
+			lc.knownFields[field] = []valueHint{captured{}, constant(value)}
+		}
+	default:
+		return "", errors.Errorf("don't know how to generate a messageid from hints=%+v", hints)
+	}
+	lc.knownFields["messageid"] = []valueHint{captured{}, constant(msgID)}
+	return msgID, nil
 }
 
 func (lc *lineComposer) appendPattern(p parser.Pattern) error {
@@ -540,15 +698,25 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 			}
 			fld, ok := v.Key[0].(parser.Field)
 			if ok {
-				lc.addHint(fld.Name, newValueMapKey(vm))
+				lc.addHint(fld.Name, newMapKey(vm.Mappings))
 			}
 
 		case parser.URLExtract:
 			lc.addHint(v.Target, urlComponent(v.Component))
 			lc.addHint(v.Source, url{})
 
+		case parser.Call:
+			// Only care about calls that set messageid
+			if v.Target != "messageid" {
+				continue
+			}
+			if v.Function != "STRCAT" {
+				return errors.Errorf("unsupported function to set messageid: %s", v.Function)
+			}
+			lc.addHint(v.Target, strcat(v.Args))
+
 		default:
-			return errors.Errorf("unsupported action type %T", v)
+			return errors.Errorf("unsupported action type %T: %s", v, v.Hashable())
 		}
 	}
 	return nil

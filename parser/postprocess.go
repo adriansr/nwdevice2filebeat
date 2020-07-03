@@ -102,6 +102,7 @@ var optimizations = PostprocessGroup{
 	Title: "optimizations",
 	Actions: []Action{
 		{"evaluate constant functions", evalConstantFunctions},
+		{"join strcat constants", joinStrcatConstants},
 	},
 }
 
@@ -1163,12 +1164,13 @@ func detectUnnamedMatches(parser *Parser) (err error) {
 	return err
 }
 
-func evalFn(name string, params []string) (string, error) {
+func evalConstantFn(name string, params []string) (string, error) {
 	switch name {
 	case "STRCAT":
 		return strings.Join(params, ""), nil
 	}
-	return "", errors.Errorf("unsupported function %s", name)
+	// STRCAT is the only function observed to have only constant arguments
+	return "", errors.Errorf("unsupported function in constant evaluation: %s", name)
 }
 
 func evalConstantFunctions(parser *Parser) (err error) {
@@ -1183,7 +1185,7 @@ func evalConstantFunctions(parser *Parser) (err error) {
 				}
 			}
 			var constant string
-			constant, err = evalFn(call.Function, params)
+			constant, err = evalConstantFn(call.Function, params)
 			if err != nil {
 				err = errors.Wrapf(err, "at %s", call.Source())
 				return WalkCancel, nil
@@ -1194,6 +1196,19 @@ func evalConstantFunctions(parser *Parser) (err error) {
 				Value:         []Operation{Constant(constant)},
 			}
 			return WalkReplace, repl
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+// Avoid having two consecutive constants in a strcat call, which makes some
+// operations on them difficult.
+func joinStrcatConstants(parser *Parser) (err error) {
+	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if call, ok := node.(Call); ok && call.Function == "STRCAT" {
+			call.Args = Pattern(call.Args).SquashConstants()
+			return WalkReplace, call
 		}
 		return WalkContinue, nil
 	})

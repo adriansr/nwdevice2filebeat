@@ -61,9 +61,6 @@ func fromDatePattern(s string) valueGenerator {
 }
 
 var overrideFields = map[string]valueGenerator{
-	"messageid": func(rng *rand.Rand, t time.Time) string {
-		return fmt.Sprintf("MSGID%04x", rng.Intn(0x10000))
-	},
 	"space": func(rng *rand.Rand, t time.Time) string {
 		var spaces = "    "
 		return spaces[:1+rng.Intn(len(spaces)-1)]

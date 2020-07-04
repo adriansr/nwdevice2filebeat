@@ -13,8 +13,8 @@ fields:
 
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module "/" .Fileset) -))
-((- getvar "extra_processors" -))
 ((- setvar "var_prefix" "" -))
+((- getvar "extra_processors" -))
 - community_id:
 - add_locale: ~
 - add_fields:

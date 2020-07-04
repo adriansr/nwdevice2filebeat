@@ -537,6 +537,7 @@ func (lc *lineComposer) Log() {
 	for _, k := range keys {
 		log.Printf(" '%s' = %+v", k, lc.knownFields[k])
 	}
+	log.Printf("Path: %+v", lc.history)
 }
 
 func (lg *logs) newLine(p parser.Parser, t time.Time) (string, error) {

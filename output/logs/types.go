@@ -16,7 +16,7 @@ type valueGenerator func(rng *rand.Rand, t time.Time) string
 
 var types = map[string]valueGenerator{
 	"Text":    makeText,
-	"TimeT":   makeTimeT,
+	"TimeT":   makeTimeT, // dangerous because time can have multiple formats.
 	"IPv4":    makeIPv4,
 	"IPv6":    makeIPv6,
 	"UInt64":  makeInt,
@@ -51,7 +51,7 @@ func makeText(rng *rand.Rand, t time.Time) string {
 func makeTimeT(rng *rand.Rand, t time.Time) string {
 	//delta := time.Duration(rng.Uint64() % uint64(maxTimeWindow))
 	//return time.Now().Add(-delta).UTC().String()
-	return t.String()
+	return t.UTC().Format(time.RFC3339)
 }
 
 func makeIPv4(rng *rand.Rand, t time.Time) string {

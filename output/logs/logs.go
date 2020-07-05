@@ -79,14 +79,16 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 	lg.rng = rand.New(rand.NewSource(int64(p.Config.Seed)))
 	t := startTime
 	delta := endTime.Sub(startTime) / time.Duration(p.Config.NumLines)
-	minDelta := time.Second
+	//minDelta := time.Second
 	var numErrors uint
 	const maxSavedErrors = 20
 	var errs multierror.Errors
 	var numLines uint
 	for numLines < p.Config.NumLines {
+		log.Printf("=== Line #%d ===", numLines)
 		text, err := lg.newLine(p, t)
 		if err != nil {
+			log.Printf("Error: %v", err)
 			if numErrors < maxSavedErrors {
 				errs = append(errs, errors.Wrapf(err, "failed to generate line #%d", numLines))
 			}
@@ -97,9 +99,11 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 			continue
 		}
 		numLines++
+		log.Printf("Log: %s", text)
 		lg.tmpFile.WriteString(text)
 		lg.tmpFile.WriteString("\n")
-		t = t.Add(2*time.Duration(lg.rng.Intn(int(delta-minDelta))) + minDelta)
+		//t = t.Add(2*time.Duration(lg.rng.Intn(int(delta-minDelta))) + minDelta)
+		t = t.Add(delta)
 	}
 	log.Printf("%s: Generated %d lines and got %d errors.", p.Description.Name, numLines, numErrors)
 	if numErrors > 0 {
@@ -185,8 +189,8 @@ type constant parser.Constant
 
 func (c constant) String() string { return "const('" + parser.Constant(c).Value() + "')" }
 func (_ constant) Quality() int   { return 1 }
-func (_ constant) Generate(rng *rand.Rand, t time.Time) string {
-	return makeText(rng, t)
+func (c constant) Generate(rng *rand.Rand, t time.Time) string {
+	return parser.Constant(c).Value()
 }
 
 type date struct{}
@@ -473,7 +477,7 @@ func (lc *lineComposer) Build() (string, error) {
 	return sb.String(), nil
 }
 
-func (lc *lineComposer) valueFor(field string) (string, error) {
+func (lc *lineComposer) valueFor(field string) (value string, err error) {
 	hints, ok := lc.knownFields[field]
 	if !ok || len(hints) == 0 {
 		return "", errors.Errorf("field %s not captured", field)
@@ -487,6 +491,10 @@ func (lc *lineComposer) valueFor(field string) (string, error) {
 		return "", errors.Errorf("field %s not captured", field)
 	}
 	best := hints[0]
+	defer func() {
+		log.Printf("valueFor('%s') hints:%+v best=%+v result='%s'", field, hints, best, value)
+	}()
+
 	idx := 1
 	for ; idx < len(hints); idx++ {
 		hint := hints[idx]
@@ -604,7 +612,10 @@ func findField(p parser.Pattern, name string) (pos []int) {
 
 func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string, err error) {
 	hints := lc.knownFields["messageid"]
-	log.Printf("MessageID: %+v", hints)
+	log.Printf("MessageID hints: %+v", hints)
+	defer func() {
+		log.Printf("MessageID result: %+v", lc.knownFields["messageid"])
+	}()
 	if len(hints) != 1 {
 		return "", errors.Errorf("bad number of hints for messageid: %+v", hints)
 	}
@@ -612,7 +623,7 @@ func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string,
 	case constant:
 		msgID = parser.Constant(v).Value()
 	case captured:
-		// Let's just make a messageID at random
+		// Let's just select a messageID at random
 		msgID = newMapKey(node.Map).Generate(lc.rng, lc.time)
 	case strcat:
 		// Compose a messageid from an expression like:
@@ -697,6 +708,7 @@ func (lc *lineComposer) addHint(field string, hint valueHint) {
 }
 
 func (lc *lineComposer) appendActions(list parser.OpList) error {
+	hasDateTime := false
 	for _, act := range list {
 		switch v := act.(type) {
 		case parser.SetField:
@@ -708,10 +720,13 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 			default:
 				return errors.Errorf("unexpected value type %T in %s", vv, v.Hashable())
 			}
+
 		case parser.DateTime:
+			hasDateTime = true
 			if err := lc.enrichFromDateTime(v); err != nil {
 				return err
 			}
+
 		case parser.ValueMapCall:
 			vm, ok := lc.parser.ValueMapsByName[v.MapName]
 			if !ok {
@@ -742,6 +757,9 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 		default:
 			return errors.Errorf("unsupported action type %T: %s", v, v.Hashable())
 		}
+	}
+	if _, hasMsgID := lc.knownFields["messageid"]; hasMsgID && !hasDateTime && false {
+		return errors.New("message without datetime")
 	}
 	return nil
 }

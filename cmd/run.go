@@ -85,10 +85,10 @@ func doRun(cmd *cobra.Command, args []string) {
 	scanner := bufio.NewScanner(inputFile)
 	start := time.Now()
 	var count int
-	for count = 1; scanner.Scan(); count++ {
+	for count = 0; scanner.Scan(); count++ {
 		line := scanner.Bytes()
 		fields, errs := rt.Process(line)
-		log.Printf("Processed message <<%s>>", line)
+		log.Printf("Processed line #%d <<%s>>", count, line)
 		log.Printf("Got %d fields:", len(fields))
 		for k, v := range fields {
 			log.Printf("  '%s': '%s'", k, v)

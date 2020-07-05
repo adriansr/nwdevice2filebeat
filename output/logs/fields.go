@@ -161,6 +161,7 @@ var overrideFields = map[string]valueGenerator{
 	"addr":    makeIPv4, // TODO: Why is this one not mapped in the CSV?
 	"address": makeIPv4,
 	"pid":     makeInt,
+	"time":    makeTime,
 }
 
 type fieldsGen map[string]valueGenerator

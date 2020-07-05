@@ -711,6 +711,12 @@ function skipdigits(str, pos) {
     return pos;
 }
 
+function dSkip(str, pos, date) {
+    var chr;
+    for (;pos < str.length && (chr=str[pos])<'0' || chr>'9'; pos++) {}
+    return pos < str.length? pos : undefined;
+}
+
 function dateVariableWidthNumber(fmtChar, min, max, setter) {
     return function (str, pos, date) {
         var start = skipws(str, pos);
@@ -1856,6 +1862,7 @@ function map_all(evt, targets, value) {
 function populate_fields(evt) {
     var base = evt.Get(FIELDS_OBJECT);
     if (base === null) return;
+    alternate_datetime(evt);
     if (map_ecs) {
         do_populate(evt, base, ecs_mappings);
     }
@@ -1866,6 +1873,47 @@ function populate_fields(evt) {
         evt.Put("rsa.raw", base);
     }
     evt.Delete(FIELDS_OBJECT);
+}
+
+var datetime_alt_components = [
+    {field: "day", fmts: [[dF]]},
+    {field: "year", fmts: [[dW]]},
+    {field: "month", fmts: [[dB],[dG]]},
+    {field: "date", fmts: [[dW,dSkip,dG,dSkip,dF],[dW,dSkip,dB,dSkip,dF],[dW,dSkip,dR,dSkip,dF]]},
+    {field: "hour", fmts: [[dN]]},
+    {field: "min", fmts: [[dU]]},
+    {field: "secs", fmts: [[dO]]},
+    {field: "time", fmts: [[dN, dSkip, dU, dSkip, dO]]},
+];
+
+function alternate_datetime(evt) {
+    if (evt.Get(FIELDS_PREFIX + "event_time") != null) {
+        return;
+    }
+    var tzOffset = tz_offset;
+    if (tzOffset === "event") {
+        tzOffset = evt.Get("event.timezone");
+    }
+    var container = new DateContainer(tzOffset);
+    for (var i=0; i<datetime_alt_components.length; i++) {
+        var dtc = datetime_alt_components[i];
+        var value = evt.Get(FIELDS_PREFIX + dtc.field) || evt.Get(FIELDS_PREFIX + "h" + dtc.field);
+        if (value == null) continue;
+        for (var f=0; f<dtc.fmts.length; f++) {
+            var pos = date_time_try_pattern_at_pos(dtc.fmts[f], value, 0, container);
+            if (pos !== undefined) {
+                console.debug("XXX parsealt ok " + dtc.field + "='" + value + "' = " + JSON.stringify(container));
+                break;
+            }
+        }
+        if (pos === undefined) {
+            console.debug("XXX parsealt FAIL " + dtc.field + "='" + value + "' = " + JSON.stringify(container));
+        }
+    }
+    var date = container.toDate();
+    if (date !== undefined) {
+        evt.Put(FIELDS_PREFIX + "event_time", date);
+    }
 }
 
 function do_populate(evt, base, targets) {

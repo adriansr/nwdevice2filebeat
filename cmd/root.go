@@ -33,6 +33,13 @@ func Execute() {
 	}
 }
 
+func terminateOnError(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
+		os.Exit(1)
+	}
+}
+
 func LogError(msg string, keysAndValues ...interface{}) {
 	var sb strings.Builder
 	sb.WriteString("Error: ")

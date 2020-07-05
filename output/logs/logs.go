@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/adriansr/nwdevice2filebeat/runtime"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -81,6 +82,10 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 	offset := time.Duration(float64(maxOffset) * 2.0 * (lg.rng.Float64() - 0.5))
 	delta := endTime.Sub(startTime) / time.Duration(p.Config.NumLines)
 	date := startTime.Add(offset)
+	run, err := runtime.New(&p, nil, nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to allocate runtime")
+	}
 	var numErrors uint
 	const maxSavedErrors = 20
 	var errs multierror.Errors
@@ -89,7 +94,7 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 		log.Printf("=== Line #%d (%s) ===", numLines, date.Format(time.RFC3339))
 		text, err := lg.newLine(p, date)
 		if err != nil {
-			log.Printf("Error: %v", err)
+			log.Printf("Generate line error: %v", err)
 			if numErrors < maxSavedErrors {
 				errs = append(errs, errors.Wrapf(err, "failed to generate line #%d", numLines))
 			}
@@ -99,6 +104,15 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 			}
 			continue
 		}
+		_, runErrs := run.Process([]byte(text))
+		if len(runErrs) > 0 {
+			log.Printf("Test line errors: %+v", runErrs)
+			continue
+		}
+		/*if _, err := flds.Get("messageid"); err != nil {
+			log.Printf("MessageID can't be captured!")
+			continue
+		}*/
 		numLines++
 		log.Printf("Log: %s", text)
 		lg.tmpFile.WriteString(text)
@@ -586,15 +600,24 @@ func (lc *lineComposer) randomWalk(node parser.Operation) error {
 		}
 
 	case parser.MsgIdSelect:
-		msgID, err := lc.composeMessageID(v)
+		msgID, err, basePath := "", errBadOverlap, lc.history
+		// Repeat until a message with valid overlap is found
+		for iter := 1; iter < 1000 && err == errBadOverlap; iter++ {
+			lc.history = basePath
+			msgID, err = lc.composeMessageID(v)
+			if err != nil {
+				return err
+			}
+			idx, ok := v.Map[msgID]
+			if !ok {
+				return errors.Errorf("No messages for messageid '%s'", msgID)
+			}
+			err = lc.randomWalk(v.Children()[idx])
+		}
 		if err != nil {
 			return err
 		}
-		idx, ok := v.Map[msgID]
-		if !ok {
-			return errors.Errorf("No messages for messageid '%s'", msgID)
-		}
-		return lc.randomWalk(v.Children()[idx])
+
 	default:
 		return errors.Errorf("unsupported node type %T", v)
 	}
@@ -610,6 +633,18 @@ func findField(p parser.Pattern, name string) (pos []int) {
 	return pos
 }
 
+func (lc *lineComposer) getAssignedValue(fieldName string) (string, bool) {
+	hints := lc.knownFields[fieldName]
+	if len(hints) == 2 {
+		_, isCaptured := hints[0].(captured)
+		ct, isConstant := hints[1].(constant)
+		if isCaptured && isConstant {
+			return ct.Generate(lc.rng, lc.time), true
+		}
+	}
+	return "", false
+}
+
 func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string, err error) {
 	hints := lc.knownFields["messageid"]
 	log.Printf("MessageID hints: %+v", hints)
@@ -617,6 +652,9 @@ func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string,
 		log.Printf("MessageID result: %+v", lc.knownFields["messageid"])
 	}()
 	if len(hints) != 1 {
+		if value, ok := lc.getAssignedValue("messageid"); ok {
+			return value, nil
+		}
 		return "", errors.Errorf("bad number of hints for messageid: %+v", hints)
 	}
 	switch v := hints[0].(type) {
@@ -652,16 +690,11 @@ func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string,
 	return msgID, nil
 }
 
+var errBadOverlap = errors.New("bad overlap")
+
 func (lc *lineComposer) appendPattern(p parser.Pattern) error {
-	if lc.payload != nil {
-		loc := *lc.payload
-		if overlap := len(lc.expression) - loc; overlap <= 0 || len(p) < overlap {
-			errors.Errorf("payload overlap is troublesome. historic=%+v overlap=%d in=%s new=%s",
-				lc.history, overlap, p.String(), lc.expression.String())
-		}
-		// TODO
-		lc.expression = lc.expression[:loc]
-		lc.payload = nil
+	if !lc.validateOverlap(p) {
+		return errBadOverlap
 	}
 
 	for idx, entry := range p {
@@ -701,6 +734,40 @@ func (lc *lineComposer) appendPattern(p parser.Pattern) error {
 		}
 	}
 	return nil
+}
+
+func (lc *lineComposer) validateOverlap(p parser.Pattern) bool {
+	if lc.payload == nil {
+		return true
+	}
+	loc := *lc.payload
+	overlap := len(lc.expression) - loc
+	if overlap <= 0 {
+		panic("bad overlap")
+	}
+
+	// Build the overlapped pattern from the header-side, replacing any fixed
+	// (messageid) fields with their expected values.
+	/*
+		var fromHeader parser.Pattern
+		for _, item := range lc.expression[loc:] {
+			if fld, ok := item.(parser.Field); ok {
+				if value, ok := lc.getAssignedValue(fld.Name); ok {
+					fromHeader = append(fromHeader, parser.Constant(value))
+					continue
+				}
+			}
+			fromHeader = append(fromHeader, item)
+		}
+
+		log.Printf("XXX overlap prev: %+v", lc.expression[loc:])
+		log.Printf("XXX overlap adj.: %+v", fromHeader)
+		log.Printf("XXX overlap next: %+v", p[:len(lc.expression)-loc])
+	*/
+	lc.expression = lc.expression[:loc]
+	lc.payload = nil
+	// TODO: Check if overlapped patterns from header and message are equivalent
+	return true
 }
 
 func (lc *lineComposer) addHint(field string, hint valueHint) {

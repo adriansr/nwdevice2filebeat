@@ -742,7 +742,6 @@ function dateFixedWidthNumber(fmtChar, width, min, max, setter) {
             setter.call(date, value);
             return pos + width;
         }
-        //console.warn("parsing date_time: '" + s + "' is not valid for %" + fmtChar);
         return;
     };
 }

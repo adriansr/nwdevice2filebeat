@@ -22,7 +22,9 @@ import (
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Runs a runtime parser against a log file (for testing)",
-	Run:   doRun,
+	Run: func(cmd *cobra.Command, args []string) {
+		terminateOnError(doRun(cmd, args))
+	},
 }
 
 func init() {
@@ -38,21 +40,21 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 }
 
-func doRun(cmd *cobra.Command, args []string) {
+func doRun(cmd *cobra.Command, args []string) error {
 	cfg, err := config.NewFromCommand(cmd)
 	if err != nil {
 		LogError("Failed to parse configuration", "reason", err)
-		return
+		return err
 	}
 	logPath, err := cmd.PersistentFlags().GetString("logs")
 	if err != nil {
 		LogError("Failed to parse log configuration", "reason", err)
-		return
+		return err
 	}
 	inputFile, err := os.Open(logPath)
 	if err != nil {
 		LogError("Failed to open logs file", "path", logPath, "reason", err)
-		return
+		return err
 	}
 	defer inputFile.Close()
 
@@ -60,7 +62,7 @@ func doRun(cmd *cobra.Command, args []string) {
 	dev, err := model.NewDevice(cfg.DevicePath, &warnings)
 	if err != nil {
 		LogError("Failed to load device", "path", cfg.DevicePath, "reason", err)
-		return
+		return err
 	}
 
 	if !warnings.Print("loading XML device") {
@@ -71,7 +73,7 @@ func doRun(cmd *cobra.Command, args []string) {
 	p, err := parser.New(dev, cfg, &warnings)
 	if err != nil {
 		LogError("Failed to parse device", "path", cfg.DevicePath, "reason", err)
-		return
+		return err
 	}
 	warnings.Print("parsing device")
 	warnings.Clear()
@@ -80,7 +82,7 @@ func doRun(cmd *cobra.Command, args []string) {
 	rt, err := runtime.New(&p, &warnings, logger)
 	if err != nil {
 		LogError("Failed to load runtime", "reason", err)
-		return
+		return err
 	}
 	scanner := bufio.NewScanner(inputFile)
 	start := time.Now()
@@ -104,4 +106,5 @@ func doRun(cmd *cobra.Command, args []string) {
 	took := time.Now().Sub(start)
 	log.Printf("Processed %d lines in %v (%.0f eps)",
 		count, took, float64(count)/took.Seconds())
+	return nil
 }

@@ -22,16 +22,15 @@ import (
 const defaultPipelineFormat = "javascript"
 
 var generateCmd = &cobra.Command{
-	Use:     "generate",
-	Short:   "Generate an output from a NetWitness device",
-	PreRunE: usage,
+	Use:   "generate",
+	Short: "Generate an output from a NetWitness device",
 }
 
 var genModuleCmd = &cobra.Command{
 	Use:   "module",
 	Short: "Generate a Filebeat module from a NetWitness device",
 	Run: func(cmd *cobra.Command, args []string) {
-		generate(cmd, "module")
+		terminateOnError(generate(cmd, "module"))
 	},
 }
 
@@ -39,7 +38,7 @@ var genPackageCmd = &cobra.Command{
 	Use:   "package",
 	Short: "Generate an Ingest Manager package from a NetWitness device",
 	Run: func(cmd *cobra.Command, args []string) {
-		generate(cmd, "package")
+		terminateOnError(generate(cmd, "package"))
 	},
 }
 
@@ -47,7 +46,7 @@ var genPipelineCmd = &cobra.Command{
 	Use:   "pipeline",
 	Short: "Generate a pipeline from a NetWitness device",
 	Run: func(cmd *cobra.Command, args []string) {
-		generate(cmd, "pipeline")
+		terminateOnError(generate(cmd, "pipeline"))
 	},
 }
 
@@ -55,7 +54,7 @@ var genLogsCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Generate sample logs from a device",
 	Run: func(cmd *cobra.Command, args []string) {
-		generate(cmd, "logs")
+		terminateOnError(generate(cmd, "logs"))
 	},
 }
 

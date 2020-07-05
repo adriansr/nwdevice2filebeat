@@ -27,8 +27,9 @@ import (
 const fieldsFile = "ecs-mappings.csv"
 
 var (
-	startTime = time.Unix(1508168573, 0).UTC()
-	endTime   = time.Unix(1593548776, 0).UTC()
+	startTime = time.Unix(1451662973, 0).UTC() //  January 1, 2016 15:42:53
+	endTime   = time.Unix(1575158399, 0).UTC() // November 30, 2019 23:59:59
+	maxOffset = time.Hour * 24 * 31
 )
 
 type logs struct {
@@ -77,16 +78,16 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 	log.Printf("Total number of possible pattern combinations is %d", num)
 	log.Printf("Generating %d random lines using seed=%x", p.Config.NumLines, p.Config.Seed)
 	lg.rng = rand.New(rand.NewSource(int64(p.Config.Seed)))
-	t := startTime
+	offset := time.Duration(float64(maxOffset) * 2.0 * (lg.rng.Float64() - 0.5))
 	delta := endTime.Sub(startTime) / time.Duration(p.Config.NumLines)
-	//minDelta := time.Second
+	date := startTime.Add(offset)
 	var numErrors uint
 	const maxSavedErrors = 20
 	var errs multierror.Errors
 	var numLines uint
 	for numLines < p.Config.NumLines {
-		log.Printf("=== Line #%d ===", numLines)
-		text, err := lg.newLine(p, t)
+		log.Printf("=== Line #%d (%s) ===", numLines, date.Format(time.RFC3339))
+		text, err := lg.newLine(p, date)
 		if err != nil {
 			log.Printf("Error: %v", err)
 			if numErrors < maxSavedErrors {
@@ -102,8 +103,7 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 		log.Printf("Log: %s", text)
 		lg.tmpFile.WriteString(text)
 		lg.tmpFile.WriteString("\n")
-		//t = t.Add(2*time.Duration(lg.rng.Intn(int(delta-minDelta))) + minDelta)
-		t = t.Add(delta)
+		date = date.Add(delta)
 	}
 	log.Printf("%s: Generated %d lines and got %d errors.", p.Description.Name, numLines, numErrors)
 	if numErrors > 0 {

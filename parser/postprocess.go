@@ -102,7 +102,7 @@ var optimizations = PostprocessGroup{
 	Title: "optimizations",
 	Actions: []Action{
 		{"evaluate constant functions", evalConstantFunctions},
-		{"join strcat constants", joinStrcatConstants},
+		{"squash strcat constants", squashStrcatConstants},
 	},
 }
 
@@ -1204,7 +1204,7 @@ func evalConstantFunctions(parser *Parser) (err error) {
 
 // Avoid having two consecutive constants in a strcat call, which makes some
 // operations on them difficult.
-func joinStrcatConstants(parser *Parser) (err error) {
+func squashStrcatConstants(parser *Parser) (err error) {
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if call, ok := node.(Call); ok && call.Function == "STRCAT" {
 			call.Args = Pattern(call.Args).SquashConstants()

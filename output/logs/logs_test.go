@@ -158,3 +158,30 @@ func TestMapKey_Filter(t *testing.T) {
 		})
 	}
 }
+
+func TestMergeOverlapped(t *testing.T) {
+	for _, test := range []struct {
+		title    string
+		header   parser.Pattern
+		message  parser.Pattern
+		expected map[string]string
+		ok       bool
+	}{
+		{
+			title:   "Easy",
+			header:  parser.Pattern{c(": udp connection")},
+			message: parser.Pattern{c(": "), f("protocol"), c(" "), f("type")},
+			expected: map[string]string{
+				"protocol": "udp",
+				"type":     "connection",
+			},
+			ok: true,
+		},
+	} {
+		t.Run(test.title, func(t *testing.T) {
+			result, ok := mergeOverlapped(test.header, test.message)
+			assert.Equal(t, test.ok, ok)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}

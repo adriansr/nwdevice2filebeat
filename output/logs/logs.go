@@ -788,7 +788,7 @@ func (lc *lineComposer) applyOverlap(p parser.Pattern) parser.Pattern {
 	log.Printf("overlap adj.: %+v", fromHeader)
 	log.Printf("overlap next: %+v", p)
 
-	fields, ok := mergeOverlapped(fromHeader, p)
+	p, fields, ok := lc.mergeOverlapped(fromHeader, p)
 	if !ok {
 		log.Printf("Overlap failed")
 		return nil
@@ -799,6 +799,8 @@ func (lc *lineComposer) applyOverlap(p parser.Pattern) parser.Pattern {
 		lc.assignValue(k, v)
 	}
 	lc.expression = lc.expression[:loc]
+	log.Printf("Overlap header: %+v", lc.expression)
+	log.Printf("Overlap message: %+v", p)
 	lc.payload = nil
 	return p
 }
@@ -880,7 +882,7 @@ func (h *helper) Capture(anchor string) (string, bool) {
 	return result, true
 }
 
-func mergeOverlapped(header, message parser.Pattern) (vars map[string]string, merged bool) {
+func (lc *lineComposer) mergeOverlapped(header, message parser.Pattern) (p parser.Pattern, vars map[string]string, merged bool) {
 	vars = make(map[string]string)
 	h := helper{
 		p: header,
@@ -896,7 +898,7 @@ func mergeOverlapped(header, message parser.Pattern) (vars map[string]string, me
 		case hIsCt && mIsCt:
 			ovr := constantOverlap(hVal, mVal)
 			if ovr == 0 {
-				return nil, false
+				return nil, nil, false
 			}
 			h.AdvanceChars(ovr)
 			m.AdvanceChars(ovr)
@@ -909,11 +911,11 @@ func mergeOverlapped(header, message parser.Pattern) (vars map[string]string, me
 			//}
 			if h.Len() == 1 {
 				vars[mVal] = hVal
-				return vars, true
+				return message, vars, true
 			}
 			value, ok := h.Capture(anchor)
 			if !ok {
-				return nil, false
+				return nil, nil, false
 			}
 			vars[mVal] = value
 			m.AdvanceField()
@@ -926,17 +928,25 @@ func mergeOverlapped(header, message parser.Pattern) (vars map[string]string, me
 			//}
 			_, ok := m.Capture(anchor)
 			if !ok {
-				return nil, false
+				return nil, nil, false
 			}
 			h.AdvanceField()
 
 		case !hIsCt && !mIsCt:
+			replace := strings.HasPrefix(mVal, "fld")
+			log.Printf("Overlap: replace field %s with %s? %v", mVal, hVal, replace)
+			if replace {
+				fld := getField(m.p[0])
+				fld.Name = hVal
+				m.p[0] = fld
+			}
+			log.Printf("Overlap: replaced: %v", message)
 			m.AdvanceField()
 			h.AdvanceField()
 			// TODO
 		}
 	}
-	return vars, true
+	return message, vars, true
 }
 
 func constantOverlap(a, b string) int {

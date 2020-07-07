@@ -69,7 +69,16 @@ func (d dateTime) Run(ctx *Context) (err error) {
 
 func (d dateTime) tryConvert(str string, ctx *Context) bool {
 	for _, format := range d.formats {
-		if date, err := d.parser(format, str); err == nil {
+		var date time.Time
+		var err error
+		if format != unixTimestamp {
+			date, err = d.parser(format, str)
+		} else {
+			var ts int64
+			ts, err = strconv.ParseInt(str, 10, 64)
+			date = time.Unix(ts, 0)
+		}
+		if err == nil {
 			log.Printf("EVNTTIME succeeded str=%s format=%s result=%s",
 				str, format, date.String())
 			ctx.Fields.Put(d.target, date.String())
@@ -78,6 +87,8 @@ func (d dateTime) tryConvert(str string, ctx *Context) bool {
 	}
 	return false
 }
+
+const unixTimestamp = "UNIX"
 
 var timeSpecToGolang = map[byte]string{
 	'C': "1/2/06 3:4:5",
@@ -100,8 +111,8 @@ var timeSpecToGolang = map[byte]string{
 	'Y': "06",
 	'W': "2006",
 	'Z': "15:04:05",
+	'X': unixTimestamp,
 	// 'A': ... number of days from the event time (for DUR, not EVNTTIME)
-	// 'X': ... UNIX timestamp
 }
 
 func dateTimeFormatToGolangLayout(input []parser.DateTimeItem) (layout string, err error) {

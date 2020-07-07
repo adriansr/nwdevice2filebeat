@@ -1334,7 +1334,6 @@ func stripLeadingSpace(parser *Parser) error {
 				} else {
 					parser.Messages[idx].content = msg.content[1:]
 				}
-
 			}
 		}
 	}

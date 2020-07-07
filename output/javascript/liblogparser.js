@@ -274,7 +274,7 @@ function STRCAT(args) {
     return s;
 }
 
-// TODO: Implement?
+// TODO: Implement
 function DIRCHK(args) {
     unimplemented("DIRCHK");
 }

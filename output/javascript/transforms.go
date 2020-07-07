@@ -72,10 +72,10 @@ var preprocessors = parser.PostprocessGroup{
 			Name: "adjust field names",
 			Run:  adjustFieldNames,
 		},
-		{
+		/*{
 			Name: "set @timestamp",
 			Run:  setTimestamp,
-		},
+		},*/
 
 		// Some MESSAGE parsers don't capture anything. That's an error for
 		// dissect so let's add an empty capture at the end.

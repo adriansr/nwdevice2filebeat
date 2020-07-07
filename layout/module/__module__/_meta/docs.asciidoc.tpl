@@ -5,9 +5,9 @@
 
 == ((.Module | title)) module
 
-This is a module for receiving ((.DisplayName)) logs over Syslog or a file.
+experimental[]
 
-NOTE: This was converted from RSA NetWitness log parser XML ((.LogParser.Description.Name | printf "%q")) device revision ((.LogParser.Version.Revision)).
+This is a module for receiving ((.DisplayName)) logs over Syslog or a file.
 
 include::../include/gs-link.asciidoc[]
 
@@ -19,6 +19,10 @@ include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `((.Fileset))` fileset settings
+
+experimental[]
+
+NOTE: This was converted from RSA NetWitness log parser XML ((.LogParser.Description.Name | printf "%q")) device revision ((.LogParser.Version.Revision)).
 
 *`var.input`*::
 

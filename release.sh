@@ -127,7 +127,7 @@ test_fileset() {
     pushd "$BEATS_DIR/x-pack/filebeat"
     
     echo ""
-    echo "Generating golden files for $MOD/$FST"
+    echo "Generating golden files for $MOD/$FST [$LINE/$LINES]"
     MODULES_PATH="$BEATS_DIR/x-pack/filebeat/module" \
         INTEGRATION_TESTS=1                          \
         TESTING_FILEBEAT_MODULES=$MOD                \
@@ -136,7 +136,7 @@ test_fileset() {
         nosetests -v -s tests/system/test_xpack_modules.py || die "Generating golden files failed"
 
     echo ""
-    echo "Testing $MOD/$FST"
+    echo "Testing $MOD/$FST [$LINE/$LINES]"
     MODULES_PATH="$BEATS_DIR/x-pack/filebeat/module" \
         INTEGRATION_TESTS=1                          \
         TESTING_FILEBEAT_MODULES=$MOD                \
@@ -193,6 +193,12 @@ pushd "$BEATS_DIR/x-pack/filebeat" && mage update && popd || die "Failed mage up
 echo ''
 echo 'Building filebeat'
 pushd "$BEATS_DIR/x-pack/filebeat" && mage build && go test -c && popd || die "Failed mage update"
+
+
+echo ''
+echo 'Validating fields'
+pushd "$BEATS_DIR/x-pack/filebeat" && ./filebeat export index-pattern > /dev/null && popd || die "Index-pattern export failed: Broken fields!"
+pushd "$BEATS_DIR/x-pack/filebeat" && ./filebeat export template > /dev/null && popd || die "Template export failed: Broken fields!"
 
 foreach_line "$BATCH" test_fileset
 

@@ -11,7 +11,7 @@
 <HEADER 
 	id1="0001" 
 	id2="0001"  
-	content="%MSDHCP-&lt;hlevel&gt;- &lt;messageid&gt;: &lt;!payload&gt;" />
+	content="%MSDHCP-&lt;hlevel&gt;-&lt;messageid&gt;: &lt;!payload&gt;" />
     
 <MESSAGE 
 	id1="00" 

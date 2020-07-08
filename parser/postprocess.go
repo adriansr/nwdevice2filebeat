@@ -49,7 +49,7 @@ var prechecks = PostprocessGroup{
 var preactions = PostprocessGroup{
 	Title: "pre-actions",
 	Actions: []Action{
-		{"strip leading space in messages", stripLeadingSpace},
+		{"strip leading and trailing space in messages", stripLeadingSpace},
 		{"adjust payload field", setPayloadField},
 	},
 }
@@ -1315,22 +1315,38 @@ func stripLeadingSpace(parser *Parser) error {
 	if !parser.Config.Fixes.StripLeadingSpace {
 		return nil
 	}
-	count := 0
-	for idx, msg := range parser.Messages {
-		if n := len(msg.content); n < 1 {
+	countL, countR := 0, 0
+	for idx := range parser.Messages {
+		if len(parser.Messages[idx].content) == 0 {
 			continue
 		}
-		if ct, ok := msg.content[0].(Constant); ok {
+		if ct, ok := parser.Messages[idx].content[0].(Constant); ok {
 			if trimmed := strings.TrimLeft(ct.Value(), " "); trimmed != ct.Value() {
-				count++
+				countL++
 				if len(trimmed) > 0 {
 					parser.Messages[idx].content[0] = Constant(trimmed)
 				} else {
-					parser.Messages[idx].content = msg.content[1:]
+					parser.Messages[idx].content = parser.Messages[idx].content[1:]
+				}
+			}
+		}
+		n := len(parser.Messages[idx].content)
+		if n == 0 {
+			continue
+		}
+		if ct, ok := parser.Messages[idx].content[n-1].(Constant); ok {
+			if trimmed := strings.TrimRight(ct.Value(), " "); trimmed != ct.Value() {
+				countR++
+				if len(trimmed) > 0 {
+					parser.Messages[idx].content[n-1] = Constant(trimmed)
+				} else {
+					parser.Messages[idx].content = parser.Messages[idx].content[:n-1]
 				}
 			}
 		}
 	}
-	log.Printf("INFO - Trimmed leading space from %d out of %d messages", count, len(parser.Messages))
+	if countL+countR > 0 {
+		log.Printf("INFO - Trimmed %d leading spaces and %d trailing spaces from %d messages", countL, countR, len(parser.Messages))
+	}
 	return nil
 }

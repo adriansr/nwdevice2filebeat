@@ -158,10 +158,11 @@ var overrideFields = map[string]valueGenerator{
 	"gmtdate": func(rng *rand.Rand, t time.Time) string {
 		return t.UTC().Format(time.RFC3339)
 	},
-	"addr":    makeIPv4, // TODO: Why is this one not mapped in the CSV?
-	"address": makeIPv4,
-	"pid":     makeInt,
-	"time":    makeTime,
+	"addr":      makeIPv4, // TODO: Why is this one not mapped in the CSV?
+	"address":   makeIPv4,
+	"pid":       makeInt,
+	"time":      makeTime,
+	"direction": oneOf("inbound", "outbound", "internal", "external", "unknown"),
 }
 
 type fieldsGen map[string]valueGenerator

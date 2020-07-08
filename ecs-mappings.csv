@@ -36,7 +36,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Network,Service Name,"This is used to capture descriptive service name, typically seen in Windows",service,service.name,Text,None,,,,service.name,,88,network,service_name,keyword
 1,,,,domain,domain,Text,None,,,,server.domain,rsa.network.domain,84,network,domain,keyword
 1,Miscellaneous,Event Session ID,This key is used to capture a sessionid from the session directly,sessionid,log.session.id,Text,Transient,,,,rsa.misc.log_session_id,,82,misc,log_session_id,keyword
-1,Miscellaneous,Group Name,This key captures the Group Name value,group,group,Text,None,,,,rsa.misc.group,,81,misc,group,keyword
+1,Miscellaneous,Group Name,This key captures the Group Name value,group,group,Text,None,,,,rsa.misc.group,group.name,81,misc,group,keyword
 1,Network,Destination Hostname,This key should only be used when it’s a Destination Hostname,dhost,host.dst,Text,None,,,,rsa.network.host_dst,destination.address,81,network,host_dst,keyword
 1,Counters,Device class Counter 1,This is a generic counter key that should be used with the label dclass.c1.str only,dclass_counter1,dclass.c1,Int32,Transient,,,,rsa.counters.dclass_c1,,80,counters,dclass_c1,integer
 1,Miscellaneous,Policy Name,This key is used to capture the Policy Name only.,policyname,policy.name,Text,None,,,,rsa.misc.policy_name,,80,misc,policy_name,keyword
@@ -75,7 +75,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Group Object,This key captures a collection/grouping of entities. Specific usage,group_object,group.object,Text,Transient,,,,rsa.misc.group_object,,42,misc,group_object,keyword
 1,Miscellaneous,Node,Common use case is the node name within a cluster. The cluster name is reflected by the host name.,node,node,Text,Transient,,,,rsa.misc.node,,42,misc,node,keyword
 1,Miscellaneous,Rule Number,This key captures the Rule number,rule,rule,Text,Transient,,,,rsa.misc.rule,,41,misc,rule,keyword
-1,,Ethernet Host Address,"Deprecated, use alias.mac",macaddr,eth.host,MAC,None,,,,rsa.network.eth_host,,39,network,eth_host,keyword
+1,,Ethernet Host Address,"Deprecated, use alias.mac",macaddr,eth.host,MAC,None,,,,rsa.network.eth_host,host.mac,39,network,eth_host,keyword
 1,Network,Source Interface,This key should only be used when it’s a Source Interface,sinterface,sinterface,Text,Transient,,,,rsa.network.sinterface,observer.ingress.interface.name,39,network,sinterface,keyword
 1,Miscellaneous,Device Name,"This is used to capture name of the Device associated with the node Like: a physical disk, printer, etc",device,device.name,Text,Transient,,,,rsa.misc.device_name,,38,misc,device_name,keyword
 1,Time,Event End time,This key is used to capture the End time mentioned in a session in a standard form,endtime,endtime,TimeT,Transient,,,,rsa.time.endtime,,38,time,endtime,keyword
@@ -132,7 +132,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Content Type,This key is used to capture Content Type only.,content_type,content.type,Text,Transient,,,,rsa.misc.content_type,,19,misc,content_type,keyword
 1,Database,Database Name,This key is used to capture the name of a database or an instance as seen in a session,db_name,database,Text,Transient,,,,rsa.db.database,,19,db,database,keyword
 1,,Translated Destination Port,"Deprecated, use port.trans.dst. NOTE: There is a type discrepancy as currently used, TM: Text, INDEX: UInt16",dtransport,dtransport,UInt16,Transient,,,,destination.nat.port,,19,network,dtransport,long
-1,Miscellaneous,Group ID,This key captures Group ID Number (related to the group name),groupid,group.id,Text,Transient,,,,rsa.misc.group_id,,19,misc,group_id,keyword
+1,Miscellaneous,Group ID,This key captures Group ID Number (related to the group name),groupid,group.id,Text,Transient,,,,rsa.misc.group_id,group.id,19,misc,group_id,keyword
 1,Miscellaneous,Policy ID,"This key is used to capture the Policy ID only, this should be a numeric value, use policy.name otherwise",policy_id,policy.id,Text,Transient,,,,rsa.misc.policy_id,,19,misc,policy_id,keyword
 1,Cryptography,Cipher Name,This key is used to capture the Encryption Type or Encryption Key only,encryption_type,crypto,Text,Transient,,,,rsa.crypto.crypto,,18,crypto,crypto,keyword
 1,Time,Recorded time,The event time as recorded by the system the event is collected from. The usage scenario is a multi-tier application where the management layer of the system records it's own timestamp at the time of collection from its child nodes. Must be in timestamp format.,recorded_time,recorded.time,TimeT,Transient,,,,rsa.time.recorded_time,,18,time,recorded_time,keyword

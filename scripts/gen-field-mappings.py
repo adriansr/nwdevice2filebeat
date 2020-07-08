@@ -68,6 +68,11 @@ if len(sys.argv) == 4:
                 if len(row) < 4:
                     raise('Need at least 2 fields for by_prio override: {}'.format(row[2:]))
                 overrides[row[0]] = by_prio(row[2:])
+            elif row[1] == 'map':
+                if len(row) != 3:
+                    raise('Need one params for map override: {}'.format(row))
+                overrides[row[0]] = { 'mode': row[2] }
+
 
 f = open(sys.argv[2], 'r')
 r = csv.reader(f, dialect=csv.excel)

@@ -16,7 +16,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Severity,This key is used to capture the severity given the session,severity,severity,Text,Transient,,,,rsa.misc.severity,log.level,167,misc,severity,keyword
 1,Investigations,Event Outcome,This key captures the outcome of a particular Event(Ex:Success),ec_outcome,ec.outcome,Text,None,,,,rsa.investigations.ec_outcome,event.outcome,153,investigations,ec_outcome,keyword
 1,Network,Destination IP address,This key should only be used when it’s a Destination IP Address.,daddr,ip.dst,IPv4,None,(null)|-,ipv6.dst,daddr_v6,destination.ip,,152,network,ip_dst,ip
-1,Miscellaneous,Event Type,This key captures the event category type as specified by the event source.,event_type,event.type,Text,None,,,,rsa.misc.event_type,event.category,149,misc,event_type,keyword
+1,Miscellaneous,Event Type,This key captures the event category type as specified by the event source.,event_type,event.type,Text,None,,,,rsa.misc.event_type,event.action,149,misc,event_type,keyword
 1,Miscellaneous,Reference ID,This key is used to capture an event id from the session directly,id,reference.id,Text,None,,,,rsa.misc.reference_id,event.code,138,misc,reference_id,keyword
 1,Network,Protocol,This key should be used to capture the protocol name,protocol,protocol,Text,Transient,,,,network.protocol,,133,network,protocol,keyword
 1,Miscellaneous,Versions,This key captures Version of the application or OS which is generating the event.,version,version,Text,None,,,,observer.version,rsa.misc.version,133,misc,version,keyword

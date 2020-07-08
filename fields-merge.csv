@@ -1,5 +1,4 @@
 # Target field, mode, extra..
-user.name,append
 message,by_prio,event_description,msg
 event.code,by_prio,id,messageid
 rsa.misc.action,append
@@ -8,6 +7,7 @@ host.name,by_prio,hostname,host
 destination.ip,append
 source.ip,append
 event.action,append
+related.user,append
 host.ip,by_prio,hostip,hostip_v6,devicehostip,alias.ip,alias.ipv6
 source.port,by_prio,sport,port.src,tcp.srcport,udp.srcport
 destination.port,by_prio,dport,port.dst,tcp.dstport,udp.dstport
@@ -44,3 +44,4 @@ user.id,by_prio,user_id,user.id,c_logon_id
 rsa.physical.org_dst,by_prio,org_dst,org.dst
 host.mac,by_prio,devicehostmac,alias.mac
 url.top_level_domain,by_prio,tld,cctld
+user.name,by_prio,user,username,c_username,uid,administrator,logon_id,owner,service_account,c_user_name

@@ -2,7 +2,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Reserved,Message,This key is used to capture the raw message that comes into the Log Decoder,msg,msg,Text,Transient,,,,rsa.internal.msg,log.original,272,internal,msg,text
 1,,,,messageid,,,,,,,rsa.internal.messageid,event.code,270,internal,messageid,keyword
 1,Time,Event Time,This key is used to capture the time mentioned in a raw session that represents the actual time an event occured in a standard normalized form,event_time,event.time,TimeT,None,,,,rsa.time.event_time,@timestamp,253,time,event_time,keyword
-1,Identity,Destination User Account,This key should only be used to capture the Primary/Destination User in the event,username,user.dst,Text,None,none|-,,,user.name,,248,identity,user_dst,keyword
+1,Identity,Destination User Account,This key should only be used to capture the Primary/Destination User in the event,username,user.dst,Text,None,none|-,,,related.user,user.name,248,identity,user_dst,keyword
 1,,,,event_description,event.desc,Text,None,,,,rsa.internal.event_desc,message,223,internal,event_desc,keyword
 1,,,,action,action,Text,None,,,,rsa.misc.action,event.action,217,misc,action,keyword
 1,Database,Index ID,This key captures IndexID of the index.,info,index,Text,Transient,,,,rsa.db.index,,214,db,index,keyword
@@ -40,7 +40,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Network,Destination Hostname,This key should only be used when it’s a Destination Hostname,dhost,host.dst,Text,None,,,,rsa.network.host_dst,destination.address,81,network,host_dst,keyword
 1,Counters,Device class Counter 1,This is a generic counter key that should be used with the label dclass.c1.str only,dclass_counter1,dclass.c1,Int32,Transient,,,,rsa.counters.dclass_c1,,80,counters,dclass_c1,integer
 1,Miscellaneous,Policy Name,This key is used to capture the Policy Name only.,policyname,policy.name,Text,None,,,,rsa.misc.policy_name,,80,misc,policy_name,keyword
-1,Identity,Source User Account,This key should only be used to capture the Secondary/Source User in the event,c_username,user.src,Text,None,none|-,,,user.name,,77,identity,user_src,keyword
+1,Identity,Source User Account,This key should only be used to capture the Secondary/Source User in the event,c_username,user.src,Text,None,none|-,,,related.user,user.name,77,identity,user_src,keyword
 1,Miscellaneous,Process ID,"This key is used to capture the Process ID, in case of parent child relationship, this can be used for child process id context.",process_id,process.id,Int64,Transient,(null)|-,process.id.val,process_id_val,process.pid,,75,misc,process_id,long
 1,,,,process,process,Text,None,,,,process.name,,74,misc,process,keyword
 1,Miscellaneous,Rule Name,This key captures the Rule Name,rulename,rule.name,Text,Transient,,,,rsa.misc.rule_name,rule.name,72,misc,rule_name,keyword
@@ -66,7 +66,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,,Network Port,"Deprecated, use port. NOTE: There is a type discrepancy as currently used, TM: Int32, INDEX: UInt64 (why neither chose the correct UInt16?!)",network_port,network.port,UInt64,None,(null),,,rsa.network.network_port,,51,network,network_port,long
 1,Network,Bytes Received,This key should only be used to capture the size of Bytes Received,rbytes,rbytes,UInt64,None,(null)|-,,,destination.bytes,,51,network,rbytes,long
 1,Time,Time Start,This key is used to capture the Start time mentioned in a session in a standard form,starttime,starttime,TimeT,None,,,,rsa.time.starttime,,50,time,starttime,keyword
-1,,,,uid,username,Text,None,none|-,,,user.name,,50,identity,username,keyword
+1,,,,uid,username,Text,None,none|-,,,related.user,user.name,50,identity,username,keyword
 1,Miscellaneous,Action Event,This key is used to capture the primary action in a session,web_method,action,Text,None,,,,rsa.misc.action,,49,misc,action,keyword
 1,,,,month,,,,,,,rsa.time.month,,49,time,month,keyword
 1,Identity,Authentication Method,This key is used to capture authentication methods used only,authmethod,auth.method,Text,Transient,,,,rsa.identity.auth_method,,46,identity,auth_method,keyword
@@ -98,7 +98,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Identity,User Role,This key is used to capture the Role of a user only,user_role,user.role,Text,Transient,,,,rsa.identity.user_role,,31,identity,user_role,keyword
 1,Miscellaneous,Event Log Name,This key captures the Name of the event log,event_log,event.log,Text,Transient,,,,rsa.misc.event_log,,30,misc,event_log,keyword
 1,Web,FQDN,Fully Qualified Domain Names,fqdn,fqdn,Text,None,,,,rsa.web.fqdn,,29,web,fqdn,keyword
-1,,User Account,"Deprecated, use user",administrator,username,Text,None,none|-,,,user.name,,29,identity,username,keyword
+1,,User Account,"Deprecated, use user",administrator,username,Text,None,none|-,,,related.user,user.name,29,identity,username,keyword
 1,,,,hostid,alias.host,Text,None,,,,rsa.network.alias_host,,28,network,alias_host,keyword
 1,,,Deprecated key defined only in table map.,data,data,Text,Transient,,,,rsa.internal.data,,28,internal,data,keyword
 1,Counters,Device class Counter 2,This is a generic counter key that should be used with the label dclass.c2.str only,dclass_counter2,dclass.c2,Int32,Transient,,,,rsa.counters.dclass_c2,,28,counters,dclass_c2,integer
@@ -146,13 +146,13 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Reference Id2,"This key is for the 2nd Linked ID. Can be either linked to ""reference.id"" or ""reference.id1"" value but should not be used unless the other two variables are in play.",id2,reference.id2,Text,Transient,,,,rsa.misc.reference_id2,,17,misc,reference_id2,keyword
 1,Miscellaneous,Sensor Name,This key captures Name of the sensor. Typically used in IDS/IPS based devices,sensor,sensor,Text,Transient,,,,rsa.misc.sensor,,17,misc,sensor,keyword
 1,Miscellaneous,Signature ID,This key captures IDS/IPS Int Signature ID,sigid,sig.id,Int32,None,(null),sig.id.str,sigid_string,rsa.misc.sig_id,,17,misc,sig_id,integer
-1,,,,logon_id,username,Text,None,none|-,,,user.name,,17,identity,username,keyword
+1,,,,logon_id,username,Text,None,none|-,,,related.user,user.name,17,identity,username,keyword
 1,,,,datetime,,,,,,,rsa.time.datetime,,17,time,datetime,keyword
 1,Network,Zone Source,This key should only be used when it’s a Source Zone.,src_zone,zone.src,Text,Transient,,,,rsa.network.zone_src,,16,network,zone_src,keyword
 1,,,,user_fullname,fullname,Text,Transient,,,,user.full_name,,15,identity,fullname,keyword
 1,Miscellaneous,Port(Physical/Logical),This key is used for Physical or logical port connection but does NOT include a network port. (Example: Printer port name).,portname,port.name,Text,Transient,,,,rsa.misc.port_name,,15,misc,port_name,keyword
 1,Miscellaneous,Rule Group,This key captures the Rule group name,rule_group,rule.group,Text,Transient,,,,rsa.misc.rule_group,,15,misc,rule_group,keyword
-1,,,,owner,username,Text,None,none|-,,,user.name,,15,identity,username,keyword
+1,,,,owner,username,Text,None,none|-,,,related.user,user.name,15,identity,username,keyword
 1,Wireless,WLAN Service Set Identifier,This key is used to capture the ssid of a Wireless Session,ssid,wlan.ssid,Text,Transient,,,,rsa.wireless.wlan_ssid,,15,wireless,wlan_ssid,keyword
 1,Network,Zone Generic,This key should be used when the source or destination context of a Zone is not clear,zone,zone,Text,Transient,,,,rsa.network.zone,,15,network,zone,keyword
 1,Network,Zone Destination,This key should only be used when it’s a Destination Zone.,dst_zone,zone.dst,Text,Transient,,,,rsa.network.zone_dst,,15,network,zone_dst,keyword
@@ -225,7 +225,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Identity,Organization,This key captures the User organization,user_org,org,Text,Transient,,,,rsa.identity.org,,7,identity,org,keyword
 1,,,Deprecated key defined only in table map.,resource,resource,Text,Transient,,,,rsa.internal.resource,,7,internal,resource,keyword
 1,Cryptography,Encryption scheme used,This key captures the Encryption scheme used,scheme,scheme,Text,Transient,,,,rsa.crypto.scheme,,7,crypto,scheme,keyword
-1,,,,service_account,username,Text,None,none|-,,,user.name,,7,identity,username,keyword
+1,,,,service_account,username,Text,None,none|-,,,related.user,user.name,7,identity,username,keyword
 1,,,,ntype,,,,,,,rsa.misc.ntype,,7,misc,ntype,keyword
 1,Identity,Distinguished Name Destination,An X.500 (LDAP) Distinguished name that used in a context that indicates a Destination dn,dst_dn,dn.dst,Text,Transient,,,,rsa.identity.dn_dst,,6,identity,dn_dst,keyword
 1,Identity,Domain ID,This key captures Pre Windows 2000 (NetBIOS) name of the domain ONLY,domain_id,domain.id,Text,Transient,,,,user.domain,,6,identity,domain_id,keyword
@@ -273,7 +273,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,,,,calling_to,phone,Text,Transient,,,,rsa.misc.phone,,4,misc,phone,keyword
 1,Miscellaneous,Signature String,This key captures a string object of the sigid variable.,sigid_string,sig.id.str,Text,Transient,,,,rsa.misc.sig_id_str,,4,misc,sig_id_str,keyword
 1,Database,Table Name,This key is used to capture the table name,tbl_name,table.name,Text,Transient,,,,rsa.db.table_name,,4,db,table_name,keyword
-1,,,,c_user_name,,,,,,,user.name,,4,identity,c_user_name,keyword
+1,,,,c_user_name,,,,,,,related.user,user.name,4,identity,c_user_name,keyword
 1,,,,cmd,,,,,,,rsa.misc.cmd,,4,misc,cmd,keyword
 1,,,,misc,,,,,,,rsa.misc.misc,,4,misc,misc,keyword
 1,,,,name,,,,,,,rsa.misc.name,,4,misc,name,keyword
@@ -343,7 +343,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,TCP Flags,This key is captures the TCP flags set in any packet of session,tcp_flags,tcp.flags,UInt8,None,,,,rsa.misc.tcp_flags,,2,misc,tcp_flags,integer
 1,Miscellaneous,Type Of Service,This key describes the type of service,tos,tos,Int32,Transient,,,,rsa.misc.tos,,2,misc,tos,integer
 1,,,Deprecated key defined only in table map.,trans_to,trans.to,Text,Transient,,,,rsa.email.trans_to,,2,email,trans_to,keyword
-1,Identity,User Account,This key should be used when the source/destination/initiated/target of a username is not clear,user,user,Text,None,,,,user.name,,2,identity,user,keyword
+1,Identity,User Account,This key should be used when the source/destination/initiated/target of a username is not clear,user,user,Text,None,,,,related.user,user.name,2,identity,user,keyword
 1,Miscellaneous,VMWARE Target,VMWare Target **VMWARE** only varaible.,vm_target,vm.target,Text,Transient,,,,rsa.misc.vm_target,,2,misc,vm_target,keyword
 1,Miscellaneous,Workspace Description,This key captures Workspace Description,workspace_desc,workspace,Text,Transient,,,,rsa.misc.workspace,,2,misc,workspace,keyword
 1,,,,addr,,,,,,,rsa.network.addr,,2,network,addr,keyword

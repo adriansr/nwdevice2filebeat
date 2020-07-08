@@ -19,11 +19,11 @@
 <HEADER 
 	id1="0003" 
 	id2="0003"
-	content="id=&lt;hfld1&gt; sn=&lt;hserial_number&gt; time=&quot;&lt;hdate&gt; &lt;htime&gt;&quot;  fw=&lt;hhostip&gt;  pri=&lt;hseverity&gt; c=&lt;hcategory&gt; m=&lt;messageid&gt; &lt;!payload&gt;" />
+	content="id=&lt;hfld1&gt; sn=&lt;hserial_number&gt; time=&quot;&lt;hdate&gt; &lt;htime&gt;&quot; fw=&lt;hhostip&gt; pri=&lt;hseverity&gt; c=&lt;hcategory&gt; m=&lt;messageid&gt; &lt;!payload&gt;" />
 <HEADER 
 	id1="0004" 
 	id2="0004"
-	content="&lt;hfld20&gt; id=&lt;hfld1&gt; sn=&lt;hserial_number&gt; time=&quot;&lt;hdate&gt; &lt;htime&gt;&quot; fw=&lt;hhostip&gt;  pri=&lt;hseverity&gt; c=&lt;hcategory&gt; m=&lt;messageid&gt; &lt;!payload&gt;" />
+	content="&lt;hfld20&gt; id=&lt;hfld1&gt; sn=&lt;hserial_number&gt; time=&quot;&lt;hdate&gt; &lt;htime&gt;&quot; fw=&lt;hhostip&gt; pri=&lt;hseverity&gt; c=&lt;hcategory&gt; m=&lt;messageid&gt; &lt;!payload&gt;" />
 
 <MESSAGE 
 	id1="4" 
@@ -307,7 +307,7 @@
 	id1="35:01" 
 	id2="35" 
 	eventcategory="1401050200" 
-	content="msg=&quot;&lt;action&gt;&quot; n=&lt;fld&gt; src={&lt;saddr&gt;:&lt;sport&gt;:&lt;sinterface&gt; dst= | &lt;saddr&gt; dst= } { &lt;daddr&gt;:&lt;dport&gt;:&lt;dinterface&gt; | &lt;daddr&gt; }  " />
+	content="msg=&quot;&lt;action&gt;&quot; n=&lt;fld&gt; src={&lt;saddr&gt;:&lt;sport&gt;:&lt;sinterface&gt; dst= | &lt;saddr&gt; dst= } { &lt;daddr&gt;:&lt;dport&gt;:&lt;dinterface&gt; | &lt;daddr&gt;}" />
 <MESSAGE 
 	id1="36" 
 	id2="36" 
@@ -670,7 +670,7 @@
 	id2="84" 
 	eventcategory="1603110000" 
 	functions="&lt;@action:Failed to resolve name&gt;"
-	content="{ msg=&quot;Failed to resolve name&quot; n=&lt;fld1&gt; dstname=&lt;dhost&gt; |  Failed to resolve name }" />
+	content="{msg=&quot;Failed to resolve name&quot; n=&lt;fld1&gt; dstname=&lt;dhost&gt;|Failed to resolve name}" />
 <MESSAGE 
 	id1="87" 
 	id2="87" 

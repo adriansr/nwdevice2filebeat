@@ -997,9 +997,6 @@ func fixAlternativesEndingInCapture(p *Parser) (err error) {
 }
 
 func fixExtraLeadingSpaceInConstants(parser *Parser) error {
-	if !parser.Config.PipelineSettings.Dissect {
-		return nil
-	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		var inserts []int
 		if match, ok := node.(Match); ok {
@@ -1010,20 +1007,17 @@ func fixExtraLeadingSpaceInConstants(parser *Parser) error {
 				case Constant:
 					if str := strings.TrimLeft(v.Value(), " "); str != v.Value() {
 						if prevIsField {
-							// EDIT: Not needed anymore since dissect was modified
-							//       to strip extra whitespace.
-							// - If the previous is a field, always keep one space
-							// - otherwise the greedy -> option in dissect will not
-							// - consume whitespace and it'll be added to the previous
-							// - captured value.
-
-							// This is generating weird patterns
-							// v = Constant( " " + str)
-							if len(str) == 0 {
-								v = Constant(" ")
-							} else {
-								v = Constant(str)
-							}
+							// Originally this stripped all the leading space, expecting
+							// that any actual space in the message will be trimmed by dissect.
+							// This one is tricky for the Javascript output, as it
+							// reconstructs the payload capture by concatenating together
+							// all the components, which means the space is lost:
+							//
+							// Original(XML):   "<field> constant:"
+							// Dissect pattern: "<field>constant:"
+							// Input log:       "value constant:"
+							// Reconstructed payload: "valueconstant:"
+							v = Constant(" " + str)
 						} else {
 							// If the previous is not a field, then we're at the
 							// start of a pattern. Keep the constant (can't be

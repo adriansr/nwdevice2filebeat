@@ -11,15 +11,15 @@
 <HEADER
 	id1="0001"
 	id2="0001"
-	content="&lt;hmonth&gt; &lt;hday&gt; &lt;hdate&gt; &lt;hhostname&gt; proto=&lt;hprotocol&gt; service=&lt;messageid&gt; status=&lt;haction&gt; src=&lt;hsaddr&gt; dst=&lt;hdaddr&gt; src_port=&lt;hsport&gt; dst_port=&lt;hdport&gt; &lt;!payload:hmonth&gt;"/>
+	content="&lt;hmonth&gt; &lt;hday&gt; &lt;htime&gt; &lt;hhostname&gt; proto=&lt;hprotocol&gt; service=&lt;messageid&gt; status=&lt;haction&gt; src=&lt;hsaddr&gt; dst=&lt;hdaddr&gt; src_port=&lt;hsport&gt; dst_port=&lt;hdport&gt; &lt;!payload:hmonth&gt;"/>
 <HEADER
 	id1="0003"
 	id2="0003"
-	content="&lt;hmonth&gt; &lt;hday&gt; &lt;hdate&gt; &lt;hhostname&gt; (&lt;messageid&gt; &lt;hfld5&gt; times in last &lt;hfld6&gt;) &lt;hfld7&gt; &lt;hfld8&gt;::&lt;!payload:hmonth&gt;"/>
+	content="&lt;hmonth&gt; &lt;hday&gt; &lt;htime&gt; &lt;hhostname&gt; (&lt;messageid&gt; &lt;hfld5&gt; times in last &lt;hfld6&gt;) &lt;hfld7&gt; &lt;hfld8&gt;::&lt;!payload:hmonth&gt;"/>
 <HEADER
 	id1="0002"
 	id2="0002"
-	content="&lt;hmonth&gt; &lt;hday&gt; &lt;hdate&gt; &lt;hhostname&gt; &lt;messageid&gt; &lt;hfld5&gt;::&lt;!payload:hmonth&gt;"/>
+	content="&lt;hmonth&gt; &lt;hday&gt; &lt;htime&gt; &lt;hhostname&gt; &lt;messageid&gt; &lt;hfld5&gt;::&lt;!payload:hmonth&gt;"/>
 	
 <MESSAGE
 	id1="enter"

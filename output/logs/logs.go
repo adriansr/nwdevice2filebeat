@@ -693,6 +693,12 @@ func (lc *lineComposer) composeMessageID(node parser.MsgIdSelect) (msgID string,
 var errBadOverlap = errors.New("bad overlap")
 
 func (lc *lineComposer) appendPattern(p parser.Pattern) (err error) {
+	log.Printf("XXX Append > %+v", p)
+	defer func() {
+		if err == nil {
+			log.Printf("XXX Output > %+v", lc.expression)
+		}
+	}()
 	if lc.payload != nil {
 		if p, err = lc.resolveAlternatives(p); err != nil {
 			return err
@@ -938,6 +944,9 @@ func (lc *lineComposer) mergeOverlapped(header, message parser.Pattern) (p parse
 			if replace {
 				fld := getField(m.p[0])
 				fld.Name = hVal
+				if hVal == "" {
+					panic(hVal)
+				}
 				m.p[0] = fld
 			}
 			log.Printf("Overlap: replaced: %v", message)

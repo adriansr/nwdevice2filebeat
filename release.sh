@@ -9,7 +9,7 @@ fi
 BATCH="$1"
 BEATS_DIR="$2"
 OUTPUT=generated.output
-ARGS="-F whitespace -O deduplicate,globals"
+ARGS="-F whitespace,alts -O deduplicate,globals"
 BASE_PORT=9500
 FILESETS=""
 

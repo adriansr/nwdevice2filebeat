@@ -1936,14 +1936,7 @@ function do_populate(evt, base, targets) {
     var result = {};
     var key;
     for (key in base) {
-        if (!base.hasOwnProperty(key) &&
-            // see if this is a non-mapped header field for a mapped field.
-            ( key.length === 0 ||
-                key.charAt(0) !== 'h' ||
-                !base.hasOwnProperty((key=key.substr(1))))
-        ) {
-            continue;
-        }
+        if (!base.hasOwnProperty(key)) continue;
         var mapping = targets[key];
         if (mapping === undefined) continue;
         var value = base[key];

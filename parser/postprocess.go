@@ -1312,7 +1312,7 @@ func injectCapturesInAlts(parser *Parser) (err error) {
 }
 
 func stripLeadingSpace(parser *Parser) error {
-	if !parser.Config.Fixes.StripLeadingSpace {
+	if !parser.Config.Fixes.TrimEdgeSpace {
 		return nil
 	}
 	countL, countR := 0, 0

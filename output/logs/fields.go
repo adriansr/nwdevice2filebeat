@@ -65,6 +65,12 @@ var overrideFields = map[string]valueGenerator{
 		var spaces = "    "
 		return spaces[:1+rng.Intn(len(spaces)-1)]
 	},
+
+	// This compensates for empty captures added to trim extra whitespace in some cases.
+	"": func(rng *rand.Rand, t time.Time) string {
+		return " "
+	},
+
 	"msgIdPart1": func(rng *rand.Rand, t time.Time) string {
 		return fmt.Sprintf("MSGA_%04x", rng.Intn(0x10000))
 	},

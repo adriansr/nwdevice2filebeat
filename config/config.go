@@ -76,9 +76,9 @@ type Optimizations struct {
 }
 
 type Fixes struct {
-	// StripLeadingSpace strips space at the start of MESSAGES, as it seems
-	// to be a common error to add an extra space first.
-	StripLeadingSpace bool
+	// TrimEdgeSpace strips space at the start and end of MESSAGES, as it seems
+	// to be a common error to add this extra space.
+	TrimEdgeSpace bool
 }
 
 type Runtime struct {

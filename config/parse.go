@@ -76,7 +76,7 @@ func parseFix(flags []string) (fix Fixes, err error) {
 	for _, flag := range flags {
 		switch flag {
 		case "space", "whitespace", "w", "s":
-			fix.StripLeadingSpace = true
+			fix.TrimEdgeSpace = true
 		default:
 			return fix, errors.Errorf("unknown fix flag: %s", flag)
 		}

@@ -109,7 +109,7 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 		log.Printf("Candidate: %s", text)
 		_, runErrs := run.Process([]byte(text))
 		if len(runErrs) > 0 {
-			log.Printf("Test line errors: %+v", runErrs)
+			log.Printf("Test line errors: %v", runErrs)
 			errCount++
 			if errCount > maxErrors {
 				return errors.New("too many errors")
@@ -960,37 +960,6 @@ func constantOverlap(a, b string) int {
 		}
 	}
 	return n
-}
-
-func (lc *lineComposer) patternsOverlap(header, message parser.Pattern) bool {
-	if len(header) > len(message) {
-		return false
-	}
-	if len(header) == 0 {
-		return true
-	}
-	a, hIsCt := header[0].(parser.Constant)
-	b, mIsCt := message[0].(parser.Constant)
-	if hIsCt != mIsCt {
-		return false
-	}
-	if hIsCt {
-		if len(b.Value()) < len(a.Value()) {
-			a, b = b, a
-		}
-		n := len(a)
-		if a != b[:n] {
-			return false
-		}
-	} else {
-		// For sure they are fields. Must merge their values, this is difficult.
-		hFld := header[0].(parser.Field)
-		mFld := message[0].(parser.Field)
-		if value, ok := lc.getAssignedValue(hFld.Name); ok {
-			lc.assignValue(mFld.Name, value)
-		}
-	}
-	return lc.patternsOverlap(header[1:], message[1:])
 }
 
 func (lc *lineComposer) addHint(field string, hint valueHint) {

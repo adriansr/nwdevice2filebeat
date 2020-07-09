@@ -169,7 +169,6 @@ var overrideFields = map[string]valueGenerator{
 	"pid":       makeInt,
 	"time":      makeTime,
 	"direction": oneOf("inbound", "outbound", "internal", "external", "unknown"),
-	"duration":  makeInt,
 }
 
 type fieldsGen map[string]valueGenerator

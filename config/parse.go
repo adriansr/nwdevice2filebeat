@@ -77,8 +77,6 @@ func parseFix(flags []string) (fix Fixes, err error) {
 		switch flag {
 		case "space", "whitespace", "w", "s":
 			fix.TrimEdgeSpace = true
-		case "alt", "alts", "alternative", "alternatives":
-			fix.TrimAlternativesSpace = true
 		default:
 			return fix, errors.Errorf("unknown fix flag: %s", flag)
 		}

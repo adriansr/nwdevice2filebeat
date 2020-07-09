@@ -80,8 +80,6 @@ var transforms = PostprocessGroup{
 
 		{"fix consecutive dissect captures in alternatives", fixAlternativesEndingInCapture},
 
-		{"trim spaces in alternatives", trimAlternativesSpace},
-
 		{"fix extra leading space in constants (1)", fixExtraLeadingSpaceInConstants},
 
 		// Reaching this point, if we have:
@@ -1350,73 +1348,5 @@ func stripLeadingSpace(parser *Parser) error {
 	if countL+countR > 0 {
 		log.Printf("INFO - Trimmed %d leading spaces and %d trailing spaces from %d messages", countL, countR, len(parser.Messages))
 	}
-	return nil
-}
-
-type trimFn func(string) string
-
-func trimLeft(s string) string {
-	return strings.TrimLeft(s, " ")
-}
-
-func trimRight(s string) string {
-	return strings.TrimRight(s, " ")
-}
-
-func stripSpace(p Pattern, pos int, trim trimFn) (changed bool) {
-	if pos < 0 || pos >= len(p) {
-		return false
-	}
-	ct, ok := p[pos].(Constant)
-	if !ok {
-		return false
-	}
-	value := trim(ct.Value())
-	if len(value) == 0 {
-		value = " "
-	}
-	if changed = value != ct.Value(); changed {
-		p[pos] = Constant(value)
-	}
-	return
-}
-
-func trimAlternativesSpaceInPattern(p Pattern) (modified bool) {
-	for idx, item := range p {
-		alt, ok := item.(Alternatives)
-		if !ok {
-			continue
-		}
-		//modified = stripSpace(p, idx-1, trimLeft) || modified
-		for _, altPattern := range alt {
-			modified = stripSpace(altPattern, 0, trimLeft) || modified
-			//modified = stripSpace(altPattern, len(altPattern)-1, trimRight) || modified
-		}
-		modified = stripSpace(p, idx+1, trimRight) || modified
-	}
-	return
-}
-
-func trimAlternativesSpace(parser *Parser) (err error) {
-	changes := 0
-	if !parser.Config.Fixes.TrimAlternativesSpace {
-		return nil
-	}
-	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
-		if match, ok := node.(Match); ok {
-			log.Printf("XXX before - %+v", match.Pattern)
-			modified := trimAlternativesSpaceInPattern(match.Pattern)
-			if modified {
-				log.Printf("XXX modified - %+v", match.Pattern)
-				changes++
-				return WalkReplace, match
-			}
-		}
-		return WalkContinue, nil
-	})
-	if changes > 0 {
-		log.Printf("INFO - Fixed whitespace issues in %d alternatives", changes)
-	}
-
 	return nil
 }

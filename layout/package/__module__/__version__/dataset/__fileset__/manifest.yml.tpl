@@ -1,5 +1,5 @@
 title: ((.DisplayName)) logs
-release: beta
+release: experimental
 type: logs
 streams:
 - input: udp
@@ -37,22 +37,22 @@ streams:
     show_user: true
     default: "local"
   - name: rsa_fields
-    type: boolean
+    type: bool
     title: Add non-ECS fields
     required: false
     show_user: true
     default: true
   - name: keep_raw_fields
-    type: boolean
+    type: bool
     title: Keep raw parser fields
     required: false
-    show_user: true
+    show_user: false
     default: false
   - name: debug
-    type: boolean
+    type: bool
     title: Enable debug logging
     required: false
-    show_user: true
+    show_user: false
     default: false
 
 - input: tcp
@@ -90,22 +90,22 @@ streams:
     show_user: true
     default: "local"
   - name: rsa_fields
-    type: boolean
+    type: bool
     title: Add non-ECS fields
     required: false
     show_user: true
     default: true
   - name: keep_raw_fields
-    type: boolean
+    type: bool
     title: Keep raw parser fields
     required: false
-    show_user: true
+    show_user: false
     default: false
   - name: debug
-    type: boolean
+    type: bool
     title: Enable debug logging
     required: false
-    show_user: true
+    show_user: false
     default: false
 
 - input: file
@@ -136,20 +136,20 @@ streams:
     show_user: true
     default: "local"
   - name: rsa_fields
-    type: boolean
+    type: bool
     title: Add non-ECS fields
     required: false
     show_user: true
     default: true
   - name: keep_raw_fields
-    type: boolean
+    type: bool
     title: Keep raw parser fields
     required: false
-    show_user: true
+    show_user: false
     default: false
   - name: debug
-    type: boolean
+    type: bool
     title: Enable debug logging
     required: false
-    show_user: true
+    show_user: false
     default: false

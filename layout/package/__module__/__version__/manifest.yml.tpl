@@ -1,21 +1,20 @@
 format_version: 1.0.0
 name: ((.Module))
 title: ((.DisplayName))
-description: ((.DisplayName)) Integration
 version: ((.Version))
-categories:
- - logs
-release: beta
+description: ((.DisplayName)) Integration
+categories: [ "security" ]
+release: experimental
 removable: true
 license: basic
 type: integration
-requirement:
+conditions:
     kibana:
-        versions: '>=7.0.0'
+        version: '>=7.0.0'
     elasticsearch:
-        versions: '>=7.0.0'
-datasources:
-- name: ((.Module))
+        version: '>=7.0.0'
+config_templates:
+- name: ((.Fileset))
   title: ((.DisplayName))
   description: Collect ((.DisplayName)) logs from syslog or a file.
   inputs:

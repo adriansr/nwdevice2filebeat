@@ -18,229 +18,229 @@
 	id2="00" 
 	eventcategory="1605020000" 
 	functions="&lt;@ec_activity:Start&gt;&lt;@ec_theme:Communication&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="00,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="00,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="01" 
 	id2="01" 
 	eventcategory="1605020000" 
 	functions="&lt;@ec_activity:Stop&gt;&lt;@ec_theme:Communication&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="01,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="01,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="02" 
 	id2="02" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="02,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="02,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="10" 
 	id2="10" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="10,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="10,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="11" 
 	id2="11" 
 	eventcategory="1605000000" 
 	functions="&lt;@ec_activity:Restore&gt;&lt;@ec_theme:Communication&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="11,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="11,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="12" 
 	id2="12" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="12,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="12,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="13" 
 	id2="13" 
 	eventcategory="1603040000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="13,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="13,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="14" 
 	id2="14" 
 	eventcategory="1603040000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="14,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="14,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="15" 
 	id2="15" 
 	eventcategory="1603040000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="15,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="15,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="16" 
 	id2="16" 
 	eventcategory="1605000000" 
 	functions="&lt;@ec_activity:Delete&gt;&lt;@ec_theme:Communication&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="16,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="16,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="17" 
 	id2="17" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="17,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="17,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="18" 
 	id2="18" 
 	eventcategory="1603000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="18,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="18,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="20" 
 	id2="20" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="20,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="20,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="21" 
 	id2="21" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="21,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="21,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="22" 
 	id2="22" 
 	eventcategory="1603000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="22,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="22,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="23" 
 	id2="23" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="23,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="23,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="24" 
 	id2="24" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="24,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="24,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="25" 
 	id2="25" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="25,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="25,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="30" 
 	id2="30" 
 	eventcategory="1605000000" 
 	functions="&lt;@ec_theme:Configuration&gt;&lt;@ec_theme:Communication&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="30,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="30,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="31" 
 	id2="31" 
 	eventcategory="1603040000" 
 	functions="&lt;@ec_theme:Configuration&gt;&lt;@ec_outcome:Failure&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="31,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="31,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="32" 
 	id2="32" 
 	eventcategory="1605000000" 
 	functions="&lt;@ec_theme:Configuration&gt;&lt;@ec_outcome:Success&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="32,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="32,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="33" 
 	id2="33" 
 	eventcategory="1605000000" 
 	functions="&lt;@ec_theme:Configuration&gt;&lt;@ec_outcome:Success&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="33,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="33,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="36" 
 	id2="36" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="36,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="36,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="50" 
 	id2="50" 
 	eventcategory="1801010000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="50,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="50,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="51" 
 	id2="51" 
 	eventcategory="1302000000" 
 	functions="&lt;@ec_theme:AccessControl&gt;&lt;@ec_outcome:Success&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="51,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="51,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="52" 
 	id2="52" 
 	eventcategory="1701070000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="52,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="52,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="53" 
 	id2="53" 
 	eventcategory="1304000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="53,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="53,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="54" 
 	id2="54" 
 	eventcategory="1301000000" 
 	functions="&lt;@ec_theme:AccessControl&gt;&lt;@ec_outcome:Failure&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="54,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="54,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="55" 
 	id2="55" 
 	eventcategory="1302000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="55,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="55,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="56" 
 	id2="56" 
 	eventcategory="1301000000" 
 	functions="&lt;@ec_theme:AccessControl&gt;&lt;@ec_outcome:Failure&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="56,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="56,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="57" 
 	id2="57" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="57,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="57,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="58" 
 	id2="58" 
 	eventcategory="1801010000" 
 	functions="&lt;@ec_theme:Communication&gt;&lt;@ec_outcome:Failure&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="58,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="58,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="59" 
 	id2="59" 
 	eventcategory="1801010000" 
 	functions="&lt;@ec_theme:Communication&gt;&lt;@ec_outcome:Failure&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="59,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="59,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="60" 
 	id2="60" 
 	eventcategory="1603000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="60,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="60,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="61" 
 	id2="61" 
 	eventcategory="1603040000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="61,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="61,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="62" 
 	id2="62" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="62,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="62,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="63" 
 	id2="63" 
 	eventcategory="1605000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="63,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="63,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="64" 
 	id2="64" 
 	eventcategory="1703000000" 
 	functions="&lt;@msg:*PARMVAL($MSG)&gt;&lt;@event_time:*EVNTTIME($MSG,&apos;%G/%F/%Y %N:%U:%O&apos;,fld12,fld1)&gt;"
-	content="64,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt; { ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt; | ,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt; | ,&lt;smacaddr&gt;, | ,&lt;smacaddr&gt;,&lt;fld6&gt; | ,&lt;smacaddr&gt;}" />
+	content="64,&lt;fld12&gt;,&lt;fld1&gt;,&lt;event_description&gt;,&lt;saddr&gt;,&lt;shost&gt;{,&lt;smacaddr&gt;,&lt;username&gt;,&lt;sessionid&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;,&lt;fld7&gt;,&lt;fld8&gt;,&lt;vendor_event_cat&gt;,&lt;fld10&gt;,&lt;fld11&gt;,&lt;fld13&gt;|,&lt;smacaddr&gt;,&lt;username&gt;,&lt;fld2&gt;,&lt;fld3&gt;,&lt;fld4&gt;,&lt;fld5&gt;|,&lt;smacaddr&gt;,|,&lt;smacaddr&gt;,&lt;fld6&gt;|,&lt;smacaddr&gt;}" />
 <MESSAGE 
 	id1="1103" 
 	id2="1103" 

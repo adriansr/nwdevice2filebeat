@@ -104,7 +104,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Counters,Device class Counter 2,This is a generic counter key that should be used with the label dclass.c2.str only,dclass_counter2,dclass.c2,Int32,Transient,,,,rsa.counters.dclass_c2,,28,counters,dclass_c2,integer
 1,Network,Interface Destination,This key should only be used when it’s a Destination Interface,dinterface,dinterface,Text,Transient,,,,rsa.network.dinterface,observer.egress.interface.name,28,network,dinterface,keyword
 1,Miscellaneous,Operating System,This key captures the Name of the Operating System,os,OS,Text,None,,,,rsa.misc.OS,,28,misc,OS,keyword
-1,Web,Web page,The captures the web page information,webpage,web.page,Text,Transient,,,,http.response.body.content,,28,web,web_page,keyword
+1,Web,Web page,The captures the web page information,webpage,web.page,Text,Transient,,,,file.name,,28,web,web_page,keyword
 1,Miscellaneous,Name of the Terminal,This key captures the Terminal Names only,terminal,terminal,Text,Transient,,,,rsa.misc.terminal,,27,misc,terminal,keyword
 1,,,,msgIdPart3,,,,,,,rsa.misc.msgIdPart3,,27,misc,msgIdPart3,keyword
 1,Miscellaneous,Filter,This key captures Filter used to reduce result set,filter,filter,Text,None,,,,rsa.misc.filter,,26,misc,filter,keyword

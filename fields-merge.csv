@@ -46,3 +46,4 @@ host.mac,by_prio,devicehostmac,alias.mac,macaddr
 url.top_level_domain,by_prio,tld,cctld
 user.name,by_prio,user,username,c_username,uid,administrator,logon_id,owner,service_account,c_user_name
 event.outcome,map,ecs_outcome
+file.name,by_prio,filename,webpage

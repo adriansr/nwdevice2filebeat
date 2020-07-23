@@ -11,6 +11,8 @@ fields:
         product: ((.Product | printf "%q"))
         type: ((.Group | printf "%q"))
 
+publisher_pipeline.disable_host: true
+
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module "/" .Fileset) -))
 ((- setvar "var_prefix" "" -))

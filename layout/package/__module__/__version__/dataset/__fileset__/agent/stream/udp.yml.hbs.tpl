@@ -1,12 +1,16 @@
 udp:
 host: "{{udp_host}}:{{udp_port}}"
-tags: {{tags}}
+tags:
+{{#each tags as |tag i|}}
+ - {{tag}}
+{{/each}}
 fields_under_root: true
 fields:
     observer:
         vendor: ((.Vendor | printf "%q"))
         product: ((.Product | printf "%q"))
         type: ((.Group | printf "%q"))
+publisher_pipeline.disable_host: true
 
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module "/" .Fileset) -))

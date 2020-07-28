@@ -12,6 +12,8 @@ OUTPUT=generated.output
 ARGS="-F whitespace -O deduplicate,globals"
 BASE_PORT=9500
 FILESETS=""
+DO_MODULE=${DO_MODULE:-1}
+DO_PACKAGE=${DO_PACKAGE:-1}
 
 die() {
     logerr "$@"
@@ -30,33 +32,42 @@ convert_device() {
     VENDOR=$(echo $ROW | cut -d, -f4)
     PROD=$(echo $ROW | cut -d, -f5)
     TYPE=$(echo $ROW | cut -d, -f6)
+    VERSION=$(echo $ROW | cut -d, -f7)
+    CATEGORIES=$(echo $ROW | cut -d, -f9 | tr ';' ,)
     PORT=$(expr $BASE_PORT + $LINE)
     DIR=$OUTPUT/$DEV
     PRODINFO="--vendor $VENDOR --product $PROD --type $TYPE"
     test -d devices/$DEV || die "Device $DEV does not exists"
     mkdir -p $DIR/module $DIR/package
-    echo "$DEV: generating module [$LINE/$LINES]"
-    echo "$DEV: generating module [$LINE/$LINES]" >> $DIR/output.log 2>&1
-    ./nwdevice2filebeat generate module --device devices/$DEV/ $ARGS $PRODINFO --output $DIR/module --port $PORT --module $MOD --fileset $FST >> $DIR/output.log 2>&1 || die "Failed generating module"
+    if test "$DO_MODULE" = "1"
+    then
+        echo "$DEV: generating module [$LINE/$LINES]"
+        echo "$DEV: generating module [$LINE/$LINES]" >> $DIR/output.log 2>&1
+        ./nwdevice2filebeat generate module --device devices/$DEV/ $ARGS $PRODINFO --output $DIR/module --port $PORT --module $MOD --fileset $FST >> $DIR/output.log 2>&1 || die "Failed generating module"
+    fi
     echo "$DEV: generating package [$LINE/$LINES]"
     echo "$DEV: generating package [$LINE/$LINES]" >> $DIR/output.log 2>&1
-    ./nwdevice2filebeat generate package --device devices/$DEV/ $ARGS $PRODINFO --output $DIR/package --port $PORT --module $MOD --fileset $FST >> $DIR/output.log 2>&1 || die "Failed generating package"
-    echo "$DEV: generating logs [$LINE/$LINES]"
-    echo "$DEV: generating logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
-    mkdir $DIR/module/$MOD/$FST/test
-    ./nwdevice2filebeat generate logs --device devices/$DEV $ARGS --output $DIR/module/$MOD/$FST/test/generated.log --lines 100 >> $DIR/output.log 2>&1
-    if test $? -eq 0
+    ./nwdevice2filebeat generate package --device devices/$DEV/ $ARGS $PRODINFO --output $DIR/package --port $PORT \
+        --module $MOD --fileset $FST --categories "$CATEGORIES" --version $VERSION >> $DIR/output.log 2>&1 || die "Failed generating package"
+    if test "$DO_MODULE" = "1"
     then
-        echo "$DEV: testing logs [$LINE/$LINES]"
-        echo "$DEV: testing logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
-        ./nwdevice2filebeat run --device devices/$DEV $ARGS --logs $DIR/module/$MOD/$FST/test/generated.log >> $DIR/output.log 2>&1 || logerr "Failed testing logs"
-    else
-        logerr "Failed generating logs for $DEV"
+        echo "$DEV: generating logs [$LINE/$LINES]"
+        echo "$DEV: generating logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
+        mkdir $DIR/module/$MOD/$FST/test
+        ./nwdevice2filebeat generate logs --device devices/$DEV $ARGS --output $DIR/module/$MOD/$FST/test/generated.log --lines 100 >> $DIR/output.log 2>&1
+        if test $? -eq 0
+        then
+            echo "$DEV: testing logs [$LINE/$LINES]"
+            echo "$DEV: testing logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
+            ./nwdevice2filebeat run --device devices/$DEV $ARGS --logs $DIR/module/$MOD/$FST/test/generated.log >> $DIR/output.log 2>&1 || logerr "Failed testing logs"
+        else
+            logerr "Failed generating logs for $DEV"
+        fi
+        for log_file in $(ls samples/$DEV/*.log 2>/dev/null)
+        do
+            cp $log_file $DIR/module/$MOD/$FST/test/
+        done
     fi
-    for log_file in $(ls samples/$DEV/*.log 2>/dev/null)
-    do
-        cp $log_file $DIR/module/$MOD/$FST/test/
-    done
 }
 
 module_to_fb() {
@@ -162,10 +173,13 @@ foreach_line() {
     done
 }
 
-test -d "$BEATS_DIR/libbeat" -a "$BEATS_DIR/.git" || die "Beats dir is not the beats repo"
-echo "This will destroy all your changes in Beats repo ($BEATS_DIR)."
-read -p "Continue? [y/n] " ANS
-test $ANS = 'y' -o $ANS = 'Y' -o $ANS = 'yes' || die "cancelled by user."
+if test $DO_MODULE -eq 1
+then
+    test -d "$BEATS_DIR/libbeat" -a "$BEATS_DIR/.git" || die "Beats dir is not the beats repo"
+    echo "This will destroy all your changes in Beats repo ($BEATS_DIR)."
+    read -p "Continue? [y/n] " ANS
+    test $ANS = 'y' -o $ANS = 'Y' -o $ANS = 'yes' || die "cancelled by user."
+fi
 
 
 if test -d venv
@@ -180,29 +194,32 @@ fi
 rm -rf $OUTPUT
 foreach_line "$BATCH" convert_device
 
-echo ''
-echo 'Cleaning up beats repo'
-pushd "$BEATS_DIR" && git clean -df && git reset --hard && popd || die "Failed cleaning beats repo"
+if [ "$DO_MODULE" = 1 ]
+then
+    echo ''
+    echo 'Cleaning up beats repo'
+    pushd "$BEATS_DIR" && git clean -df && git reset --hard && popd || die "Failed cleaning beats repo"
 
-foreach_line "$BATCH" module_to_fb
+    foreach_line "$BATCH" module_to_fb
 
-echo ''
-echo 'Running mage update'
-pushd "$BEATS_DIR/x-pack/filebeat" && mage update && popd || die "Failed mage update"
+    echo ''
+    echo 'Running mage update'
+    pushd "$BEATS_DIR/x-pack/filebeat" && mage update && popd || die "Failed mage update"
 
-echo ''
-echo 'Building filebeat'
-pushd "$BEATS_DIR/x-pack/filebeat" && mage build && go test -c && popd || die "Failed mage update"
+    echo ''
+    echo 'Building filebeat'
+    pushd "$BEATS_DIR/x-pack/filebeat" && mage build && go test -c && popd || die "Failed mage update"
 
 
-echo ''
-echo 'Validating fields'
-pushd "$BEATS_DIR/x-pack/filebeat" && ./filebeat export index-pattern > /dev/null && popd || die "Index-pattern export failed: Broken fields!"
-pushd "$BEATS_DIR/x-pack/filebeat" && ./filebeat export template > /dev/null && popd || die "Template export failed: Broken fields!"
+    echo ''
+    echo 'Validating fields'
+    pushd "$BEATS_DIR/x-pack/filebeat" && ./filebeat export index-pattern > /dev/null && popd || die "Index-pattern export failed: Broken fields!"
+    pushd "$BEATS_DIR/x-pack/filebeat" && ./filebeat export template > /dev/null && popd || die "Template export failed: Broken fields!"
 
-foreach_line "$BATCH" test_fileset
+    foreach_line "$BATCH" test_fileset
 
-echo ''
-echo 'Updating filebeat docs'
-pushd "$BEATS_DIR/filebeat" && make update && popd || die "Failed cleaning beats repo"
+    echo ''
+    echo 'Updating filebeat docs'
+    pushd "$BEATS_DIR/filebeat" && make update && popd || die "Failed cleaning beats repo"
 
+fi

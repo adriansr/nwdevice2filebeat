@@ -3,7 +3,7 @@ name: ((.Module))
 title: ((.DisplayName))
 version: ((.Version))
 description: ((.DisplayName)) Integration
-categories: [ "security" ]
+categories: ((.Categories | tojson))
 release: experimental
 removable: true
 license: basic
@@ -28,4 +28,10 @@ config_templates:
         title: Collect logs from ((.DisplayName)) via file
         description: Collecting syslog from ((.DisplayName)) via file.
 # No icon
-icon:
+icons:
+((- if .Icon ))
+ - src: /img/logo.svg
+   title: ((.DisplayName)) logo
+   size: 32x32
+   type: image/svg+xml
+(( end ))

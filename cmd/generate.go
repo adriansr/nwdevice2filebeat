@@ -7,6 +7,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -87,6 +88,7 @@ func init() {
 	genPackageCmd.PersistentFlags().String("type", "", "Type of logs (observer.type)")
 	genPackageCmd.PersistentFlags().String("version", "0.0.1", "Package version")
 	genPackageCmd.PersistentFlags().Uint16("port", 9010, "Default port number")
+	genPackageCmd.PersistentFlags().StringSlice("categories", nil, "Ingest Manager category list")
 	genPackageCmd.MarkPersistentFlagDirname("output")
 	genPackageCmd.MarkPersistentFlagRequired("output")
 
@@ -185,21 +187,35 @@ func generate(cmd *cobra.Command, targetLayout string) error {
 	if cfg.Module.Type == "" {
 		cfg.Module.Type = p.Description.Group
 	}
+	// Icon
+	var icon string
+	path := filepath.Join("media", p.Description.Name, "logo.svg")
+	if _, err := os.Stat(path); err == nil {
+		icon = path
+	}
 	outLayout, err := layout.New(targetLayout, layout.Vars{
-		LogParser:     p,
+		LogParser: p,
+		//
+		Categories:    cfg.Module.Categories,
 		DisplayName:   p.Description.DisplayName,
-		Module:        cfg.Module.Name,
 		Fileset:       cfg.Module.Fileset,
+		GeneratedTime: time.Now().UTC(),
+		Group:         cfg.Module.Type,
+		Icon:          icon,
+		Module:        cfg.Module.Name,
+		Port:          cfg.Module.Port,
 		Product:       cfg.Module.Product,
 		Vendor:        cfg.Module.Vendor,
-		Group:         cfg.Module.Type,
 		Version:       cfg.Module.Version,
-		Port:          cfg.Module.Port,
-		GeneratedTime: time.Now().UTC(),
 	})
 	if err != nil {
 		LogError("Failed loading output layout", "format", targetLayout, "reason", err)
 		return err
+	}
+	if icon != "" {
+		err = outLayout.AddFile("__img.dir__/logo.svg", layout.Copy{
+			Path: icon,
+		})
 	}
 	if err = out.Populate(outLayout); err != nil {
 		LogError("Failed populating output layout from pipeline", "format", targetLayout, "reason", err)

@@ -26,6 +26,7 @@ func NewFromCommand(cmd *cobra.Command) (cfg Config, err error) {
 	cfg.PipelineFormat, _ = cmd.PersistentFlags().GetString("format")
 	cfg.Module.Name, _ = cmd.PersistentFlags().GetString("module")
 	cfg.Module.Fileset, _ = cmd.PersistentFlags().GetString("fileset")
+	cfg.Module.Categories, _ = cmd.PersistentFlags().GetStringSlice("categories")
 	cfg.Module.Version, _ = cmd.PersistentFlags().GetString("version")
 	cfg.Module.Port, _ = cmd.PersistentFlags().GetUint16("port")
 	cfg.Module.Vendor, _ = cmd.PersistentFlags().GetString("vendor")

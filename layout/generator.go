@@ -6,6 +6,7 @@ package layout
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
@@ -51,10 +52,12 @@ type Generator struct {
 
 type Vars struct {
 	LogParser     parser.Parser
+	Categories    []string
 	DisplayName   string
 	Group         string
 	Module        string
 	Fileset       string
+	Icon          string
 	Product       string
 	Vendor        string
 	Version       string
@@ -148,6 +151,11 @@ func (g *Generator) doIndent(indent string, times int, value string) (result str
 	return prefix + strings.Replace(value, "\n", "\n"+prefix, -1), nil
 }
 
+func (g *Generator) doToJSON(value interface{}) (result string, err error) {
+	data, err := json.Marshal(value)
+	return string(data), err
+}
+
 func New(layout string, vars Vars) (*Generator, error) {
 	baseDir := filepath.Join(templatesDir, layout)
 	files, err := util.ListFilesRecursive(baseDir)
@@ -167,6 +175,7 @@ func New(layout string, vars Vars) (*Generator, error) {
 		"title":   strings.Title,
 		"inline":  gen.doInline,
 		"indent":  gen.doIndent,
+		"tojson":  gen.doToJSON,
 	}
 	for _, sourcePath := range files {
 		// Strip <templatesDir>/<template> prefix from paths.

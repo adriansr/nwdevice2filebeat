@@ -190,7 +190,15 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Write(")")
 
 	case parser.Match:
-		out.Write("match(").JS(v.ID).Write(", ").JS(v.Input).Write(", ").JS(v.Pattern.Tokenizer())
+		if v.TagValues.IsSet() {
+			out.Write("tagval(").JS(v.ID).Write(", ").JS(v.Input).Write(", tvm, {").Newline()
+			for k, v := range v.TagValues.Map {
+				out.Indent().JS(k).Write(": ").JS(v).Write(",").Unindent().Newline()
+			}
+			out.Write("}")
+		} else {
+			out.Write("match(").JS(v.ID).Write(", ").JS(v.Input).Write(", ").JS(v.Pattern.Tokenizer())
+		}
 		if len(v.OnSuccess) > 0 {
 			out.Write(", processor_chain([").
 				Indent().Newline()
@@ -201,7 +209,6 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 			out.Unindent().Write("])")
 		}
 		out.Write(")")
-
 	case parser.AllMatch:
 		out.Write("all_match({").Newline().Indent().
 			Write("processors: [").Newline().Indent()
@@ -294,6 +301,17 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 		out.Write("msg(").JS(v.msgID1).Write(", ")
 		generate(v.wrapped[0], out)
 		out.Write(")")
+
+	case TagValMapCfg:
+		if v.TagValMapSettings == nil {
+			return
+		}
+		out.Write("var tvm = {").Newline().Indent().
+			Write("pair_separator: ").JS(v.PairSeparator).Write(",").Newline().
+			Write("kv_separator: ").JS(v.KeyValueSeparator).Write(",").Newline().
+			Write("open_quote: ").JS(v.OpenQuote).Write(",").Newline().
+			Write("close_quote: ").JS(v.CloseQuote).Write(",").Newline().
+			Unindent().Write("};").Newline()
 
 	default:
 		out.Writef("/* TODO: here goes a %T */", v)

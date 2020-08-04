@@ -21,6 +21,7 @@ type Parser struct {
 	Description model.DeviceHeader
 	Version     model.Version
 
+	TagValMap *TagValMapSettings
 	ValueMaps []ValueMap
 	Regexs    []Regex
 	Headers   []header
@@ -40,9 +41,6 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 	p.Version = dev.Version
 
 	var unsupported []string
-	if len(dev.TagValMaps) > 0 {
-		unsupported = append(unsupported, "TAGVALMAP")
-	}
 
 	if len(dev.Regexs) > 0 {
 		unsupported = append(unsupported, "REGEX")
@@ -55,6 +53,9 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 	}
 	if len(unsupported) > 0 {
 		return p, errors.Errorf("found unsupported features: %v", unsupported)
+	}
+	if p.TagValMap, err = p.processTagValMap(dev.TagValMaps); err != nil {
+		return p, err
 	}
 	if p.ValueMaps, p.ValueMapsByName, err = p.processValueMaps(dev.ValueMaps); err != nil {
 		return p, err
@@ -130,6 +131,7 @@ func (p *Parser) makeMessagesNode(msgs []message) (Operation, error) {
 			SourceContext: SourceContext(msg.pos),
 			Input:         "payload",
 			Pattern:       msg.content,
+			TagValues:     msg.tags,
 		}
 		match.OnSuccess = make([]Operation, 0, 2+len(msg.functions))
 		if msg.eventcategory != "" {
@@ -229,7 +231,7 @@ func (p *Parser) processHeaders(input []*model.Header) (output []header, err err
 func (p *Parser) processMessages(input []*model.Message) (output []message, err error) {
 	output = make([]message, len(input))
 	for idx, xml := range input {
-		vm, err := newMessage(xml)
+		vm, err := p.newMessage(xml)
 		if err != nil {
 			return output, errors.Wrapf(err, "error parsing MESSAGE at %s", xml.Pos())
 		}
@@ -339,6 +341,7 @@ type message struct {
 	eventcategory string
 	functions     []Operation
 	content       Pattern
+	tags          TagValues
 }
 
 func (m message) String() string {
@@ -346,7 +349,7 @@ func (m message) String() string {
 		m.id1, m.id2, m.eventcategory, m.functions, m.content.String())
 }
 
-func newMessage(xml *model.Message) (m message, err error) {
+func (p *Parser) newMessage(xml *model.Message) (m message, err error) {
 	// These appear in all the messages.
 	if xml.ID1 == "" {
 		return m, errors.Errorf("empty ID1 attribute")
@@ -370,6 +373,18 @@ func newMessage(xml *model.Message) (m message, err error) {
 	}
 	if m.functions, err = parseFunctions(xml.Functions, SourceContext(xml.Pos())); err != nil {
 		return m, errors.Wrap(err, "error parsing functions")
+	}
+
+	isTagVal := xml.TagVal == "true"
+	if xml.TagVal != "" && !isTagVal {
+		return m, fmt.Errorf("unsupported tagval='%s'", xml.TagVal)
+	}
+	if isTagVal && p.TagValMap == nil {
+		return m, fmt.Errorf("unexpected tagval='%s'", xml.TagVal)
+	}
+	if isTagVal {
+		m.tags, err = newTagValues(m.content, *p.TagValMap)
+		err = errors.Wrap(err, "parsing tagval")
 	}
 	return m, err
 }

@@ -242,7 +242,6 @@ type Header struct {
 	ID2           string `xml:"id2,attr"`
 	EventCategory string `xml:"eventcategory,attr"`
 	MissField     string `xml:"missField,attr"`
-	TagVal        string `xml:"tagval,attr"`
 	Functions     string `xml:"functions,attr"`
 	Content       string `xml:"content,attr"`
 	MessageID     string `xml:"messageid,attr"`

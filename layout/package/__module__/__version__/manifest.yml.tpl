@@ -10,9 +10,9 @@ license: basic
 type: integration
 conditions:
     kibana:
-        version: '>=7.9.0'
+        version: '^7.9.0'
     elasticsearch:
-        version: '>=7.9.0'
+        version: '^7.9.0'
 config_templates:
 - name: ((.Fileset))
   title: ((.DisplayName))

@@ -62,7 +62,7 @@
 	id2="inbound/pass1"
 	eventcategory="1207010201"
 	functions="&lt;@:*SYSVAL($ID1)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@direction:inbound&gt;&lt;@starttime:*EVNTTIME($MSG,'%X',fld1)&gt;&lt;@endtime:*EVNTTIME($MSG,'%X',fld2)&gt;&lt;@disposition:*getActionName(fld3)&gt;&lt;@result:*getReasonName(resultcode)&gt;&lt;@event_cat:*getEventLegacyCategory(disposition)&gt;&lt;@event_cat_name:*getEventLegacyCategoryName(event_cat)&gt;&lt;@action: RECV&gt;"
-	content="inbound/pass1:&lt;web_domain&gt;[&lt;saddr&gt;] &lt;id&gt; &lt;fld1&gt; &lt;fld2&gt; RECV &lt;from&gt; &lt;to&gt;{&lt;fld3&gt; &lt;resultcode&gt; &lt;info&gt;|&lt;info&gt;}"/>
+	content="inbound/pass1:&lt;web_domain&gt;[&lt;saddr&gt;] &lt;id&gt; &lt;fld1&gt; &lt;fld2&gt; RECV &lt;from&gt; &lt;to&gt; {&lt;fld3&gt; &lt;resultcode&gt; &lt;info&gt;|&lt;info&gt;}"/>
 
 	
 <MESSAGE 

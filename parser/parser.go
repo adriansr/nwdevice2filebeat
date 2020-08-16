@@ -49,7 +49,10 @@ func New(dev model.Device, cfg config.Config, warnings *util.Warnings) (p Parser
 		unsupported = append(unsupported, "SUMDATA")
 	}
 	if len(dev.VarTypes) > 0 {
-		unsupported = append(unsupported, "VARTYPE")
+		//unsupported = append(unsupported, "VARTYPE")
+		//
+		// Let's just warn when VARTYPE entries are found.
+		warnings.Add(dev.VarTypes[0].Pos(), "Unsupported feature VARTYPE")
 	}
 	if len(unsupported) > 0 {
 		return p, errors.Errorf("found unsupported features: %v", unsupported)

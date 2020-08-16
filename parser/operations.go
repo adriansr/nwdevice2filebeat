@@ -176,6 +176,7 @@ type Match struct {
 	Input        string
 	Pattern      Pattern
 	PayloadField string
+	TagValues    TagValues
 	OnSuccess    []Operation
 }
 

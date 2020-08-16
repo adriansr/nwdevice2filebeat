@@ -143,10 +143,27 @@ func (p RawJS) Children() []parser.Operation {
 	return nil
 }
 
+type TagValMapCfg struct {
+	*parser.TagValMapSettings
+}
+
+func (p TagValMapCfg) String() string {
+	return "TagValMapCfg"
+}
+
+func (p TagValMapCfg) Hashable() string {
+	return fmt.Sprintf("%#q", p)
+}
+
+func (p TagValMapCfg) Children() []parser.Operation {
+	return nil
+}
+
 func adjustTree(p *parser.Parser) (err error) {
 	var file File
 	file.Nodes = append(file.Nodes,
 		RawJS(header),
+		TagValMapCfg{p.TagValMap},
 		MainProcessor{inner: []parser.Operation{p.Root}})
 	for _, vm := range p.ValueMaps {
 		file.Nodes = append(file.Nodes, vm)

@@ -151,8 +151,8 @@ func (p TagValMapCfg) String() string {
 	return "TagValMapCfg"
 }
 
-func (TagValMapCfg) Hashable() string {
-	return ""
+func (p TagValMapCfg) Hashable() string {
+	return fmt.Sprintf("%#q", p)
 }
 
 func (p TagValMapCfg) Children() []parser.Operation {

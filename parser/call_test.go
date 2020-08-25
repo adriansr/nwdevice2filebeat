@@ -33,7 +33,7 @@ func TestCall(t *testing.T) {
 				Function: "STRCAT",
 				Args: []Value{
 					Constant("header_"),
-					Field("id2"),
+					Field{Name: "id2"},
 				},
 			},
 		},
@@ -43,7 +43,7 @@ func TestCall(t *testing.T) {
 				Function: "STRCAT",
 				Args: []Value{
 					Constant("header_"),
-					Field("id2"),
+					Field{Name: "id2"},
 				},
 			},
 		},
@@ -52,7 +52,7 @@ func TestCall(t *testing.T) {
 			expected: Call{
 				Function: "PARMVAL",
 				Args: []Value{
-					Field("$MSG"),
+					Field{Name: "$MSG"},
 				},
 			},
 		},
@@ -61,7 +61,7 @@ func TestCall(t *testing.T) {
 			expected: Call{
 				Function: "PARMVAL",
 				Args: []Value{
-					Field("$MSG"),
+					Field{Name: "$MSG"},
 				},
 			},
 		},
@@ -70,10 +70,10 @@ func TestCall(t *testing.T) {
 			expected: Call{
 				Function: "MyCall",
 				Args: []Value{
-					Field("$HDR"),
+					Field{Name: "$HDR"},
 					Constant(`%G/%F/%W %H:%U:%O`),
-					Field("hdate1"),
-					Field("htime"),
+					Field{Name: "hdate1"},
+					Field{Name: "htime"},
 				},
 			},
 		},
@@ -92,7 +92,7 @@ func TestCall(t *testing.T) {
 			expected: Call{
 				Function: "MY_FUN",
 				Args: []Value{
-					Field("field"),
+					Field{Name: "field"},
 				},
 			},
 		},
@@ -101,7 +101,7 @@ func TestCall(t *testing.T) {
 			expected: Call{
 				Function: "MY_FUN",
 				Args: []Value{
-					Field("field"),
+					Field{Name: "field"},
 				},
 			},
 		},
@@ -143,7 +143,7 @@ func TestCall(t *testing.T) {
 					Constant("this is fine"),
 					Constant("at some point someone got tired of quotes"),
 					Constant("\t"),
-					Field("my.field"),
+					Field{Name: "my.field"},
 				},
 			},
 		},
@@ -175,7 +175,7 @@ func TestCall2(t *testing.T) {
 				SourceContext: loc,
 				Function:      "APPEND",
 				Target:        "target",
-				Args:          []Value{Constant("hola"), Constant(":"), Field("feo")},
+				Args:          []Value{Constant("hola"), Constant(":"), Field{Name: "feo"}},
 			},
 		},
 		{
@@ -193,7 +193,7 @@ func TestCall2(t *testing.T) {
 				Function:      "CALC",
 				Target:        "duration",
 				Args: []Value{
-					Field("duration"),
+					Field{Name: "duration"},
 					Constant("*"),
 					Constant("60"),
 				},

@@ -38,7 +38,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
         }
         action plain_save {
             if start_plain < end_plain {
-                out = append(out, data[start_plain:end_plain])
+                out = append(out, unescapeAlts(data[start_plain:end_plain]))
             }
             start_plain = p
             end_plain = p
@@ -49,7 +49,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
         }
         action alt_end {
             // TODO
-            alts = append(alts, data[start_alt:p])
+            alts = append(alts, unescapeAlts(data[start_alt:p]))
             start_alt = p+1
         }
         alt_open = "{";
@@ -75,8 +75,9 @@ func splitAlternatives(data string) (out []interface{}, err error) {
         write init;
         write exec;
     }%%
-    /*if err == errSplitAltFailed {
-        out = nil
-    }*/
     return
+}
+
+func unescapeAlts(s string) string {
+    return strings.Replace(s, "{{", "{", -1)
 }

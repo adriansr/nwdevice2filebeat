@@ -47,13 +47,13 @@ func TestSplitAlternatives(t *testing.T) {
 		{
 			input: "one {{ pattern",
 			expected: []interface{}{
-				"one {{ pattern",
+				"one { pattern",
 			},
 		},
 		{
 			input: "still one {{ pattern}",
 			expected: []interface{}{
-				"still one {{ pattern}",
+				"still one { pattern}",
 			},
 		},
 		{
@@ -91,13 +91,13 @@ func TestPatternWithAlternatives(t *testing.T) {
 			input: "one <a> {alternative <c> 1|alternative 2 <d>} <e>",
 			expected: Pattern{
 				Constant("one "),
-				Field("a"),
+				Field{Name: "a"},
 				Constant(" "),
 				Alternatives{
-					Pattern{Constant("alternative "), Field("c"), Constant(" 1")},
-					Pattern{Constant("alternative 2 "), Field("d")},
+					Pattern{Constant("alternative "), Field{Name: "c"}, Constant(" 1")},
+					Pattern{Constant("alternative 2 "), Field{Name: "d"}},
 				},
-				Constant(" "), Field("e")},
+				Constant(" "), Field{Name: "e"}},
 		},
 	} {
 		result, err := ParsePatternWithAlternatives(test.input)

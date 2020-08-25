@@ -60,25 +60,25 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				Input:     "input",
 				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
 				Pattern: Pattern{
-					Constant("x"), Field("b"), Constant("c"),
+					Constant("x"), Field{Name: "b"}, Constant("c"),
 					Alternatives{
-						Pattern{Constant("y"), Field("c")},
-						Pattern{Field("d")},
+						Pattern{Constant("y"), Field{Name: "c"}},
+						Pattern{Field{Name: "d"}},
 					},
 					Constant("z"),
-					Field("e"),
+					Field{Name: "e"},
 				},
 			},
 			expected: Match{
 				Input:     "input",
 				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
 				Pattern: Pattern{
-					Constant("x"), Field("b"), Constant("c"),
+					Constant("x"), Field{Name: "b"}, Constant("c"),
 					Alternatives{
-						Pattern{Constant("y"), Field("c"), Constant("z")},
-						Pattern{Field("d"), Constant("z")},
+						Pattern{Constant("y"), Field{Name: "c"}, Constant("z")},
+						Pattern{Field{Name: "d"}, Constant("z")},
 					},
-					Field("e"),
+					Field{Name: "e"},
 				},
 			},
 		},
@@ -93,10 +93,10 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
 				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"), Field("c")},
-						Pattern{Field("d")},
+						Pattern{Constant("y"), Field{Name: "c"}},
+						Pattern{Field{Name: "d"}},
 					},
-					Field("e"),
+					Field{Name: "e"},
 				},
 			},
 			expected: Match{
@@ -104,10 +104,10 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
 				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"), Field("c"), Constant(" ")},
-						Pattern{Field("d"), Constant(" ")},
+						Pattern{Constant("y"), Field{Name: "c"}, Constant(" ")},
+						Pattern{Field{Name: "d"}, Constant(" ")},
 					},
-					Field("e"),
+					Field{Name: "e"},
 				},
 			},
 		},
@@ -120,8 +120,8 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
 				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"), Field("c")},
-						Pattern{Field("d")},
+						Pattern{Constant("y"), Field{Name: "c"}},
+						Pattern{Field{Name: "d"}},
 					},
 				},
 			},
@@ -130,8 +130,8 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				OnSuccess: OpList{SetField{Target: "a", Value: []Operation{Constant("b")}}},
 				Pattern: Pattern{
 					Alternatives{
-						Pattern{Constant("y"), Field("c")},
-						Pattern{Field("d")},
+						Pattern{Constant("y"), Field{Name: "c"}},
+						Pattern{Field{Name: "d"}},
 					},
 				},
 			},
@@ -144,9 +144,9 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("y")},
-						Pattern{Field("d")},
+						Pattern{Field{Name: "d"}},
 					},
-					Field("z"),
+					Field{Name: "z"},
 				},
 			},
 			expected: Match{
@@ -155,9 +155,9 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("y")},
-						Pattern{Field("d"), Constant(" ")},
+						Pattern{Field{Name: "d"}, Constant(" ")},
 					},
-					Field("z"),
+					Field{Name: "z"},
 				},
 			},
 		},
@@ -169,7 +169,7 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("y")},
-						Pattern{Field("d")},
+						Pattern{Field{Name: "d"}},
 					},
 					Constant("z"),
 				},
@@ -180,7 +180,7 @@ func TestFixAlternativesEndInCapture(t *testing.T) {
 				Pattern: Pattern{
 					Alternatives{
 						Pattern{Constant("yz")},
-						Pattern{Field("d"), Constant("z")},
+						Pattern{Field{Name: "d"}, Constant("z")},
 					},
 				},
 			},
@@ -197,16 +197,16 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 		{
 			input: Alternatives{
 				Pattern{Constant("Hello world")},
-				Pattern{Constant("Hell is "), Field("f")},
+				Pattern{Constant("Hell is "), Field{Name: "f"}},
 				Pattern{Constant("Helium")},
-				Pattern{Constant("Hel"), Field("z")},
+				Pattern{Constant("Hel"), Field{Name: "z"}},
 				Pattern{Constant("Hel")},
 			},
 			expected: Alternatives{
 				Pattern{Constant("lo world")},
-				Pattern{Constant("l is "), Field("f")},
+				Pattern{Constant("l is "), Field{Name: "f"}},
 				Pattern{Constant("ium")},
-				Pattern{Field("z")},
+				Pattern{Field{Name: "z"}},
 				Pattern{},
 			},
 			prefix: "Hel",
@@ -223,11 +223,11 @@ func TestExtractLeadingConstantPrefix(t *testing.T) {
 		{
 			input: Alternatives{
 				Pattern{Constant("Repetition is bad.")},
-				Pattern{Constant("Repetition is bad."), Field("isit")},
+				Pattern{Constant("Repetition is bad."), Field{Name: "isit"}},
 				Pattern{Constant("Repetition is bad.")},
 			},
 			expected: Alternatives{
-				Pattern{Field("isit")},
+				Pattern{Field{Name: "isit"}},
 				Pattern{},
 			},
 			prefix: "Repetition is bad.",
@@ -249,13 +249,13 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 			input: Alternatives{
 				Pattern{Constant("Bananan")},
 				Pattern{Constant("nananananan")},
-				Pattern{Field("f"), Constant("Batman")},
+				Pattern{Field{Name: "f"}, Constant("Batman")},
 				Pattern{Constant("an")},
 			},
 			expected: Alternatives{
 				Pattern{Constant("Banan")},
 				Pattern{Constant("nanananan")},
-				Pattern{Field("f"), Constant("Batm")},
+				Pattern{Field{Name: "f"}, Constant("Batm")},
 				Pattern{},
 			},
 			prefix: "an",
@@ -272,11 +272,11 @@ func TestExtractTrailingConstantPrefix(t *testing.T) {
 		{
 			input: Alternatives{
 				Pattern{Constant("Repetition is bad.")},
-				Pattern{Field("isit"), Constant("Repetition is bad.")},
+				Pattern{Field{Name: "isit"}, Constant("Repetition is bad.")},
 				Pattern{Constant("Repetition is bad.")},
 			},
 			expected: Alternatives{
-				Pattern{Field("isit")},
+				Pattern{Field{Name: "isit"}},
 				Pattern{},
 			},
 			prefix: "Repetition is bad.",
@@ -302,7 +302,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 									Constant("hello"),
 									Alternatives{
 										Pattern{Constant(" world")},
-										Pattern{Constant(" "), Field("capture")},
+										Pattern{Constant(" "), Field{Name: "capture"}},
 										Pattern{Constant(" ")},
 									}},
 							},
@@ -321,7 +321,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 									Constant("hello "),
 									Alternatives{
 										Pattern{Constant("world")},
-										Pattern{Field("capture")},
+										Pattern{Field{Name: "capture"}},
 										Pattern{},
 									}},
 							},
@@ -428,7 +428,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 						Pattern{Constant("logs ")},
 						Pattern{Constant("files ")},
 					},
-					Field("z"),
+					Field{Name: "z"},
 					Alternatives{
 						Pattern{Constant("scan")},
 						Pattern{Constant("skipped")},
@@ -442,7 +442,7 @@ func TestFixAlternativesEdgeSpace(t *testing.T) {
 						Pattern{Constant("file")},
 					},
 					Constant("s "),
-					Field("z"),
+					Field{Name: "z"},
 					Constant("s"),
 					Alternatives{
 						Pattern{Constant("can")},
@@ -468,7 +468,7 @@ func TestFixExtraLeadingSpaceInConstants(t *testing.T) {
 									Constant("  hello"),
 									Alternatives{
 										Pattern{Constant("world")},
-										Pattern{Field("capture")},
+										Pattern{Field{Name: "capture"}},
 									},
 									Constant(" space here"),
 								},
@@ -485,13 +485,13 @@ func TestFixExtraLeadingSpaceInConstants(t *testing.T) {
 						Nodes: []Operation{
 							Match{
 								Pattern: Pattern{
-									Field(""),
+									Field{Name: ""},
 									Constant("hello"),
 									Alternatives{
 										Pattern{Constant("world")},
-										Pattern{Field("capture")},
+										Pattern{Field{Name: "capture"}},
 									},
-									Field(""),
+									Field{Name: ""},
 									Constant("space here"),
 								},
 							},
@@ -506,8 +506,8 @@ func TestFixExtraLeadingSpaceInConstants(t *testing.T) {
 			input: Match{
 				Pattern: Pattern{
 					Alternatives{
-						Pattern{Field("a")},
-						Pattern{Field("b")},
+						Pattern{Field{Name: "a"}},
+						Pattern{Field{Name: "b"}},
 					},
 					Constant(" :"),
 				},
@@ -515,10 +515,10 @@ func TestFixExtraLeadingSpaceInConstants(t *testing.T) {
 			expected: Match{
 				Pattern: Pattern{
 					Alternatives{
-						Pattern{Field("a")},
-						Pattern{Field("b")},
+						Pattern{Field{Name: "a"}},
+						Pattern{Field{Name: "b"}},
 					},
-					Field(""),
+					Field{Name: ""},
 					Constant(":"),
 				},
 			},
@@ -656,7 +656,7 @@ func TestAliens(t *testing.T) {
 		},
 	}, config.Config{
 		DevicePath: "test",
-	})
+	}, nil)
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
 	}

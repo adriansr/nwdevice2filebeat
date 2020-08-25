@@ -5,7 +5,11 @@
 
 package parser
 
-import "github.com/pkg/errors"
+import (
+	"strings"
+
+	"github.com/pkg/errors"
+)
 
 //line alt_generated.go:11
 var _parse_alternatives_eof_actions []byte = []byte{
@@ -151,7 +155,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
 //line alt.go.rl:50
 
 		// TODO
-		alts = append(alts, data[start_alt:p])
+		alts = append(alts, unescapeAlts(data[start_alt:p]))
 		start_alt = p + 1
 
 		goto _again
@@ -173,7 +177,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
 //line alt.go.rl:39
 
 		if start_plain < end_plain {
-			out = append(out, data[start_plain:end_plain])
+			out = append(out, unescapeAlts(data[start_plain:end_plain]))
 		}
 		start_plain = p
 		end_plain = p
@@ -181,7 +185,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
 //line alt.go.rl:50
 
 		// TODO
-		alts = append(alts, data[start_alt:p])
+		alts = append(alts, unescapeAlts(data[start_alt:p]))
 		start_alt = p + 1
 
 		goto _again
@@ -206,7 +210,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
 //line alt.go.rl:39
 
 				if start_plain < end_plain {
-					out = append(out, data[start_plain:end_plain])
+					out = append(out, unescapeAlts(data[start_plain:end_plain]))
 				}
 				start_plain = p
 				end_plain = p
@@ -231,7 +235,7 @@ func splitAlternatives(data string) (out []interface{}, err error) {
 //line alt.go.rl:39
 
 				if start_plain < end_plain {
-					out = append(out, data[start_plain:end_plain])
+					out = append(out, unescapeAlts(data[start_plain:end_plain]))
 				}
 				start_plain = p
 				end_plain = p
@@ -251,8 +255,9 @@ func splitAlternatives(data string) (out []interface{}, err error) {
 
 //line alt.go.rl:77
 
-	/*if err == errSplitAltFailed {
-	    out = nil
-	}*/
 	return
+}
+
+func unescapeAlts(s string) string {
+	return strings.Replace(s, "{{", "{", -1)
 }

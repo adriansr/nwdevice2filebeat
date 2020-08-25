@@ -19,17 +19,17 @@ func TestPattern(t *testing.T) {
 	}{
 		{
 			input:    `a<a>`,
-			expected: []Value{Constant("a"), Field("a")},
+			expected: []Value{Constant("a"), Field{Name: "a"}},
 		},
 		{
 			input: `%ZENPRISEMDM-4: <hdate> <htime>, <hfld1> [<hprocess>] <messageid> <hdate>`,
 			expected: []Value{
-				Constant("%ZENPRISEMDM-4: "), Field("hdate"),
-				Constant(" "), Field("htime"),
-				Constant(", "), Field("hfld1"),
-				Constant(" ["), Field("hprocess"),
-				Constant("] "), Field("messageid"),
-				Constant(" "), Field("hdate")},
+				Constant("%ZENPRISEMDM-4: "), Field{Name: "hdate"},
+				Constant(" "), Field{Name: "htime"},
+				Constant(", "), Field{Name: "hfld1"},
+				Constant(" ["), Field{Name: "hprocess"},
+				Constant("] "), Field{Name: "messageid"},
+				Constant(" "), Field{Name: "hdate"}},
 		},
 		{
 			input:    `Hello world`,
@@ -37,7 +37,7 @@ func TestPattern(t *testing.T) {
 		},
 		{
 			input:    `<Hello><world>`,
-			expected: []Value{Field("Hello"), Field("world")},
+			expected: []Value{Field{Name: "Hello"}, Field{Name: "world"}},
 		},
 		{
 			input: ``,
@@ -45,7 +45,7 @@ func TestPattern(t *testing.T) {
 		},
 		{
 			input:    ` <field> `,
-			expected: []Value{Constant(" "), Field("field"), Constant(" ")},
+			expected: []Value{Constant(" "), Field{Name: "field"}, Constant(" ")},
 		},
 		{
 			input: `<field`,
@@ -65,15 +65,15 @@ func TestPattern(t *testing.T) {
 		},
 		{
 			input:    `<!payload>`,
-			expected: []Value{Payload(Field(""))},
+			expected: []Value{Payload(Field{Name: ""})},
 		},
 		{
 			input:    `<!payload:custom> And this is just <<neat>`,
-			expected: []Value{Payload(Field("custom")), Constant(` And this is just <<neat>`)},
+			expected: []Value{Payload(Field{Name: "custom"}), Constant(` And this is just <<neat>`)},
 		},
 		{
 			input:    `<dot.fields> are cool too`,
-			expected: []Value{Field("dot.fields"), Constant(` are cool too`)},
+			expected: []Value{Field{Name: "dot.fields"}, Constant(` are cool too`)},
 		},
 	} {
 		result, err := ParsePattern(testCase.input)

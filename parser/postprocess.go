@@ -83,10 +83,11 @@ var transforms = PostprocessGroup{
 		{"fix extra leading space in constants (1)", fixExtraLeadingSpaceInConstants},
 
 		// Reaching this point, if we have:
-		// constant<field>{alternative...}
-		// we will generate broken dissect due to the trailer {pN} used to
-		// terminate the pattern before the alternative. Inject the <field>
-		// into the alternatives to avoid this.
+		// <field>{alternative...}
+		// we will generate broken parsers due to the capture before an alternative.
+		// neither dissect-mode or runtime support this:
+		// Dissect: Will result in a double capture -> "<field><p0>" -> [alts..]
+		// Runtime: "<field>{alts...}" field will capture the whole message.
 		{"inject leading captures into alternatives", injectCapturesInAlts},
 
 		{"split alternatives into dissect patterns", splitDissect},
@@ -1290,9 +1291,6 @@ func injectCapturesInAltsPattern(pattern Pattern) (Pattern, error) {
 }
 
 func injectCapturesInAlts(parser *Parser) (err error) {
-	if !parser.Config.PipelineSettings.Dissect {
-		return nil
-	}
 	parser.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok {
 			var newPattern Pattern

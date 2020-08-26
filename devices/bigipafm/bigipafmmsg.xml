@@ -17,7 +17,7 @@
 	id2="0001" 
 	prioritize="true"
 	messageid="STRCAT('BIGIP','_','AFM')"
-	content="&lt;hfld1&gt; &lt;hfld2&gt; &lt;hhostname&gt; &lt;hfld3&gt; &lt;hfld4&gt; &lt;hfld5&gt; [F5@&lt;hfld6&gt;&lt;!payload&gt;" />
+	content="&lt;hfld1&gt; &lt;hfld2&gt; &lt;hhostname&gt; &lt;hfld3&gt; &lt;hfld4&gt; &lt;hfld5&gt; [F5@&lt;hfld6&gt; &lt;!payload&gt;" />
 <VALUEMAP
 	    name="getEventCategoryActivity"
 		default="$NONE"

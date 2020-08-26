@@ -15,16 +15,16 @@
 	id1="0003" 
 	id2="0003"
 	messageid="STRCAT('urls')" 
-	content="&lt;hfld1&gt; &lt;hfld2&gt;.&lt;hfld3&gt; { &lt;hfld4&gt;_appliance | &lt;hfld4&gt; } urls &lt;!payload:hfld4&gt;" />
+	content="&lt;hfld1&gt; &lt;hfld2&gt;.&lt;hfld3&gt; &lt;hfld4&gt;{_appliance | }urls &lt;!payload:hfld4&gt;" />
 <HEADER 
 	id1="0002" 
 	id2="0002"
 	messageid="STRCAT('events')" 
-	content="&lt;hfld1&gt; &lt;hfld2&gt;.&lt;hfld3&gt; { &lt;node&gt;_appliance | &lt;node&gt; } events &lt;!payload&gt;" />
+	content="&lt;hfld1&gt; &lt;hfld2&gt;.&lt;hfld3&gt; {&lt;node&gt;_appliance|&lt;node&gt;} events &lt;!payload&gt;" />
 <HEADER 
 	id1="0001" 
 	id2="0001" 
-	content="&lt;hfld1&gt; &lt;hfld2&gt;.&lt;hfld3&gt; { &lt;hfld4&gt;_appliance | &lt;hfld4&gt; } &lt;messageid&gt; &lt;!payload:hfld4&gt;" /> 
+	content="&lt;hfld1&gt; &lt;hfld2&gt;.&lt;hfld3&gt; &lt;hfld4&gt;{_appliance | }&lt;messageid&gt; &lt;!payload:hfld4&gt;" /> 
 <HEADER 
 	id1="0005" 
 	id2="0005" 

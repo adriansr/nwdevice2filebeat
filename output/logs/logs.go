@@ -939,6 +939,25 @@ func (lc *lineComposer) mergeOverlapped(header, message parser.Pattern) (p parse
 				fld := getField(m.p[0])
 				fld.Name = hVal
 				m.p[0] = fld
+				// Drop the current hints for the replaced field, otherwise
+				// it'll have double the hints as the overlapped pattern is
+				// processed again
+				if prevHints := lc.knownFields[hVal]; len(prevHints) > 0 {
+					var cap captured
+					numCap := 0
+					for _, hint := range prevHints {
+						if hint == cap {
+							numCap++
+						}
+					}
+					// TODO: This will panic if a field is captured more than once in the header
+					//       and at least one of those captures has an enrichment.
+					//       Don't know what to do in that case.
+					if numCap > 1 && numCap != len(prevHints) {
+						panic(fmt.Sprintf("fld '%s' captured %d times", hVal, numCap))
+					}
+					delete(lc.knownFields, hVal)
+				}
 			}
 			log.Printf("Overlap: replaced: %v", message)
 			m.AdvanceField()
@@ -1017,6 +1036,7 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 	}
 	return nil
 }
+
 func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) (err error) {
 	lc.addHint(dt.Target, date{})
 	fields := dt.Fields

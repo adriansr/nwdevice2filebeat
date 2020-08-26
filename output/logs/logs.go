@@ -92,7 +92,7 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 		return errors.Wrap(err, "failed to allocate runtime")
 	}
 
-	var errCount int
+	var errCount uint
 	const maxErrors = 1000
 	var numLines uint
 	for numLines < p.Config.NumLines {
@@ -101,7 +101,7 @@ func (lg *logs) Generate(p parser.Parser) (err error) {
 		if err != nil {
 			log.Printf("Generate line error: %v", err)
 			errCount++
-			if errCount > maxErrors {
+			if errCount/(numLines+1) > maxErrors {
 				return errors.New("too many errors")
 			}
 			continue

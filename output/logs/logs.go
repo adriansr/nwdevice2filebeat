@@ -187,6 +187,14 @@ func (_ captured) Generate(rng *rand.Rand, t time.Time) string {
 	return makeText(rng, t)
 }
 
+type noopHint struct{}
+
+func (_ noopHint) String() string { return "noop" }
+func (_ noopHint) Quality() int   { return 0 }
+func (_ noopHint) Generate(rng *rand.Rand, t time.Time) string {
+	return makeText(rng, t)
+}
+
 type copyField parser.Field
 
 func (c copyField) String() string { return "copy_from(" + c.Name + ")" }
@@ -469,6 +477,52 @@ type lineComposer struct {
 }
 
 func (lc *lineComposer) Build() (string, error) {
+	// Try to balance hinting captures with actual captures for each field.
+	fldCaptures := make(map[string]int)
+	for _, act := range lc.expression {
+		switch v := act.(type) {
+		case parser.Field:
+			fldCaptures[v.Name]++
+		}
+	}
+	var cap captured
+	for fld, hints := range lc.knownFields {
+		hintCaptures := 0
+		for _, hint := range hints {
+			if hint == cap {
+				hintCaptures++
+			}
+		}
+		actualCaptures := fldCaptures[fld]
+		switch {
+		case actualCaptures == 0:
+			// Fields set during actions
+			continue
+
+		case actualCaptures == hintCaptures:
+			continue
+
+		case fldCaptures[fld] == 1 && hintCaptures > 1:
+			// This happens due to overlap, when a field is hinted twice once
+			// in the header and once in the overlapped message.
+			// When a message is overlapped we don't yet have enough information
+			// to fix this, as we don't know which capture is more interesting
+			// or if the field is going to be repeated.
+
+			// Replace all hints with noops to ensure all hints are considered.
+			var repl valueHint = captured{}
+			for idx, hint := range hints {
+				if hint == cap {
+					hints[idx] = repl
+					repl = noopHint{}
+				}
+			}
+			continue
+		}
+		return "", fmt.Errorf("bad hinting for field '%s'. hintCaptures=%d, actual=%d, hints=%v", fld, hintCaptures, actualCaptures, hints)
+	}
+
+	// Build the final log message.
 	var sb strings.Builder
 	for _, act := range lc.expression {
 		switch v := act.(type) {
@@ -942,22 +996,6 @@ func (lc *lineComposer) mergeOverlapped(header, message parser.Pattern) (p parse
 				// Drop the current hints for the replaced field, otherwise
 				// it'll have double the hints as the overlapped pattern is
 				// processed again
-				if prevHints := lc.knownFields[hVal]; len(prevHints) > 0 {
-					var cap captured
-					numCap := 0
-					for _, hint := range prevHints {
-						if hint == cap {
-							numCap++
-						}
-					}
-					// TODO: This will panic if a field is captured more than once in the header
-					//       and at least one of those captures has an enrichment.
-					//       Don't know what to do in that case.
-					if numCap > 1 && numCap != len(prevHints) {
-						panic(fmt.Sprintf("fld '%s' captured %d times", hVal, numCap))
-					}
-					delete(lc.knownFields, hVal)
-				}
 			}
 			log.Printf("Overlap: replaced: %v", message)
 			m.AdvanceField()

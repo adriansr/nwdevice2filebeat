@@ -205,9 +205,9 @@ func (c constant) Generate(rng *rand.Rand, t time.Time) string {
 
 type date struct{}
 
-func (c date) String() string { return "date" }
-func (_ date) Quality() int   { return 0 }
-func (_ date) Generate(rng *rand.Rand, t time.Time) string {
+func (date) String() string { return "date" }
+func (date) Quality() int   { return 1 }
+func (date) Generate(rng *rand.Rand, t time.Time) string {
 	return makeTimeT(rng, t)
 }
 
@@ -967,7 +967,6 @@ func (lc *lineComposer) addHint(field string, hint valueHint) {
 }
 
 func (lc *lineComposer) appendActions(list parser.OpList) error {
-	hasDateTime := false
 	for _, act := range list {
 		switch v := act.(type) {
 		case parser.SetField:
@@ -981,7 +980,6 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 			}
 
 		case parser.DateTime:
-			hasDateTime = true
 			if err := lc.enrichFromDateTime(v); err != nil {
 				return err
 			}
@@ -1017,36 +1015,60 @@ func (lc *lineComposer) appendActions(list parser.OpList) error {
 			return errors.Errorf("unsupported action type %T: %s", v, v.Hashable())
 		}
 	}
-	if _, hasMsgID := lc.knownFields["messageid"]; hasMsgID && !hasDateTime && false {
-		return errors.New("message without datetime")
-	}
 	return nil
 }
-
-func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) error {
+func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) (err error) {
 	lc.addHint(dt.Target, date{})
-	// TODO: Multiple formats
-	fmt := dt.Formats[0]
 	fields := dt.Fields
+	var hints map[string]valueHint
+	for _, fmt := range dt.Formats {
+		if hints, err = hintsFromDateTimePattern(fmt, fields, nil); err == nil {
+			for fld, hint := range hints {
+				lc.addHint(fld, hint)
+			}
+			break
+		}
+	}
+	return err
+}
+
+func hintsFromDateTimePattern(fmt []parser.DateTimeItem, fields []string, hints map[string]valueHint) (map[string]valueHint, error) {
+	if hints == nil {
+		hints = make(map[string]valueHint, len(fields))
+	}
 	switch {
 	case len(fields) == 1: // 1 to many
-		lc.addHint(fields[0], dateComponent(fmt))
+		hints[fields[0]] = dateComponent(fmt)
 
 	case len(fields) == len(fmt): // 1:1 mapping
 		for idx, src := range fields {
-			lc.addHint(src, dateComponent(fmt[idx:idx+1]))
+			hints[src] = dateComponent(fmt[idx : idx+1])
 		}
 
-	case len(fields) == 2 && len(fmt) > 2: // Split 3+ fields in 2.
-		// Try to split the fmt in two parts, one for date, one for time.
-		pos := splitDateAndTime(fmt)
-		if pos != -1 {
-			lc.addHint(fields[0], dateComponent(fmt[:pos]))
-			lc.addHint(fields[1], dateComponent(fmt[pos:]))
-			break
-		}
-		fallthrough
 	case len(fields) < len(fmt): // Split fields, at least 1 fmt per fld
+		// Try to split the fmt in two parts, one for date, one for time.
+		if dtSplit := splitPatternDateAndTime(fmt); dtSplit != -1 {
+			if len(fields) == 2 {
+				hints[fields[0]] = dateComponent(fmt[:dtSplit])
+				hints[fields[1]] = dateComponent(fmt[dtSplit:])
+				break
+			}
+			multifields := map[string]struct{}{
+				"date":  {},
+				"hdate": {},
+				"time":  {},
+				"htime": {},
+			}
+			if _, found := multifields[fields[0]]; found {
+				hints[fields[0]] = dateComponent(fmt[:dtSplit])
+				return hintsFromDateTimePattern(fmt[dtSplit:], fields[1:], hints)
+			}
+			if _, found := multifields[fields[len(fields)-1]]; found {
+				hints[fields[len(fields)-1]] = dateComponent(fmt[dtSplit:])
+				return hintsFromDateTimePattern(fmt[:dtSplit], fields[:len(fields)-1], hints)
+			}
+		}
+
 		div := len(fmt) / len(fields)
 		rem := len(fmt) % len(fields)
 		pos := 0
@@ -1055,14 +1077,14 @@ func (lc *lineComposer) enrichFromDateTime(dt parser.DateTime) error {
 			if pos == 0 {
 				next += rem
 			}
-			lc.addHint(fld, dateComponent(fmt[pos:next]))
+			hints[fld] = dateComponent(fmt[pos:next])
 			pos = next
 		}
 	default:
 		// Don't know how to split this. More fields than formats
-		return errors.Errorf("don't know how to split datetime %+v", dt)
+		return nil, errors.Errorf("don't know how to split datetime %+v", fmt)
 	}
-	return nil
+	return hints, nil
 }
 
 // Which chars correspond to date components, in opposition to time components
@@ -1080,7 +1102,7 @@ var dateChars = map[byte]struct{}{
 // Find the offset which splits a datetime pattern into a date and time
 // component (or time and date). Returns -1 if there is no such offset.
 // (for example only date components or mixed date and time).
-func splitDateAndTime(pattern []parser.DateTimeItem) int {
+func splitPatternDateAndTime(pattern []parser.DateTimeItem) int {
 	split, isDate := -1, false
 	for idx, elem := range pattern {
 		if elem.Spec() == parser.DateTimeConstant {

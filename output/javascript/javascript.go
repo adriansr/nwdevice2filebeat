@@ -191,9 +191,17 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 
 	case parser.Match:
 		if v.TagValues.IsSet() {
-			out.Write("tagval(").JS(v.ID).Write(", ").JS(v.Input).Write(", tvm, {").Newline()
+			// Print sorted k: v pairs to ensure predictable code.
+			keyValues := make([][2]string, 0, len(v.TagValues.Map))
 			for k, v := range v.TagValues.Map {
-				out.Indent().JS(k).Write(": ").JS(v).Write(",").Unindent().Newline()
+				keyValues = append(keyValues, [2]string{k, v})
+			}
+			sort.Slice(keyValues, func(i, j int) bool {
+				return keyValues[i][0] < keyValues[j][0]
+			})
+			out.Write("tagval(").JS(v.ID).Write(", ").JS(v.Input).Write(", tvm, {").Newline()
+			for _, entry := range keyValues {
+				out.Indent().JS(entry[0]).Write(": ").JS(entry[1]).Write(",").Unindent().Newline()
 			}
 			out.Write("}")
 		} else {

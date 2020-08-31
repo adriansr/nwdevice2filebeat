@@ -157,7 +157,11 @@ func setPayloadField(parser *Parser) error {
 		if _, ok := last.(Payload); !ok {
 			return errors.New("expected payload as last field")
 		}
-		hdr.content[n-1] = Field{Name: "payload"}
+		if payload == "" {
+			hdr.content[n-1] = Field{Name: "payload"}
+		} else {
+			hdr.content[n-1] = Field{Name: "p0"}
+		}
 	}
 	return nil
 }
@@ -171,11 +175,9 @@ func checkPayloadOverlap(parser *Parser) (err error) {
 		if payload == "" || payload == "$START" {
 			continue
 		}
-		count := 0
-		for _, elem := range hdr.content {
-			if fld, ok := elem.(Field); ok && fld.Name == payload {
-				count++
-			}
+		count, err := hdr.content.CountField(payload)
+		if err != nil {
+			return err
 		}
 		if count != 1 {
 			return errors.Errorf("at %s: payload field '%s' appears %d times. Expected 1.", hdr.pos, payload, count)
@@ -537,6 +539,7 @@ func splitDissect(p *Parser) (err error) {
 				SourceContext: match.SourceContext,
 			}
 			input, partCounter := match.Input, 0
+			payload := match.PayloadField
 			for pos := 0; ; pos++ {
 				end := pos
 				var found bool
@@ -552,10 +555,12 @@ func splitDissect(p *Parser) (err error) {
 						ID:            fmt.Sprintf("%s/%d", match.ID, partCounter),
 						Input:         input,
 						Pattern:       dupPattern(match.Pattern[pos:end]),
-						PayloadField:  "", // TODO
+					}
+					if count, _ := node.Pattern.CountField(payload); count > 0 && payload != "" {
+						node.PayloadField = payload
 					}
 					if found {
-						input = "p0" //fmt.Sprintf("p%d", partCounter)
+						input = "p0"
 						partCounter++
 						node.Pattern = append(node.Pattern, Field{Name: input})
 					}
@@ -570,7 +575,7 @@ func splitDissect(p *Parser) (err error) {
 				var part Value
 				displayCounter := partCounter
 				if pos < len(match.Pattern)-1 {
-					input = "p0" // fmt.Sprintf("p%d", partCounter)
+					input = "p0"
 					part = Field{Name: input}
 					partCounter++
 				}
@@ -579,9 +584,11 @@ func splitDissect(p *Parser) (err error) {
 						SourceContext: match.SourceContext,
 						ID:            fmt.Sprintf("%s/%d_%d", match.ID, displayCounter, idx),
 						Input:         curInput,
-						PayloadField:  "", // TODO
 					}
 					m.Pattern = pattern
+					if count, _ := m.Pattern.CountField(payload); count > 0 && payload != "" {
+						m.PayloadField = payload
+					}
 					if part != nil {
 						m.Pattern = append(m.Pattern, part)
 					}

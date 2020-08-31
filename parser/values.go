@@ -177,6 +177,40 @@ func (c Pattern) PayloadField() (field string, err error) {
 	return
 }
 
+// CountField is useful for counting how many times a field appears in a pattern.
+// If there are alternatives within the pattern, it is expected that each alternative
+// branch has the same number of instances of the given field.
+// This is useful for quickly checking if a (sub)pattern contains the payload field.
+func (c Pattern) CountField(name string) (int, error) {
+	count := 0
+	for _, elem := range c {
+		switch v := elem.(type) {
+		case Field:
+			if v.Name == name {
+				count++
+			}
+		case Alternatives:
+			base, err := v[0].CountField(name)
+			if err != nil {
+				return 0, err
+			}
+			for _, alt := range v[1:] {
+				// Ensure that the payload field appears the same number of times
+				// in all branches of this alternatives.
+				tmp, err := alt.CountField(name)
+				if err != nil {
+					return 0, err
+				}
+				if tmp != base {
+					return 0, errors.New("field doesn't appear in all alternative branches")
+				}
+			}
+			count += base
+		}
+	}
+	return count, nil
+}
+
 func (p Pattern) StripLeft() Pattern {
 	if len(p) == 0 {
 		return nil

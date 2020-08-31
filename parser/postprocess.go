@@ -74,6 +74,8 @@ var transforms = PostprocessGroup{
 		// TODO:
 		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
 
+		{"simplify alternatives", simplifyAlternatives},
+
 		{"fix consecutive dissect captures", fixDissectCaptures},
 
 		{"fix repetition at edge of alternatives", fixAlternativesEdgeSpace},
@@ -947,6 +949,64 @@ func fixAlternativesEdgeSpace(p *Parser) (err error) {
 			}
 
 			if modified {
+				return WalkReplace, match
+			}
+		}
+		return WalkContinue, nil
+	})
+	return err
+}
+
+const (
+	leftSide  = 0
+	rightSide = 1
+)
+
+func stripCommonPattern(alts Alternatives, side int) (output Pattern, newAlts Alternatives) {
+	access := func(p Pattern) Value {
+		return p[0]
+	}
+	strip := Alternatives.StripLeft
+	if side == rightSide {
+		access = func(p Pattern) Value {
+			return p[len(p)-1]
+		}
+		strip = Alternatives.StripRight
+	}
+	for change := true; len(alts) > 0 && alts.MinLength() > 1 && change; {
+		base := access(alts[0])
+		diff := len(alts) - 1
+		for _, alt := range alts[1:] {
+			if access(alt) == base {
+				diff--
+			}
+		}
+		if change = diff == 0; change {
+			output = append(output, base)
+			alts = strip(alts)
+		}
+	}
+	return output, alts
+}
+
+func simplifyAlternatives(p *Parser) (err error) {
+	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
+		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
+			var output Pattern
+			for _, item := range match.Pattern {
+				alts, ok := item.(Alternatives)
+				if !ok {
+					output = append(output, item)
+					continue
+				}
+				common, alts := stripCommonPattern(alts, leftSide)
+				output = append(output, common...)
+				common, alts = stripCommonPattern(alts, rightSide)
+				output = append(append(output, alts), common...)
+			}
+			if len(output) != len(match.Pattern) {
+				output = output.SquashConstants()
+				match.Pattern = output
 				return WalkReplace, match
 			}
 		}

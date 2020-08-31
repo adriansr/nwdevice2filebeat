@@ -127,6 +127,16 @@ func (alt Alternatives) StripLeft() Alternatives {
 	return alt
 }
 
+func (alt Alternatives) MinLength() int {
+	length := len(alt[0])
+	for _, p := range alt[1:] {
+		if len(p) < length {
+			length = len(p)
+		}
+	}
+	return length
+}
+
 func (alt Alternatives) StripRight() Alternatives {
 	for idx, pattern := range alt {
 		alt[idx] = pattern.StripRight()

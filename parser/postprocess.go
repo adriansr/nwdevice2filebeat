@@ -866,9 +866,6 @@ outer:
 }
 
 func fixAlternativesEdgeSpace(p *Parser) (err error) {
-	if !p.Config.PipelineSettings.Dissect {
-		return nil
-	}
 	p.Walk(func(node Operation) (action WalkAction, operation Operation) {
 		if match, ok := node.(Match); ok && match.Pattern.HasAlternatives() {
 			type insert struct {

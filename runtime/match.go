@@ -300,7 +300,7 @@ func matchPattern(msg []byte, pos int, pattern pattern) (nextPos int, captured c
 	captured.payload = -1
 	msgPos, msgLen := pos, len(msg)
 	itemIdx, numItems := 0, len(pattern)
-	if !pattern[itemIdx].isCapture {
+	if itemIdx < numItems && !pattern[itemIdx].isCapture {
 		if msgPos = skipConstant(msg, msgPos, pattern[itemIdx].value); msgPos == -1 {
 			return msgPos, captures{}
 		}

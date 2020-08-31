@@ -168,7 +168,7 @@
 	id2="00002" 
 	eventcategory="1701000000" 
 	functions="&lt;@hardware_id:*HDR(hfld2)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@vsys:*HDR(hvsys)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@level:*SYSVAL($LEVEL)&gt;&lt;@severity:*HDR(hseverity)&gt;"
-	content="&lt;change_attribute&gt; has been restored from &lt;change_old&gt; to default port &lt;change_new&gt;{. &lt;info&gt;|&lt;info&gt;}" />
+	content="&lt;change_attribute&gt; has been restored from &lt;change_old&gt; to default port &lt;change_new&gt;" />
 <MESSAGE 
 	id1="00002:15" 
 	id2="00002" 
@@ -385,7 +385,7 @@
 	id2="00002" 
 	eventcategory="1701000000" 
 	functions="&lt;@hardware_id:*HDR(hfld2)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@vsys:*HDR(hvsys)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@level:*SYSVAL($LEVEL)&gt;&lt;@severity:*HDR(hseverity)&gt;"
-	content="&lt;change_attribute&gt; {has been changed|changed} from &lt;change_old&gt; to &lt;change_new&gt;{. &lt;info&gt;|&lt;info&gt;}" />
+	content="&lt;change_attribute&gt; {has been changed|changed} from &lt;change_old&gt; to &lt;change_new&gt;" />
 <MESSAGE 
 	id1="00003" 
 	id2="00003" 
@@ -547,7 +547,7 @@
 	id2="00005" 
 	eventcategory="1001000000" 
 	functions="&lt;@hardware_id:*HDR(hfld2)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@vsys:*HDR(hvsys)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@level:*SYSVAL($LEVEL)&gt;&lt;@severity:*HDR(hseverity)&gt;&lt;@dclass_counter1_string:Number of times the attack occurred&gt;&lt;@inout:*DIRCHK($OUT,saddr,daddr,sport,dport)&gt;"
-	content=" &lt;signame&gt; has been detected! From &lt;saddr&gt;:&lt;sport&gt; to &lt;daddr&gt;:&lt;dport&gt;{,|&lt;space&gt;} using protocol &lt;protocol&gt;{,|&lt;space&gt;} { and arriving at |  on } interface &lt;interface&gt; { in zone &lt;zone&gt;. | . } &lt;space&gt;The attack occurred &lt;dclass_counter1&gt; times" />
+	content=" &lt;signame&gt; has been detected! From &lt;saddr&gt;:&lt;sport&gt; to &lt;daddr&gt;:&lt;dport&gt;{,| }&lt;space&gt;using protocol &lt;protocol&gt;{,| }&lt;fld99&gt;interface &lt;interface&gt; { in zone &lt;zone&gt;. | . } &lt;space&gt;The attack occurred &lt;dclass_counter1&gt; times" />
 <MESSAGE 
 	id1="00005:04" 
 	id2="00005" 
@@ -3540,7 +3540,7 @@
 	id2="00033" 
 	eventcategory="1801010000" 
 	functions="&lt;@hardware_id:*HDR(hfld2)&gt;&lt;@:*SYSVAL($MSGID,$ID1)&gt;&lt;@msg:*PARMVAL($MSG)&gt;&lt;@level:*SYSVAL($LEVEL)&gt;&lt;@severity:*HDR(hseverity)&gt;&lt;@vsys:*HDR(hvsys)&gt;&lt;@dclass_counter1_string:Number of times the attack occurred&gt;&lt;@inout:*DIRCHK($OUT,saddr,daddr,sport,dport)&gt;"
-	content="&lt;signame&gt;! From &lt;saddr&gt;:&lt;sport&gt; to &lt;daddr&gt;:&lt;dport&gt;{,|&lt;space&gt;} using protocol &lt;protocol&gt;{,|&lt;space&gt;} and arriving at interface &lt;dinterface&gt; in zone &lt;dst_zone&gt;.&lt;space&gt;The attack occurred &lt;dclass_counter1&gt; time." />
+	content="&lt;signame&gt;! From &lt;saddr&gt;:&lt;sport&gt; to &lt;daddr&gt;:&lt;dport&gt;{,| }&lt;space&gt;using protocol &lt;protocol&gt;{,| }&lt;fld99&gt;arriving at interface &lt;dinterface&gt; in zone &lt;dst_zone&gt;.&lt;space&gt;The attack occurred &lt;dclass_counter1&gt; time." />
 <MESSAGE 
 	id1="00033:20" 
 	id2="00033" 

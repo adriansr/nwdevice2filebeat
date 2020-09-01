@@ -74,11 +74,9 @@ var transforms = PostprocessGroup{
 		// Convert EVNTTIME calls
 		{"convert EVNTTIME and DUR calls", convertEventTime},
 
-		// TODO:
-		// Replace SYSVAL references with fields from headers (id1, messageid, etc.)
-
 		{"simplify alternatives", simplifyAlternatives},
 
+		// Simplify alternatives may have introduced broken (consecutive) dissect captures.
 		{"fix consecutive dissect captures", fixDissectCaptures},
 
 		{"fix repetition at edge of alternatives", fixAlternativesEdgeSpace},
@@ -97,10 +95,11 @@ var transforms = PostprocessGroup{
 
 		{"split alternatives into dissect patterns", splitDissect},
 
-		//{"fix extra leading space in constants (2)", fixExtraLeadingSpaceInConstants},
 		{"fix extra space in constants", fixExtraSpaceInConstants},
 
 		{"make dissect captures greedy", makeDissectGreedy},
+
+		{"fix consecutive dissect captures", fixDissectCaptures},
 	},
 }
 

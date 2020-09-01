@@ -50,6 +50,9 @@ var preactions = PostprocessGroup{
 	Title: "pre-actions",
 	Actions: []Action{
 		{"strip leading and trailing space in messages", stripLeadingSpace},
+
+		{"strip consecutive spaces in messages", stripConsecutiveSpace},
+
 		{"adjust payload field", setPayloadField},
 	},
 }
@@ -1373,42 +1376,92 @@ func injectCapturesInAlts(parser *Parser) (err error) {
 	return err
 }
 
+func stripConsecutiveSpacePattern(p Pattern, prevWasSpace bool) bool {
+	for idx, item := range p {
+		switch v := item.(type) {
+		case Constant:
+			var result []byte
+			for _, chr := range []byte(v.Value()) {
+				if chr == ' ' {
+					if prevWasSpace {
+						continue
+					}
+					prevWasSpace = true
+				} else {
+					prevWasSpace = false
+				}
+				result = append(result, chr)
+			}
+			p[idx] = Constant(result)
+		case Alternatives:
+			allEndInSpace := true
+			for _, alt := range v {
+				allEndInSpace = stripConsecutiveSpacePattern(alt, prevWasSpace) && allEndInSpace
+			}
+			prevWasSpace = allEndInSpace
+		default:
+			prevWasSpace = false
+		}
+	}
+	return prevWasSpace
+}
+
+func stripConsecutiveSpace(parser *Parser) error {
+	// TODO: Own flag
+	if !parser.Config.Fixes.TrimEdgeSpace {
+		return nil
+	}
+	for _, msg := range parser.Messages {
+		stripConsecutiveSpacePattern(msg.content, false)
+	}
+	return nil
+}
+
+func trimWhitespace(p Pattern, side int) Pattern {
+	access := func(p Pattern) *Value {
+		return &p[0]
+	}
+	strip := Pattern.StripLeft
+	trim := strings.TrimLeft
+	if side == rightSide {
+		access = func(p Pattern) *Value {
+			return &p[len(p)-1]
+		}
+		trim = strings.TrimRight
+		strip = Pattern.StripRight
+	}
+	if len(p) == 0 {
+		return p
+	}
+	ptr := access(p)
+	switch v := (*ptr).(type) {
+	case Constant:
+		if trimmed := trim(v.Value(), " "); trimmed != v.Value() {
+			if len(trimmed) > 0 {
+				*ptr = Constant(trimmed)
+			} else {
+				p = strip(p)
+			}
+		}
+	case Alternatives:
+		for idx, alt := range v {
+			v[idx] = trimWhitespace(alt, side)
+		}
+		*ptr = v
+	}
+	return p
+}
+
 func stripLeadingSpace(parser *Parser) error {
 	if !parser.Config.Fixes.TrimEdgeSpace {
 		return nil
 	}
-	countL, countR := 0, 0
-	for idx := range parser.Messages {
-		if len(parser.Messages[idx].content) == 0 {
+	for idx, msg := range parser.Messages {
+		if len(msg.content) == 0 {
 			continue
 		}
-		if ct, ok := parser.Messages[idx].content[0].(Constant); ok {
-			if trimmed := strings.TrimLeft(ct.Value(), " "); trimmed != ct.Value() {
-				countL++
-				if len(trimmed) > 0 {
-					parser.Messages[idx].content[0] = Constant(trimmed)
-				} else {
-					parser.Messages[idx].content = parser.Messages[idx].content[1:]
-				}
-			}
-		}
-		n := len(parser.Messages[idx].content)
-		if n == 0 {
-			continue
-		}
-		if ct, ok := parser.Messages[idx].content[n-1].(Constant); ok {
-			if trimmed := strings.TrimRight(ct.Value(), " "); trimmed != ct.Value() {
-				countR++
-				if len(trimmed) > 0 {
-					parser.Messages[idx].content[n-1] = Constant(trimmed)
-				} else {
-					parser.Messages[idx].content = parser.Messages[idx].content[:n-1]
-				}
-			}
-		}
-	}
-	if countL+countR > 0 {
-		log.Printf("INFO - Trimmed %d leading spaces and %d trailing spaces from %d messages", countL, countR, len(parser.Messages))
+		msg.content = trimWhitespace(trimWhitespace(msg.content, leftSide), rightSide)
+		parser.Messages[idx] = msg
 	}
 	return nil
 }

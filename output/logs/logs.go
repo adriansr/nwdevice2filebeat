@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -476,6 +477,8 @@ type lineComposer struct {
 	history     []string
 }
 
+var removeWhitespace = regexp.MustCompile(" +")
+
 func (lc *lineComposer) Build() (string, error) {
 	// Try to balance hinting captures with actual captures for each field.
 	fldCaptures := make(map[string]int)
@@ -538,7 +541,7 @@ func (lc *lineComposer) Build() (string, error) {
 			return "", errors.Errorf("no support for type %T when building log", v)
 		}
 	}
-	return sb.String(), nil
+	return removeWhitespace.ReplaceAllString(sb.String(), " "), nil
 }
 
 func (lc *lineComposer) valueFor(field string) (value string, err error) {

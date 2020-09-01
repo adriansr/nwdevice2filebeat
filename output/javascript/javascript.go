@@ -205,7 +205,22 @@ func generate(op parser.Operation, out *output.CodeWriter) {
 			}
 			out.Write("}")
 		} else {
-			out.Write("match(").JS(v.ID).Write(", ").JS(v.Input).Write(", ").JS(v.Pattern.Tokenizer())
+			fn := "match"
+			arg := v.Pattern.Tokenizer()
+			// If this is a single capture dissect pattern, i.e. "%{fld}" or "%{}",
+			// replace with a call to match_copy, which will be faster and supports
+			// empty input. (Dissect always fails for empty input).
+			switch len(v.Pattern) {
+			case 0:
+				fn = "match_copy"
+				arg = ""
+			case 1:
+				if fld, ok := v.Pattern[0].(parser.Field); ok {
+					fn = "match_copy"
+					arg = fld.Name
+				}
+			}
+			out.Writef("%s(", fn).JS(v.ID).Write(", ").JS(v.Input).Write(", ").JS(arg)
 		}
 		if len(v.OnSuccess) > 0 {
 			out.Write(", processor_chain([").

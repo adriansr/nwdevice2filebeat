@@ -187,6 +187,29 @@ function match(id, src, pattern, on_success) {
     };
 }
 
+function match_copy(id, src, dst, on_success) {
+    dst = FIELDS_PREFIX + dst;
+    if (dst === FIELDS_PREFIX || dst === src) {
+        return function (evt) {
+            if (debug) {
+                console.debug("noop      OK: " + id + " field:" + src);
+                console.debug("       input: <<" + evt.Get(src) + ">>");
+            }
+            if (on_success != null) on_success(evt);
+        }
+    }
+    return function (evt) {
+        var msg = evt.Get(src);
+        evt.Put(dst, msg);
+        if (debug) {
+            console.debug("copy      OK: " + id + " field:" + src);
+            console.debug("      target: '" + dst + "'");
+            console.debug("       input: <<" + msg + ">>");
+        }
+        if (on_success != null) on_success(evt);
+    }
+}
+
 function cleanup_flags(processor) {
     return function(evt) {
         processor(evt);

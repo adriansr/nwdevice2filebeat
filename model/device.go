@@ -5,6 +5,7 @@
 package model
 
 import (
+	"bytes"
 	"compress/gzip"
 	"encoding/xml"
 	"fmt"
@@ -113,6 +114,10 @@ func (dev *Device) load() error {
 		if err != nil {
 			return errors.Wrapf(err, "error reading at %s", pos)
 		}
+		if isBadEncoding(token) {
+			return errors.Errorf("error decoding at %s: Invalid codepoint (U+0092) detected. This is usually caused by using the &#x092 XML entity in place of a Right Single Quotation Mark. Edit the pipeline to remove this codepoint.",
+				pos)
+		}
 		fn, exists := xmlStates[state]
 		if !exists {
 			return errors.Errorf("at %s: internal error: unknown state %v", pos, state)
@@ -135,6 +140,38 @@ func (dev *Device) load() error {
 	}
 	log.Printf("loaded %d elements", numItems)
 	return nil
+}
+
+// Look for wrong usages of &#x92 (U+0092, PRIVATE USE TWO) when the
+// parser author probably meant (U+2019, RIGHT SINGLE QUOTATION MARK).
+//
+// This seems to be caused by:
+// - Input logs are in microsoft's windows1252 codepage which interprets
+//   0x092 byte as a right-single-quotation-mark.
+// - Parser author (or netwitness software) uses &#xNN xml entity in
+//   the hopes that it translates to a byte, while it translates to
+//   an unicode codepoint with a completely different meaning.
+//
+// Ideally this could be replaced by U+2019, but it's better to edit
+// the XML parser so that the quote is ignored or at the ASCII
+// single-quote (U+0027) is also accepted. This is to avoid parsing
+// errors, as the original logs may not use this kind of quote after
+// all.
+func isBadEncoding(token xml.Token) bool {
+	checkBadRune := func(b []byte) bool {
+		return bytes.ContainsRune(b, 0x92)
+	}
+	switch v := token.(type) {
+	case xml.StartElement:
+		for _, attr := range v.Attr {
+			if checkBadRune([]byte(attr.Value)) {
+				return true
+			}
+		}
+	case xml.CharData:
+		return checkBadRune(v)
+	}
+	return false
 }
 
 type stateFn func(token xml.Token, decoder *xml.Decoder) (XMLElement, xmlState, error)

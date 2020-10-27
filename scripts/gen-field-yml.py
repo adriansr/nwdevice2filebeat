@@ -7,6 +7,15 @@ import sys
 import yaml
 from shared import *
 
+# These fields are set outside the NW parser (ingest pipeline)
+hardcoded_ecs_fields = [
+    'event.ingested',
+    'error.message',
+    'source.as.number',
+    'source.as.organization.name',
+    'destination.as.number',
+    'destination.as.organization.name',
+]
 
 def read_ecs_fields(f):
     def flatten(fields):
@@ -82,7 +91,7 @@ with open(sys.argv[2], 'r') as f:
         if typ not in type_to_es:
             raise Exception('unsupported type: {} in {}'.format(typ, row))
         es_type = type_to_es[typ]
-        if es_type is None or es_type is 'mac':
+        if es_type is None or es_type == 'mac':
             es_type = 'keyword'
         for field in filter(str.__len__, [row[idx] for idx in [MAP, ALT]]):
             if is_rsa_field(field):
@@ -105,6 +114,12 @@ with open(sys.argv[2], 'r') as f:
                     print('WARNING: Undocumented ECS field ' + field)
                     ref = {'type': es_type}
                 ecs[field] = ref
+
+for add_field in hardcoded_ecs_fields:
+    if add_field not in ecs:
+        if add_field not in ecs_ref:
+            raise Exception('hardcoded field {} is not documented'.format(add_field))
+        ecs[add_field] = ecs_ref[add_field]
 
 for action in [(rsa, 'fields.yml'), (ecs, 'ecs.yml')]:
     print('Saving {} ...'.format(action[1]))

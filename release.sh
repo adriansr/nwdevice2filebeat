@@ -13,6 +13,7 @@ ARGS="-F whitespace -O deduplicate,globals"
 BASE_PORT=9522
 FILESETS=""
 DO_MODULE=${DO_MODULE:-1}
+INSTALL_MODULE=${INSTALL_MODULE:-1}
 DO_PACKAGE=${DO_PACKAGE:-1}
 
 die() {
@@ -194,7 +195,7 @@ fi
 rm -rf $OUTPUT
 foreach_line "$BATCH" convert_device
 
-if [ "$DO_MODULE" = 1 ]
+if [ "$DO_MODULE" = 1 -a "$INSTALL_MODULE" = 1 ]
 then
     echo ''
     echo 'Cleaning up beats repo'

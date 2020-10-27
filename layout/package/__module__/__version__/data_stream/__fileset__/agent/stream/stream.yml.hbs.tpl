@@ -13,7 +13,9 @@ fields:
         vendor: ((.Vendor | printf "%q"))
         product: ((.Product | printf "%q"))
         type: ((.Group | printf "%q"))
+{{#contains tags "forwarded"}}
 publisher_pipeline.disable_host: true
+{{/contains}}
 
 processors:
 ((- setvar "basedir" (print "${path.home}/module/" .Module "/" .Fileset) -))

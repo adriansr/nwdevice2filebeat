@@ -9,12 +9,18 @@ from shared import *
 
 # These fields are set outside the NW parser (ingest pipeline)
 hardcoded_ecs_fields = [
-    'event.ingested',
-    'error.message',
-    'source.as.number',
-    'source.as.organization.name',
     'destination.as.number',
     'destination.as.organization.name',
+    'error.message',
+    'event.ingested',
+    'event.original',
+    'observer.type',
+    'observer.vendor',
+    'related.ip',
+    'source.as.number',
+    'source.as.organization.name',
+    'tags',
+    'event.original',
 ]
 
 def read_ecs_fields(f):

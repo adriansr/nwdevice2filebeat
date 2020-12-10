@@ -34,7 +34,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Server Application,This key is used to capture the name of the server application only,application,server,Text,Transient,,,,network.application,,91,misc,server,keyword
 1,Miscellaneous,Event Source,This key captures Source of the event that’s not a hostname,event_source,event.source,Text,None,,,,rsa.misc.event_source,related.hosts,90,misc,event_source,keyword
 1,Network,Service Name,"This is used to capture descriptive service name, typically seen in Windows",service,service.name,Text,None,,,,service.name,,88,network,service_name,keyword
-1,,,,domain,domain,Text,None,,,,server.domain,rsa.network.domain,84,network,domain,keyword
+1,,,,domain,domain,Text,None,,,,server.domain,rsa.network.domain,84,network,domain,keyword,related.hosts
 1,Miscellaneous,Event Session ID,This key is used to capture a sessionid from the session directly,sessionid,log.session.id,Text,Transient,,,,rsa.misc.log_session_id,,82,misc,log_session_id,keyword
 1,Miscellaneous,Group Name,This key captures the Group Name value,group,group,Text,None,,,,rsa.misc.group,group.name,81,misc,group,keyword
 1,Network,Destination Hostname,This key should only be used when it’s a Destination Hostname,dhost,host.dst,Text,None,,,,rsa.network.host_dst,destination.address,81,network,host_dst,keyword,related.hosts

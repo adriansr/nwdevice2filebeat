@@ -7,6 +7,7 @@ host.name,by_prio,hostname,host
 destination.ip,append
 source.ip,append
 related.user,append
+related.hosts,append
 event.action,by_prio,action,event_type
 host.ip,by_prio,hostip,hostip_v6,devicehostip,alias.ip,alias.ipv6
 source.port,by_prio,sport,port.src,tcp.srcport,udp.srcport

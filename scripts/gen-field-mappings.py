@@ -34,7 +34,7 @@ append = {'mode': 'append'}
 
 
 def process_row(row):
-    lst = filter(str.__len__, [row[idx] for idx in [MAP, ALT]])
+    lst = filter(str.__len__, [row[idx] if idx < len(row) else '' for idx in [MAP, ALT, EXTRA]])
     typ = row[TYPE]
     if typ not in type_to_es:
         raise Exception('unsupported type: {}'.format(typ))

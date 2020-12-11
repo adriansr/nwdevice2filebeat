@@ -2017,6 +2017,7 @@ function do_populate(evt, base, targets) {
         var mapping = targets[key];
         if (mapping === undefined) continue;
         var value = base[key];
+        if (value === "") continue;
         if (mapping.convert !== undefined) {
             value = mapping.convert(value);
             if (value === undefined) {

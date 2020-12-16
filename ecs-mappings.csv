@@ -1,4 +1,4 @@
-revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,flags,nullTokens,failureKey,failureMapping,ecsName,Proposed,nbOccurrences,shortMeta,name_noDot, old ecsType
+revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,flags,nullTokens,failureKey,failureMapping,ecsName,Proposed,nbOccurrences,shortMeta,name_noDot, old ecsType,extra ecs
 1,Reserved,Message,This key is used to capture the raw message that comes into the Log Decoder,msg,msg,Text,Transient,,,,rsa.internal.msg,log.original,272,internal,msg,text
 1,,,,messageid,,,,,,,rsa.internal.messageid,event.code,270,internal,messageid,keyword
 1,Time,Event Time,This key is used to capture the time mentioned in a raw session that represents the actual time an event occured in a standard normalized form,event_time,event.time,TimeT,None,,,,rsa.time.event_time,@timestamp,253,time,event_time,keyword
@@ -28,16 +28,16 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Result Code,This key is used to capture the outcome/result numeric value of an action in a session,resultcode,result.code,Text,None,,,,rsa.misc.result_code,,112,misc,result_code,keyword
 1,Miscellaneous,Category,This key is used to capture the category of an event given by the vendor in the session,category,category,Text,None,,,,rsa.misc.category,,105,misc,category,keyword
 1,Miscellaneous,Object Name,This is used to capture name of object,obj_name,obj.name,Text,None,,,,rsa.misc.obj_name,,102,misc,obj_name,keyword
-1,Network,Source Hostname,This key should only be used when it’s a Source Hostname.,shost,host.src,Text,None,,,,host.hostname,source.address,99,network,host_src,keyword
+1,Network,Source Hostname,This key should only be used when it’s a Source Hostname.,shost,host.src,Text,None,,,,host.hostname,source.address,99,network,host_src,keyword,related.hosts
 1,Miscellaneous,Object Type,This is used to capture type of object,obj_type,obj.type,Text,None,,,,rsa.misc.obj_type,,96,misc,obj_type,keyword
 1,Web,URL,This key is used for capturing complete url,url,url,Text,Transient,,,,url.original,,93,web,url,keyword
 1,Miscellaneous,Server Application,This key is used to capture the name of the server application only,application,server,Text,Transient,,,,network.application,,91,misc,server,keyword
-1,Miscellaneous,Event Source,This key captures Source of the event that’s not a hostname,event_source,event.source,Text,None,,,,rsa.misc.event_source,,90,misc,event_source,keyword
+1,Miscellaneous,Event Source,This key captures Source of the event that’s not a hostname,event_source,event.source,Text,None,,,,rsa.misc.event_source,related.hosts,90,misc,event_source,keyword
 1,Network,Service Name,"This is used to capture descriptive service name, typically seen in Windows",service,service.name,Text,None,,,,service.name,,88,network,service_name,keyword
-1,,,,domain,domain,Text,None,,,,server.domain,rsa.network.domain,84,network,domain,keyword
+1,,,,domain,domain,Text,None,,,,server.domain,rsa.network.domain,84,network,domain,keyword,related.hosts
 1,Miscellaneous,Event Session ID,This key is used to capture a sessionid from the session directly,sessionid,log.session.id,Text,Transient,,,,rsa.misc.log_session_id,,82,misc,log_session_id,keyword
 1,Miscellaneous,Group Name,This key captures the Group Name value,group,group,Text,None,,,,rsa.misc.group,group.name,81,misc,group,keyword
-1,Network,Destination Hostname,This key should only be used when it’s a Destination Hostname,dhost,host.dst,Text,None,,,,rsa.network.host_dst,destination.address,81,network,host_dst,keyword
+1,Network,Destination Hostname,This key should only be used when it’s a Destination Hostname,dhost,host.dst,Text,None,,,,rsa.network.host_dst,destination.address,81,network,host_dst,keyword,related.hosts
 1,Counters,Device class Counter 1,This is a generic counter key that should be used with the label dclass.c1.str only,dclass_counter1,dclass.c1,Int32,Transient,,,,rsa.counters.dclass_c1,,80,counters,dclass_c1,integer
 1,Miscellaneous,Policy Name,This key is used to capture the Policy Name only.,policyname,policy.name,Text,None,,,,rsa.misc.policy_name,,80,misc,policy_name,keyword
 1,Identity,Source User Account,This key should only be used to capture the Secondary/Source User in the event,c_username,user.src,Text,None,none|-,,,related.user,user.name,77,identity,user_src,keyword
@@ -97,7 +97,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,,Privilege,"Deprecated, use permissions",privilege,privilege,Text,Transient,,,,rsa.file.privilege,,31,file,privilege,keyword
 1,Identity,User Role,This key is used to capture the Role of a user only,user_role,user.role,Text,Transient,,,,rsa.identity.user_role,,31,identity,user_role,keyword
 1,Miscellaneous,Event Log Name,This key captures the Name of the event log,event_log,event.log,Text,Transient,,,,rsa.misc.event_log,,30,misc,event_log,keyword
-1,Web,FQDN,Fully Qualified Domain Names,fqdn,fqdn,Text,None,,,,rsa.web.fqdn,,29,web,fqdn,keyword
+1,Web,FQDN,Fully Qualified Domain Names,fqdn,fqdn,Text,None,,,,rsa.web.fqdn,related.hosts,29,web,fqdn,keyword
 1,,User Account,"Deprecated, use user",administrator,username,Text,None,none|-,,,related.user,user.name,29,identity,username,keyword
 1,,,,hostid,alias.host,Text,None,,,,rsa.network.alias_host,,28,network,alias_host,keyword
 1,,,Deprecated key defined only in table map.,data,data,Text,Transient,,,,rsa.internal.data,,28,internal,data,keyword
@@ -137,7 +137,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Cryptography,Cipher Name,This key is used to capture the Encryption Type or Encryption Key only,encryption_type,crypto,Text,Transient,,,,rsa.crypto.crypto,,18,crypto,crypto,keyword
 1,Time,Recorded time,The event time as recorded by the system the event is collected from. The usage scenario is a multi-tier application where the management layer of the system records it's own timestamp at the time of collection from its child nodes. Must be in timestamp format.,recorded_time,recorded.time,TimeT,Transient,,,,rsa.time.recorded_time,,18,time,recorded_time,keyword
 1,Miscellaneous,Virtual system name,This key captures Virtual System Name,vsys,vsys,Text,Transient,,,,rsa.misc.vsys,,18,misc,vsys,keyword
-1,Web,Web request Domain,This key captures Domain name in the Web Request,web_domain,web.domain,Text,Transient,,,,url.domain,,18,web,web_domain,keyword
+1,Web,Web request Domain,This key captures Domain name in the Web Request,web_domain,web.domain,Text,Transient,,,,url.domain,related.hosts,18,web,web_domain,keyword
 1,Miscellaneous,Connection ID,This key captures the Connection ID,connectionid,connection.id,Text,Transient,,,,rsa.misc.connection_id,,17,misc,connection_id,keyword
 1,Investigations,Vendor supplied Event Category,This is a vendor supplied category. This should be used in situations where the vendor has adopted their own event_category taxonomy.,vendor_event_cat,event.vcat,Text,Transient,,,,rsa.investigations.event_vcat,,17,investigations,event_vcat,keyword
 1,Miscellaneous,Packets Total,"This key is the total number of packets sent/received in a session. Also, in cases where the Sent or Received context is not clear, this can be used.",packets,packets,UInt32,Transient,(null)|-,,,network.packets,,17,misc,packets,long
@@ -197,7 +197,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Rule Unique ID,This key is the Unique Identifier for a rule.,rule_uid,rule.uid,Text,Transient,,,,rsa.misc.rule_uid,,9,misc,rule_uid,keyword
 1,,Source Domain,"Deprecated, use domain.src",c_domain,sdomain,Text,Transient,,,,source.domain,,9,network,sdomain,keyword
 1,Miscellaneous,Trigger Description,This key captures the Description of the trigger or threshold condition.,trigger_desc,trigger.desc,Text,Transient,,,,rsa.misc.trigger_desc,,9,misc,trigger_desc,keyword
-1,,,,host,,,,,,,host.name,,9,network,host,keyword
+1,,,,host,,,,,,,host.name,related.hosts,9,network,host,keyword
 1,,,,inout,,,,,,,rsa.misc.inout,,9,misc,inout,keyword
 1,,,,p_msgid,,,,,,,rsa.misc.p_msgid,,9,misc,p_msgid,keyword
 1,,Child Pid,"Deprecated, use process.id",child_pid,child.pid,Int32,Transient,,child.pid.val,child_pid_val,process.pid,,8,misc,child_pid,long
@@ -209,7 +209,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,,,,process_src,process.src,Text,Transient,,,,process.parent.name,,8,misc,process_src,keyword
 1,Network,Network mask Source,This key is used for capturing source Network Mask,smask,smask,Text,Transient,,,,rsa.network.smask,,8,network,smask,keyword
 1,Database,SQL Transaction ID,This key captures the SQL transantion ID of the current session,trans_id,transact.id,Text,Transient,,,,rsa.db.transact_id,,8,db,transact_id,keyword
-1,Web,Web referer Domain,Web referer's domain,web_ref_domain,web.ref.domain,Text,Transient,,,,rsa.web.web_ref_domain,,8,web,web_ref_domain,keyword
+1,Web,Web referer Domain,Web referer's domain,web_ref_domain,web.ref.domain,Text,Transient,,,,rsa.web.web_ref_domain,related.hosts,8,web,web_ref_domain,keyword
 1,,,,data_type,,,,,,,rsa.misc.data_type,,8,misc,data_type,keyword
 1,,,,msgIdPart4,,,,,,,rsa.misc.msgIdPart4,,8,misc,msgIdPart4,keyword
 1,Cryptography,Source (Server) Cipher size,This key captures Source (Client) Cipher Size,s_ciphersize,cipher.size.src,Int32,Transient,,,,rsa.crypto.cipher_size_src,,7,crypto,cipher_size_src,integer

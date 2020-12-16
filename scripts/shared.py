@@ -8,6 +8,7 @@ SRC = 4
 TYPE = 6
 MAP = 11
 ALT = 12
+EXTRA = 17
 
 # Conversions
 type_to_es = {

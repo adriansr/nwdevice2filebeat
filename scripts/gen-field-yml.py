@@ -99,7 +99,7 @@ with open(sys.argv[2], 'r') as f:
         es_type = type_to_es[typ]
         if es_type is None or es_type == 'mac':
             es_type = 'keyword'
-        for field in filter(str.__len__, [row[idx] for idx in [MAP, ALT]]):
+        for field in filter(str.__len__, [row[idx] if idx < len(row) else '' for idx in [MAP, ALT, EXTRA]]):
             if is_rsa_field(field):
                 if field in rsa:
                     if rsa[field]['type'] != es_type:

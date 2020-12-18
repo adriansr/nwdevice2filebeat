@@ -27,9 +27,8 @@ policy_templates:
       - type: file
         title: Collect logs from ((.DisplayName)) via file
         description: Collecting syslog from ((.DisplayName)) via file.
-# No icon
-icons:
 ((- if .Icon ))
+icons:
  - src: /img/logo.svg
    title: ((.DisplayName)) logo
    size: 32x32

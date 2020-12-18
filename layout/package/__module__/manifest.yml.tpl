@@ -5,7 +5,6 @@ version: ((.Version))
 description: ((.DisplayName)) Integration
 categories: ((.Categories | tojson))
 release: experimental
-removable: true
 license: basic
 type: integration
 conditions:
@@ -34,3 +33,6 @@ icons:
    size: 32x32
    type: image/svg+xml
 (( end ))
+owner:
+  github: elastic/security-external-integrations
+    

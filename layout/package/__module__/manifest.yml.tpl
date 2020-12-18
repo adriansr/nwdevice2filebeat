@@ -8,10 +8,7 @@ release: experimental
 license: basic
 type: integration
 conditions:
-    kibana:
-        version: '^7.10.0'
-    elasticsearch:
-        version: '^7.10.0'
+    kibana.version: '^7.10.0'
 policy_templates:
 - name: ((.Fileset))
   title: ((.DisplayName))

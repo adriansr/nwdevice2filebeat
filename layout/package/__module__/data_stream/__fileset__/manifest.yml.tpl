@@ -54,7 +54,6 @@ streams:
         required: false
         show_user: false
         default: false
-    
   - input: tcp
     title: ((.DisplayName)) logs
     description: Collect ((.DisplayName)) logs
@@ -107,8 +106,8 @@ streams:
         required: false
         show_user: false
         default: false
-    
   - input: file
+    enabled: false
     title: ((.DisplayName)) logs
     description: Collect ((.DisplayName)) logs from file
     vars:

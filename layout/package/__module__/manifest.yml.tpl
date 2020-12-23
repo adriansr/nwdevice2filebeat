@@ -29,6 +29,6 @@ icons:
     title: ((.DisplayName)) logo
     size: 32x32
     type: image/svg+xml
-(( end ))
+((- end ))
 owner:
   github: elastic/security-external-integrations

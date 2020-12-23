@@ -145,7 +145,7 @@ test_fileset() {
         TESTING_FILEBEAT_MODULES=$MOD                \
         TESTING_FILEBEAT_FILESETS=$FST               \
         GENERATE=1                                   \
-        nosetests -v -s tests/system/test_xpack_modules.py || die "Generating golden files failed"
+        pytest -v -s tests/system/test_xpack_modules.py || die "Generating golden files failed"
 
     echo ""
     echo "Testing $MOD/$FST [$LINE/$LINES]"
@@ -153,7 +153,7 @@ test_fileset() {
         INTEGRATION_TESTS=1                          \
         TESTING_FILEBEAT_MODULES=$MOD                \
         TESTING_FILEBEAT_FILESETS=$FST               \
-        nosetests -v -s tests/system/test_xpack_modules.py || die "Generating golden files failed"
+        pytest -v -s tests/system/test_xpack_modules.py || die "Generating golden files failed"
 
     popd
 }

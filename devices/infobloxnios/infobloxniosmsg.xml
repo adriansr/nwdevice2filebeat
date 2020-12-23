@@ -10,14 +10,14 @@
 		device="2.0" />
 	
 <HEADER
+	id1="001"
+	id2="001"
+	content="&lt;month&gt; &lt;day&gt; &lt;time&gt; &lt;hhostname&gt; &lt;messageid&gt;[&lt;data&gt;]: &lt;!payload&gt;"		/>
+<HEADER
 	id1="006"
 	id2="006"
 	content="&lt;month&gt; &lt;day&gt; &lt;time&gt; &lt;hhostname&gt; {&lt;hhostip&gt;&lt;messageid&gt;[&lt;data&gt;]|&lt;hhostip&gt;&lt;messageid&gt;}: &lt;!payload&gt;"/>
 
-<HEADER
-	id1="001"
-	id2="001"
-	content="&lt;month&gt; &lt;day&gt; &lt;time&gt; &lt;hhostname&gt; &lt;messageid&gt;[&lt;data&gt;]: &lt;!payload&gt;"		/>
 <HEADER
 	id1="005"
 	id2="005"

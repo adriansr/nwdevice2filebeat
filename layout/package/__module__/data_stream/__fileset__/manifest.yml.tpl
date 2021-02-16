@@ -106,7 +106,7 @@ streams:
         required: false
         show_user: false
         default: false
-  - input: file
+  - input: logfile
     enabled: false
     title: ((.DisplayName)) logs
     description: Collect ((.DisplayName)) logs from file

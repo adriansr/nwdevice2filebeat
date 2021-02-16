@@ -20,7 +20,7 @@ policy_templates:
       - type: tcp
         title: Collect logs from ((.DisplayName)) via TCP
         description: Collecting syslog from ((.DisplayName)) via TCP
-      - type: file
+      - type: logfile
         title: Collect logs from ((.DisplayName)) via file
         description: Collecting syslog from ((.DisplayName)) via file.
   ((- if .Icon ))

@@ -10,7 +10,6 @@ BATCH="$1"
 BEATS_DIR="$2"
 OUTPUT=generated.output
 ARGS="-F whitespace -O deduplicate,globals"
-BASE_PORT=9522
 FILESETS=""
 DO_MODULE=${DO_MODULE:-1}
 INSTALL_MODULE=${INSTALL_MODULE:-1}
@@ -35,7 +34,7 @@ convert_device() {
     TYPE=$(echo $ROW | cut -d, -f6)
     VERSION=$(echo $ROW | cut -d, -f7)
     CATEGORIES=$(echo $ROW | cut -d, -f9 | tr ';' ,)
-    PORT=$(expr $BASE_PORT + $LINE)
+    PORT=$(echo $ROW | cut -d, -f10)
     DIR=$OUTPUT/$DEV
     PRODINFO="--vendor $VENDOR --product $PROD --type $TYPE"
     test -d devices/$DEV || die "Device $DEV does not exists"
@@ -50,25 +49,28 @@ convert_device() {
     echo "$DEV: generating package [$LINE/$LINES]" >> $DIR/output.log 2>&1
     ./nwdevice2filebeat generate package --device devices/$DEV/ $ARGS $PRODINFO --output $DIR/package --port $PORT \
         --module $MOD --fileset $FST --categories "$CATEGORIES" --version $VERSION >> $DIR/output.log 2>&1 || die "Failed generating package"
-    if test "$DO_MODULE" = "1"
+    echo "$DEV: generating logs [$LINE/$LINES]"
+    echo "$DEV: generating logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
+
+    mkdir -p $DIR/module/$MOD/$FST/test
+
+    ./nwdevice2filebeat generate logs --device devices/$DEV $ARGS --output $DIR/module/$MOD/$FST/test/generated.log --lines 100 >> $DIR/output.log 2>&1
+    if test $? -eq 0
     then
-        echo "$DEV: generating logs [$LINE/$LINES]"
-        echo "$DEV: generating logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
-        mkdir $DIR/module/$MOD/$FST/test
-        ./nwdevice2filebeat generate logs --device devices/$DEV $ARGS --output $DIR/module/$MOD/$FST/test/generated.log --lines 100 >> $DIR/output.log 2>&1
-        if test $? -eq 0
-        then
-            echo "$DEV: testing logs [$LINE/$LINES]"
-            echo "$DEV: testing logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
-            ./nwdevice2filebeat run --device devices/$DEV $ARGS --logs $DIR/module/$MOD/$FST/test/generated.log >> $DIR/output.log 2>&1 || logerr "Failed testing logs"
-        else
-            logerr "Failed generating logs for $DEV"
-        fi
-        for log_file in $(ls samples/$DEV/*.log 2>/dev/null)
-        do
-            cp $log_file $DIR/module/$MOD/$FST/test/
-        done
+        echo "$DEV: testing logs [$LINE/$LINES]"
+        echo "$DEV: testing logs [$LINE/$LINES]" >> $DIR/output.log 2>&1
+        ./nwdevice2filebeat run --device devices/$DEV $ARGS --logs $DIR/module/$MOD/$FST/test/generated.log >> $DIR/output.log 2>&1 || logerr "Failed testing logs"
+    else
+        logerr "Failed generating logs for $DEV"
     fi
+    mkdir -p $DIR/package/$MOD/_dev/deploy/docker/sample_logs
+    cp $DIR/module/$MOD/$FST/test/generated.log $DIR/package/$MOD/_dev/deploy/docker/sample_logs/$MOD-$FST-generated.log
+
+    for log_file in $(ls samples/$DEV/*.log 2>/dev/null)
+    do
+        cp $log_file $DIR/module/$MOD/$FST/test/
+        cp $log_file $DIR/package/$MOD/_dev/deploy/docker/sample_logs/$MOD-$FST-$(basename $log_file)
+    done
 }
 
 module_to_fb() {

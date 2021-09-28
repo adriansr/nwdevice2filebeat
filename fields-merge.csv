@@ -4,8 +4,6 @@ event.code,by_prio,id,messageid
 rsa.misc.action,append
 rsa.network.alias_host,append
 host.name,by_prio,hostname,host
-destination.ip,append
-source.ip,append
 related.user,append
 related.hosts,append
 event.action,by_prio,action,event_type

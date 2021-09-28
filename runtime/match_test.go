@@ -11,11 +11,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type P = parser.Pattern
-type C = parser.Constant
-type F = parser.Field
-type Y = parser.Payload
-type A = parser.Alternatives
+type (
+	P = parser.Pattern
+	C = parser.Constant
+	A = parser.Alternatives
+)
+
+func F(f string) parser.Field {
+	return parser.Field{Name: f}
+}
+
+func Y(f string) parser.Payload {
+	return parser.Payload{Name: f}
+}
 
 func s(str string) []byte {
 	return []byte(str)

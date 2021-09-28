@@ -179,7 +179,8 @@ func TestMergeOverlapped(t *testing.T) {
 		},
 	} {
 		t.Run(test.title, func(t *testing.T) {
-			result, ok := lc.mergeOverlapped(test.header, test.message)
+			var lc lineComposer
+			_, result, ok := lc.mergeOverlapped(test.header, test.message)
 			assert.Equal(t, test.ok, ok)
 			assert.Equal(t, test.expected, result)
 		})

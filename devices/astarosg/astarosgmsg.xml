@@ -19,13 +19,12 @@
 <HEADER
 	id1="0001"
 	id2="0001"
-	content="&lt;hfld1&gt;  &lt;messageid&gt;[&lt;process_id&gt;]: &lt;!payload&gt;"/>
-		
-	
+	content="&lt;hfld1&gt; &lt;hostname&gt; &lt;messageid&gt;[&lt;process_id&gt;]: &lt;!payload&gt;"/>
+
 <HEADER
 	id1="0002"
 	id2="0002"
-	content="&lt;hfld1&gt; &lt;hostname&gt; &lt;messageid&gt;[&lt;process_id&gt;]: &lt;!payload&gt;"/>
+	content="&lt;hfld1&gt;  &lt;messageid&gt;[&lt;process_id&gt;]: &lt;!payload&gt;"/>
 	
 <HEADER
 	id1="0003"

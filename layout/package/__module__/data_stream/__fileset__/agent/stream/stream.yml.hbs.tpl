@@ -4,6 +4,9 @@ paths:
 {{/each}}
 exclude_files: [".gz$"]
 tags:
+{{#if preserve_original_event}}
+  - preserve_original_event
+{{/if}}
 {{#each tags as |tag i|}}
  - {{tag}}
 {{/each}}
@@ -13,11 +16,13 @@ fields:
         vendor: ((.Vendor | printf "%q"))
         product: ((.Product | printf "%q"))
         type: ((.Group | printf "%q"))
-{{#contains tags "forwarded"}}
+{{#contains "forwarded" tags}}
 publisher_pipeline.disable_host: true
 {{/contains}}
-
 processors:
+{{#if processors}}
+{{processors}}
+{{/if}}
 ((- setvar "basedir" (print "${path.home}/module/" .Module "/" .Fileset) -))
 ((- setvar "var_prefix" "" -))
 ((- getvar "extra_processors" -))
@@ -65,7 +70,3 @@ processors:
     target_subdomain_field: url.subdomain
     target_etld_field: url.top_level_domain
 - add_locale: ~
-- add_fields:
-    target: ''
-    fields:
-        ecs.version: 1.8.0

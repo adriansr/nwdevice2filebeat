@@ -30,7 +30,7 @@ source.nat.port,by_prio,stransport,port.trans.src
 destination.nat.port,by_prio,dtransport,port.trans.dst
 url.domain,by_prio,urldomain,web_domain
 rsa.misc.connection_id,by_prio,connectionid,connection_id
-process.ppid,by_prio,parent_pid,process_id_src
+process.parent.pid,by_prio,parent_pid,process_id_src
 user.full_name,by_prio,user_fullname,patient_fullname
 rsa.wireless.wlan_ssid,by_prio,ssid,bssid
 destination.domain,by_prio,ddomain,domain.dst

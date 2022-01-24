@@ -1,5 +1,5 @@
 revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,flags,nullTokens,failureKey,failureMapping,ecsName,Proposed,nbOccurrences,shortMeta,name_noDot, old ecsType,extra ecs
-1,Reserved,Message,This key is used to capture the raw message that comes into the Log Decoder,msg,msg,Text,Transient,,,,rsa.internal.msg,log.original,272,internal,msg,text
+1,Reserved,Message,This key is used to capture the raw message that comes into the Log Decoder,msg,msg,Text,Transient,,,,rsa.internal.msg,message,272,internal,msg,text
 1,,,,messageid,,,,,,,rsa.internal.messageid,event.code,270,internal,messageid,keyword
 1,Time,Event Time,This key is used to capture the time mentioned in a raw session that represents the actual time an event occured in a standard normalized form,event_time,event.time,TimeT,None,,,,rsa.time.event_time,@timestamp,253,time,event_time,keyword
 1,Identity,Destination User Account,This key should only be used to capture the Primary/Destination User in the event,username,user.dst,Text,None,none|-,,,related.user,user.name,248,identity,user_dst,keyword
@@ -141,7 +141,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Connection ID,This key captures the Connection ID,connectionid,connection.id,Text,Transient,,,,rsa.misc.connection_id,,17,misc,connection_id,keyword
 1,Investigations,Vendor supplied Event Category,This is a vendor supplied category. This should be used in situations where the vendor has adopted their own event_category taxonomy.,vendor_event_cat,event.vcat,Text,Transient,,,,rsa.investigations.event_vcat,,17,investigations,event_vcat,keyword
 1,Miscellaneous,Packets Total,"This key is the total number of packets sent/received in a session. Also, in cases where the Sent or Received context is not clear, this can be used.",packets,packets,UInt32,Transient,(null)|-,,,network.packets,,17,misc,packets,long
-1,,Parent Pid,"Deprecated, use process.id.src",parent_pid,parent.pid,Int32,Transient,,parent.pid.val,parent_pid_val,process.ppid,,17,misc,parent_pid,long
+1,,Parent Pid,"Deprecated, use process.id.src",parent_pid,parent.pid,Int32,Transient,,parent.pid.val,parent_pid_val,process.parent.pid,,17,misc,parent_pid,long
 1,Identity,User Profile,This key is used to capture the user profile,profile,profile,Text,Transient,,,,rsa.identity.profile,,17,identity,profile,keyword
 1,Miscellaneous,Reference Id2,"This key is for the 2nd Linked ID. Can be either linked to ""reference.id"" or ""reference.id1"" value but should not be used unless the other two variables are in play.",id2,reference.id2,Text,Transient,,,,rsa.misc.reference_id2,,17,misc,reference_id2,keyword
 1,Miscellaneous,Sensor Name,This key captures Name of the sensor. Typically used in IDS/IPS based devices,sensor,sensor,Text,Transient,,,,rsa.misc.sensor,,17,misc,sensor,keyword
@@ -234,7 +234,7 @@ revision,Meta Class,Meta Concept,Meta Description,envisionName,nwName,format,fla
 1,Miscellaneous,Observed Value,This key captures the Value observed (from the perspective of the device generating the log).,observed_val,observed.val,Text,Transient,,,,rsa.misc.observed_val,,6,misc,observed_val,keyword
 1,Miscellaneous,Policy Contents,This key captures the contents of the policy. This contains details about the policy,policy_value,policy.value,Text,Transient,,,,rsa.misc.policy_value,,6,misc,policy_value,keyword
 1,Miscellaneous,Pool Name,This key captures the name of a resource pool,pool_name,pool.name,Text,Transient,,,,rsa.misc.pool_name,,6,misc,pool_name,keyword
-1,Miscellaneous,Source Process ID,"This key is used to capture the Source Process ID, in case of parent child relationship, this can be used for parent process id context",process_id_src,process.id.src,Int64,Transient,(null)|-,process.src,process_src,process.ppid,,6,misc,process_id_src,long
+1,Miscellaneous,Source Process ID,"This key is used to capture the Source Process ID, in case of parent child relationship, this can be used for parent process id context",process_id_src,process.id.src,Int64,Transient,(null)|-,process.src,process_src,process.parent.pid,,6,misc,process_id_src,long
 1,Miscellaneous,Rule Template,A default set of parameters which are overlayed onto a rule (or rulename) which efffectively constitutes a template,rule_template,rule.template,Text,Transient,,,,rsa.misc.rule_template,,6,misc,rule_template,keyword
 1,,,,count,,,,,,,rsa.misc.count,,6,misc,count,keyword
 1,,,,number,,,,,,,rsa.misc.number,,6,misc,number,keyword

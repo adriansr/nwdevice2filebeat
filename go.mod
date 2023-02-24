@@ -7,6 +7,6 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.2.2
-	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
+	golang.org/x/net v0.7.0
 	gopkg.in/yaml.v2 v2.2.2
 )
